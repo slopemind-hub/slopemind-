@@ -1902,8 +1902,8 @@ function exportPDF() {
     ['ESTABLE',  'FS >= 1.5',       'EC7 / AusIMM',  'Cumple minimo. Monitorizacion periodica'],
   ];
   const colores = [rojo, naranja, amarillo, verde];
-  const colW = [(W-margin*2)*0.14, (W-margin*2)*0.18, (W-margin*2)*0.18, (W-margin*2)*0.5];
-  const colX = [margin, margin+colW[0], margin+colW[0]+colW[1], margin+colW[0]+colW[1]+colW[2]];
+const colW = [(W-margin*2)*0.16, (W-margin*2)*0.20, (W-margin*2)*0.20, (W-margin*2)*0.44];
+const colX = [margin, margin+colW[0], margin+colW[0]+colW[1], margin+colW[0]+colW[1]+colW[2]];
 
   // cabecera tabla
   ['ESTADO','INTERVALO','NORMATIVA','ACCIÓN'].forEach((h,i)=>{
@@ -1915,6 +1915,11 @@ function exportPDF() {
   y += 3;
 
   tabla.forEach((row, ri) => {
+    // fondo alternado
+    if (ri % 2 === 0) {
+      doc.setFillColor(250, 249, 246);
+      doc.rect(margin, y-3, W-margin*2, 7, 'F');
+    }
     row.forEach((cell, ci) => {
       if (ci === 0) {
         doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(...colores[ri]);
@@ -1923,11 +1928,8 @@ function exportPDF() {
       }
       doc.text(cell, colX[ci]+2, y);
     });
-    y += 5;
-    doc.setDrawColor(...gris3); doc.line(margin, y-1, W-margin, y-1);
+    y += 7;
   });
-
-  y += 6;
 
   // ── RECOMENDACIÓN ──
   doc.setFillColor(245, 242, 235);
