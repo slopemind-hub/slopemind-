@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SLOPEMIND v2.0 – Stability & Risk Engine</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
   --bg:       #080b0d;
@@ -47,7 +48,7 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 0 32px;
-  height: 56px;
+  height: 64px;
   background: var(--surf1);
   border-bottom: 1px solid var(--border);
   z-index: 200;
@@ -662,6 +663,9 @@ canvas.sens-big {
       <div class="mbadge active" id="btn-infinite" onclick="setMethod('infinite')">Talud Infinito</div>
       <div class="mbadge" id="btn-bishop" onclick="setMethod('bishop')">Bishop</div>
     </div>
+    <button onclick="exportPDF()" style="font-family:var(--fm);font-size:0.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:2px;border:1px solid var(--accent);color:var(--accent);background:rgba(232,200,66,0.08);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(232,200,66,0.18)'" onmouseout="this.style.background='rgba(232,200,66,0.08)'">
+  ⬇ Exportar PDF
+</button>
     <div style="display:flex;align-items:center;gap:6px;">
       <div class="pulse-dot"></div>
       <span style="font-family:var(--fm);font-size:0.55rem;color:var(--text3);">ORIOL DEVESA · 2026</span>
@@ -1677,7 +1681,288 @@ function toggleSeismic() {
   strip.className = 'fs-strip ' + (seismicOn ? 'cols-4' : 'cols-3');
   update();
 }
+// ═══════════════════════════════════════════════════════
+//  EXPORT PDF
+// ═══════════════════════════════════════════════════════
+function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, H = 297;
+  const margin = 18;
 
+  // Colores
+  const negro   = [28, 25, 23];
+  const gris1   = [68, 64, 60];
+  const gris2   = [120, 113, 108];
+  const gris3   = [214, 211, 205];
+  const accent  = [184, 154, 48];
+  const rojo    = [192, 57, 43];
+  const naranja = [192, 98, 11];
+  const amarillo= [138, 112, 0];
+  const verde   = [45, 125, 90];
+
+  function fsColor(fs) {
+    if (fs < 1.0) return rojo;
+    if (fs < 1.3) return naranja;
+    if (fs < 1.5) return amarillo;
+    return verde;
+  }
+  function getState(fs) {
+    if (fs < 1.0) return 'FALLA';
+    if (fs < 1.3) return 'CRÍTICO';
+    if (fs < 1.5) return 'MARGINAL';
+    return 'ESTABLE';
+  }
+
+  // Leer valores actuales
+  const H_v     = gv('H'),    beta_v = gv('beta'), c_v   = gv('c');
+  const phi_v   = gv('phi'),  gam_v  = gv('gamma'),nf_v  = gv('nf');
+  const R_v     = gv('R'),    cx_v   = gv('cx'),   cy_v  = gv('cy');
+  const ndov_v  = gv('ndov'), dc_v   = gv('dc'),   dphi_v= gv('dphi');
+  const kh_v    = seismicOn ? gv('kh') : 0;
+  const c_c     = c_v*(1-dc_v/100);
+  const p_c     = phi_v - dphi_v;
+  const fs_det  = calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,nf_v);
+  const fs_cons = calcFS_inf(H_v,beta_v,c_c,p_c,gam_v,nf_v);
+  const fs_sat  = calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,100);
+  const fs_seis = calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,nf_v,kh_v);
+  const bishop  = calcBishop(H_v,beta_v,c_v,phi_v,gam_v,nf_v,R_v,cx_v,cy_v,ndov_v);
+  const fs_bish = bishop.fs || 0;
+  const crPhi   = findCritPhi(H_v,beta_v,c_v,gam_v,nf_v);
+  const crC     = findCritC(H_v,beta_v,phi_v,gam_v,nf_v);
+  const crBeta  = findCritBeta(H_v,c_v,phi_v,gam_v,nf_v);
+  const crNF    = findCritNF(H_v,beta_v,c_v,phi_v,gam_v);
+  const fecha   = new Date().toLocaleDateString('es-ES',{year:'numeric',month:'long',day:'numeric'});
+
+  let y = 0;
+
+  // ── CABECERA ──
+  doc.setFillColor(...accent);
+  doc.rect(0, 0, W, 22, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.setTextColor(255,255,255);
+  doc.text('SLOPEMIND', margin, 14);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7);
+  doc.setTextColor(255,255,255);
+  doc.text('STABILITY & RISK ENGINE — MINING SLOPES', margin + 48, 14);
+  doc.setFontSize(7);
+  doc.text('v2.0', W - margin, 14, { align: 'right' });
+
+  // ── LÍNEA SUBTÍTULO ──
+  doc.setFillColor(245, 242, 235);
+  doc.rect(0, 22, W, 10, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...negro);
+  doc.text('INFORME DE ESTABILIDAD DE TALUD', margin, 29);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7);
+  doc.setTextColor(...gris2);
+  doc.text(`Generado: ${fecha}`, W - margin, 29, { align: 'right' });
+
+  y = 40;
+
+  // ── SECCIÓN: PARÁMETROS ──
+  doc.setFillColor(245, 242, 235);
+  doc.rect(margin, y, W - margin*2, 7, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...accent);
+  doc.text('PARÁMETROS DE ENTRADA', margin + 3, y + 4.8);
+  y += 10;
+
+  const params = [
+    ['Altura H', `${H_v} m`,          'Cohesión c\'', `${c_v} kPa`,       'Radio R', `${R_v} m`],
+    ['Angulo beta', `${beta_v}°`,      'Friccion phi', `${phi_v}°`,        'Centro X', `${cx_v.toFixed(2)}xL`],
+    ['Nivel freatico', `${nf_v}%`,     'Peso esp. y',  `${gam_v} kN/m3`,  'Centro Y', `${cy_v.toFixed(2)}xH`],
+    ['Dc incert.', `${dc_v}%`,         'Dphi incert.', `${dphi_v}°`,       'Dovelas', `${ndov_v}`],
+  ];
+
+  doc.setFontSize(7.5);
+  params.forEach(row => {
+    const cols = [margin, margin+42, margin+84, margin+126, margin+158, margin+178];
+    row.forEach((cell, i) => {
+      if (i % 2 === 0) {
+        doc.setFont('helvetica','normal');
+        doc.setTextColor(...gris1);
+      } else {
+        doc.setFont('helvetica','bold');
+        doc.setTextColor(...negro);
+      }
+      doc.text(cell, cols[i], y);
+    });
+    y += 6;
+  });
+
+  if (seismicOn) {
+    doc.setFont('helvetica','normal'); doc.setTextColor(...gris1);
+    doc.text('Coef. sísmico kh', margin, y);
+    doc.setFont('helvetica','bold'); doc.setTextColor(...negro);
+    doc.text(`${kh_v.toFixed(2)}`, margin+42, y);
+    y += 6;
+  }
+
+  y += 4;
+
+  // ── SECCIÓN: FACTORES DE SEGURIDAD ──
+  doc.setFillColor(245, 242, 235);
+  doc.rect(margin, y, W - margin*2, 7, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...accent);
+  doc.text('FACTORES DE SEGURIDAD', margin + 3, y + 4.8);
+  y += 10;
+
+  const fsCards = [
+    { label: 'FS DETERMINISTA',        fs: fs_det,  method: 'Talud Infinito · Mohr-Coulomb' },
+    { label: 'FS CONSERVADOR',         fs: fs_cons, method: `c'·(1-${dc_v}%) · φ'-${dphi_v}°` },
+    { label: 'FS BISHOP SIMPLIFICADO', fs: fs_bish, method: 'Sup. circular · iteración convergente' },
+    { label: 'FS SATURADO',            fs: fs_sat,  method: 'NF=100% · peor caso' },
+  ];
+
+  const cardW = (W - margin*2 - 12) / 4;
+  fsCards.forEach((card, i) => {
+    const cx2 = margin + i * (cardW + 4);
+    const col = fsColor(card.fs);
+    // fondo
+    doc.setFillColor(250, 249, 246);
+    doc.setDrawColor(...gris3);
+    doc.roundedRect(cx2, y, cardW, 22, 2, 2, 'FD');
+    // borde izquierdo color
+    doc.setFillColor(...col);
+    doc.rect(cx2, y, 2, 22, 'F');
+    // label
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(5.5);
+    doc.setTextColor(...gris2);
+    doc.text(card.label, cx2+5, y+5);
+    // valor
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(14);
+    doc.setTextColor(...col);
+    doc.text(card.fs > 90 ? '∞' : card.fs.toFixed(3), cx2+5, y+14);
+    // estado
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(6);
+    doc.setTextColor(...col);
+    doc.text(getState(card.fs), cx2+5, y+19);
+    // método
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(5);
+    doc.setTextColor(...gris2);
+    // no cabe method en tarjeta pequeña
+  });
+  y += 28;
+
+  // ── SECCIÓN: VALORES CRÍTICOS ──
+  doc.setFillColor(245, 242, 235);
+  doc.rect(margin, y, W - margin*2, 7, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...accent);
+  doc.text('VALORES CRÍTICOS (FS = 1.0)', margin + 3, y + 4.8);
+  y += 10;
+
+  const crits = [
+    { label: 'phi CRITICO',  val: crPhi  !== null ? `${crPhi.toFixed(1)}°`  : '—', sub: 'angulo min. estabilidad' },
+    { label: 'c CRITICA',    val: `${crC.toFixed(1)} kPa`,                         sub: 'cohesion min. FS=1' },
+    { label: 'beta CRITICO', val: crBeta !== null ? `${crBeta.toFixed(1)}°` : '>80°', sub: 'angulo max. corte' },
+    { label: 'NF CRITICO',   val: crNF   !== null ? `${crNF}%`              : '>100%', sub: 'nivel freatico limite' },
+  ];
+
+  crits.forEach((cr, i) => {
+    const cx2 = margin + i * (cardW + 4);
+    doc.setFillColor(253, 248, 231);
+    doc.setDrawColor(...gris3);
+    doc.roundedRect(cx2, y, cardW, 18, 2, 2, 'FD');
+    doc.setFont('helvetica','normal'); doc.setFontSize(5.5); doc.setTextColor(...gris2);
+    doc.text(cr.label, cx2+4, y+5);
+    doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...accent);
+    doc.text(cr.val, cx2+4, y+13);
+    doc.setFont('helvetica','normal'); doc.setFontSize(5); doc.setTextColor(...gris2);
+    doc.text(cr.sub, cx2+4, y+17);
+  });
+  y += 24;
+
+  // ── SECCIÓN: CLASIFICACIÓN EC7 ──
+  doc.setFillColor(245, 242, 235);
+  doc.rect(margin, y, W - margin*2, 7, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...accent);
+  doc.text('CLASIFICACIÓN EUROCODE 7 / ISRM', margin + 3, y + 4.8);
+  y += 10;
+
+  const tabla = [
+    ['FALLA',    'FS < 1.0',        'EC7 GEO ULS',   'Evacuacion inmediata'],
+    ['CRITICO',  '1.0 <= FS < 1.3', 'ISRM / EC7',    'Analisis urgente + medidas correctoras'],
+    ['MARGINAL', '1.3 <= FS < 1.5', 'ISRM temporal', 'Monitorizacion activa + drenaje'],
+    ['ESTABLE',  'FS >= 1.5',       'EC7 / AusIMM',  'Cumple minimo. Monitorizacion periodica'],
+  ];
+  const colores = [rojo, naranja, amarillo, verde];
+  const colW = [(W-margin*2)*0.14, (W-margin*2)*0.18, (W-margin*2)*0.18, (W-margin*2)*0.5];
+  const colX = [margin, margin+colW[0], margin+colW[0]+colW[1], margin+colW[0]+colW[1]+colW[2]];
+
+  // cabecera tabla
+  ['ESTADO','INTERVALO','NORMATIVA','ACCIÓN'].forEach((h,i)=>{
+    doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...gris2);
+    doc.text(h, colX[i]+2, y);
+  });
+  y += 3;
+  doc.setDrawColor(...gris3); doc.line(margin, y, W-margin, y);
+  y += 3;
+
+  tabla.forEach((row, ri) => {
+    row.forEach((cell, ci) => {
+      if (ci === 0) {
+        doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(...colores[ri]);
+      } else {
+        doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(...negro);
+      }
+      doc.text(cell, colX[ci]+2, y);
+    });
+    y += 5;
+    doc.setDrawColor(...gris3); doc.line(margin, y-1, W-margin, y-1);
+  });
+
+  y += 6;
+
+  // ── RECOMENDACIÓN ──
+  doc.setFillColor(245, 242, 235);
+  doc.rect(margin, y, W - margin*2, 7, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
+  doc.text('RECOMENDACIÓN AUTOMÁTICA (EC7 / ISRM)', margin + 3, y + 4.8);
+  y += 10;
+
+  const rec = getRecommendation(fs_det, fs_cons, fs_bish)
+    .replace('✓','OK')
+    .replace('△','!')
+    .replace('⚠','AVISO')
+    .replace('⛔','FALLA');
+  doc.setFillColor(250,249,246);
+  doc.setDrawColor(...gris3);
+  doc.roundedRect(margin, y, W-margin*2, 16, 2, 2, 'FD');
+  doc.setFillColor(...fsColor(Math.min(fs_det,fs_cons,fs_bish)));
+  doc.rect(margin, y, 2.5, 16, 'F');
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...negro);
+  const recLines = doc.splitTextToSize(rec, W-margin*2-10);
+  doc.text(recLines, margin+6, y+6);
+  y += 22;
+
+  // ── FOOTER ──
+  doc.setFillColor(...accent);
+  doc.rect(0, H-14, W, 14, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
+  doc.text('SLOPEMIND v2.0', margin, H-6);
+  doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+  doc.text('Stability & Risk Engine — Mining Slopes', margin+38, H-6);
+  doc.setFontSize(6.5);
+  doc.text('Das 9ª ed. · Bishop 1955 · Seed & Goodman 1964 · Eurocode 7', W-margin, H-6, { align:'right' });
+
+  doc.save(`SLOPEMIND_informe_${fecha.replace(/ /g,'_')}.pdf`);
+}
 // ═══════════════════════════════════════════════════════
 //  EVENTS
 // ═══════════════════════════════════════════════════════
