@@ -1939,19 +1939,24 @@ const colX = [margin, margin+colW[0], margin+colW[0]+colW[1], margin+colW[0]+col
   y += 10;
 
   const rec = getRecommendation(fs_det, fs_cons, fs_bish)
-    .replace('✓','OK')
-    .replace('△','!')
-    .replace('⚠','AVISO')
-    .replace('⛔','FALLA');
+    .replace('✓','')
+    .replace('△','')
+    .replace('⚠','AVISO:')
+    .replace('⛔','FALLA:')
+    .replace(/FS ≥/g,'FS >=')
+    .replace(/FS </g,'FS <')
+    .replace(/≤/g,'<=')
+    .replace(/\u2265/g,'>=')
+    .replace(/\u2264/g,'<=');
   doc.setFillColor(250,249,246);
   doc.setDrawColor(...gris3);
-  doc.roundedRect(margin, y, W-margin*2, 16, 2, 2, 'FD');
+  doc.roundedRect(margin, y, W-margin*2, 24, 2, 2, 'FD');
   doc.setFillColor(...fsColor(Math.min(fs_det,fs_cons,fs_bish)));
   doc.rect(margin, y, 2.5, 16, 'F');
   doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...negro);
   const recLines = doc.splitTextToSize(rec, W-margin*2-10);
   doc.text(recLines, margin+6, y+6);
-  y += 22;
+  y += 30;
 
   // ── FOOTER ──
   doc.setFillColor(...accent);
