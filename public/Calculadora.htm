@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLOPEMIND v2.0 – Stability & Risk Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080b0d;
+  --surf1:    #0f1419;
+  --surf2:    #141c24;
+  --surf3:    #1a2430;
+  --border:   #222d38;
+  --border2:  #2e3d4e;
+  --accent:   #e8c842;
+  --accent2:  #4ef0c0;
+  --accent3:  #4a8fff;
+  --danger:   #ff4455;
+  --warn:     #ff8c00;
+  --marg:     #f5c400;
+  --safe:     #4ef0c0;
+  --text:     #dde3ea;
+  --text2:    #8a97a6;
+  --text3:    #4a5968;
+  --fd: 'Bebas Neue', sans-serif;
+  --fm: 'DM Mono', monospace;
+  --fb: 'DM Sans', sans-serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body { height:100%; overflow:hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--fb);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 56px;
+  background: var(--surf1);
+  border-bottom: 1px solid var(--border);
+  z-index: 200;
+}
+
+.logo-wrap { display:flex; align-items:baseline; gap:10px; }
+.logo-name {
+  font-family: var(--fd);
+  font-size: 1.7rem;
+  letter-spacing: 4px;
+  color: var(--accent);
+  line-height: 1;
+}
+.logo-ver {
+  font-family: var(--fm);
+  font-size: 0.58rem;
+  color: var(--text3);
+  letter-spacing: 2px;
+}
+.logo-tag {
+  font-family: var(--fm);
+  font-size: 0.55rem;
+  color: var(--text3);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.header-right { display:flex; align-items:center; gap:20px; }
+.method-badge {
+  display: flex;
+  gap: 6px;
+}
+.mbadge {
+  font-family: var(--fm);
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+.mbadge.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(232,200,66,0.08);
+}
+.pulse-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent2);
+  animation: pulse 2.2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
+/* ── MAIN LAYOUT ── */
+.app-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  overflow: hidden;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  background: var(--surf1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.left-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+
+.sec-hd {
+  font-family: var(--fm);
+  font-size: 0.55rem;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+  margin-top: 14px;
+}
+.sec-hd:first-child { margin-top: 2px; }
+
+.inp-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+.inp-label {
+  font-size: 0.75rem;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+}
+.inp-label em {
+  display: block;
+  font-style: normal;
+  font-family: var(--fm);
+  font-size: 0.55rem;
+  color: var(--text3);
+  margin-top: 1px;
+}
+.slider-col { flex: 1.1; min-width: 0; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;        /* ← añade esta línea */
+  width: 100%;
+  height: 2px;
+  background: var(--border2);
+  border-radius: 1px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;        /* ← y esta */
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.4);
+  box-shadow: 0 0 8px rgba(232,200,66,0.5);
+}
+
+.sval {
+  font-family: var(--fm);
+  font-size: 0.65rem;
+  color: var(--accent);
+  text-align: right;
+  min-width: 52px;
+}
+
+/* seismic toggle */
+.seismic-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.toggle-track {
+  width: 30px; height: 16px;
+  border-radius: 8px;
+  background: var(--border2);
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-track.on { background: var(--accent); }
+.toggle-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 2px; left: 2px;
+  transition: left 0.2s;
+}
+.toggle-track.on .toggle-thumb { left: 16px; }
+.toggle-label {
+  font-family: var(--fm);
+  font-size: 0.6rem;
+  color: var(--text2);
+  letter-spacing: 1px;
+}
+
+.seismic-row { display:none; }
+.seismic-row.visible { display:flex; }
+
+/* legend */
+.legend {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.leg-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 6px;
+}
+.leg-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.leg-text {
+  font-family: var(--fm);
+  font-size: 0.6rem;
+  color: var(--text2);
+}
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ── FS STRIP ── */
+.fs-strip {
+  flex-shrink: 0;
+  display: grid;
+  border-bottom: 1px solid var(--border);
+  background: var(--surf1);
+}
+.fs-strip.cols-4 { grid-template-columns: repeat(4,1fr); }
+.fs-strip.cols-3 { grid-template-columns: repeat(3,1fr); }
+
+.fs-card {
+  padding: 16px 20px;
+  border-right: 1px solid var(--border);
+  transition: background 0.35s;
+  position: relative;
+  overflow: hidden;
+}
+.fs-card:last-child { border-right: none; }
+.fs-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.3;
+  transition: opacity 0.3s;
+}
+
+.fsc-label {
+  font-family: var(--fm);
+  font-size: 0.52rem;
+  letter-spacing: 2px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.fsc-val {
+  font-family: var(--fd);
+  font-size: 2.6rem;
+  letter-spacing: 2px;
+  line-height: 1;
+  transition: color 0.3s;
+}
+.fsc-state {
+  font-family: var(--fm);
+  font-size: 0.58rem;
+  letter-spacing: 2px;
+  margin-top: 4px;
+  transition: color 0.3s;
+}
+
+/* ── TABS ── */
+.tab-bar {
+  flex-shrink: 0;
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--surf1);
+  padding: 0 20px;
+}
+.tab {
+  font-family: var(--fm);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--text2); }
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ── TAB CONTENT ── */
+.tab-content { flex:1; overflow: hidden; position: relative; }
+.tab-pane {
+  position: absolute; inset: 0;
+  display: none;
+  overflow: hidden;
+}
+.tab-pane.active { display: flex; }
+
+/* TAB: VISUAL */
+#tab-visual {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+}
+#tab-visual.active { display: flex; }
+
+.visual-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  overflow: hidden;
+}
+
+.canvas-wrap {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+.canvas-label {
+  font-family: var(--fm);
+  font-size: 0.52rem;
+  letter-spacing: 3px;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+#slopeCanvas {
+  flex: 1;
+  width: 100%;
+  border-radius: 4px;
+  background: #090d12;
+  border: 1px solid var(--border);
+  min-height: 0;
+}
+.canvas-info {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-family: var(--fm);
+  font-size: 0.55rem;
+  color: var(--text3);
+}
+.canvas-info span { color: var(--accent); }
+
+.sens-panel {
+  border-left: 1px solid var(--border);
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--surf1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.sens-lbl {
+  font-family: var(--fm);
+  font-size: 0.52rem;
+  letter-spacing: 2px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.sens-canvas-wrap { position: relative; }
+canvas.sc {
+  width: 100%;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  background: #090d12;
+  display: block;
+}
+
+/* TAB: BISHOP */
+#tab-bishop {
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+#tab-bishop.active { display: flex; }
+
+.bishop-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  overflow: hidden;
+}
+.bishop-main {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+.bishop-canvas-wrap {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+#bishopCanvas {
+  width: 100%; height: 100%;
+  border-radius: 4px;
+  background: #090d12;
+  border: 1px solid var(--border);
+}
+.bishop-info {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  font-family: var(--fm); font-size: 0.55rem; color: var(--text3);
+}
+.bishop-info span { color: var(--accent); }
+
+.bishop-side {
+  border-left: 1px solid var(--border);
+  padding: 16px;
+  overflow-y: auto;
+  background: var(--surf1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.bishop-params {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.bp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.bp-lbl { font-size: 0.75rem; color: var(--text); }
+.bp-lbl em {
+  display: block; font-style: normal;
+  font-family: var(--fm); font-size: 0.55rem; color: var(--text3);
+}
+.bp-val {
+  font-family: var(--fm); font-size: 0.75rem;
+  color: var(--accent); min-width: 70px; text-align: right;
+}
+
+.iter-bar {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--surf2);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+.iter-title {
+  font-family: var(--fm); font-size: 0.55rem;
+  letter-spacing: 2px; color: var(--text3);
+  text-transform: uppercase; margin-bottom: 10px;
+}
+.iter-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.iter-label { font-family: var(--fm); font-size: 0.6rem; color: var(--text2); }
+.iter-val { font-family: var(--fm); font-size: 0.65rem; color: var(--accent2); }
+
+/* TAB: SENSITIVITY */
+#tab-sens {
+  display: none;
+  padding: 16px;
+  overflow-y: auto;
+  gap: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+#tab-sens.active { display: flex; flex-direction: column; }
+
+.sens-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.sens-card {
+  background: var(--surf1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px;
+}
+.sens-card-title {
+  font-family: var(--fm); font-size: 0.55rem;
+  letter-spacing: 2px; color: var(--accent);
+  text-transform: uppercase; margin-bottom: 10px;
+}
+canvas.sens-big {
+  width: 100%; border-radius: 3px;
+  background: #090d12; border: 1px solid var(--border);
+  display: block;
+}
+
+/* TAB: RESULTS */
+#tab-results {
+  display: none;
+  padding: 16px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+#tab-results.active { display: block; }
+
+.res-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.res-card {
+  background: var(--surf1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.res-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: currentColor;
+}
+.res-card-lbl {
+  font-family: var(--fm); font-size: 0.52rem;
+  letter-spacing: 2px; color: var(--text3);
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.res-card-val {
+  font-family: var(--fd); font-size: 2.2rem;
+  letter-spacing: 1px; line-height: 1;
+}
+.res-card-state {
+  font-family: var(--fm); font-size: 0.6rem;
+  letter-spacing: 1.5px; margin-top: 5px;
+}
+.res-card-method {
+  font-family: var(--fm); font-size: 0.55rem;
+  color: var(--text3); margin-top: 3px;
+}
+
+.crit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.crit-card {
+  background: var(--surf2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 14px;
+}
+.crit-card-lbl {
+  font-family: var(--fm); font-size: 0.52rem;
+  letter-spacing: 2px; color: var(--text3);
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.crit-card-val {
+  font-family: var(--fd); font-size: 1.5rem;
+  color: var(--accent); letter-spacing: 1px; line-height: 1;
+}
+.crit-card-sub {
+  font-family: var(--fm); font-size: 0.52rem;
+  color: var(--text3); margin-top: 4px;
+}
+
+.rec-box {
+  background: var(--surf1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 16px;
+}
+.rec-box-lbl {
+  font-family: var(--fm); font-size: 0.52rem;
+  letter-spacing: 2px; color: var(--accent);
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.rec-box-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ── COLOR STATES ── */
+.s-fail  { color: var(--danger); }
+.s-crit  { color: var(--warn); }
+.s-marg  { color: var(--marg); }
+.s-safe  { color: var(--safe); }
+.bg-fail { background: rgba(255,68,85,0.05); }
+.bg-crit { background: rgba(255,140,0,0.05); }
+.bg-marg { background: rgba(245,196,0,0.05); }
+.bg-safe { background: rgba(78,240,192,0.05); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-wrap">
+    <div>
+      <div class="logo-name">SLOPEMIND</div>
+      <div class="logo-tag">STABILITY &amp; RISK ENGINE — MINING SLOPES</div>
+    </div>
+    <div class="logo-ver">v2.0</div>
+  </div>
+  <div class="header-right">
+    <div class="method-badge">
+      <div class="mbadge active" id="btn-infinite" onclick="setMethod('infinite')">Talud Infinito</div>
+      <div class="mbadge" id="btn-bishop" onclick="setMethod('bishop')">Bishop</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <div class="pulse-dot"></div>
+      <span style="font-family:var(--fm);font-size:0.55rem;color:var(--text3);">ORIOL DEVESA · 2026</span>
+    </div>
+  </div>
+</header>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="left-scroll">
+
+      <div class="sec-hd">GEOMETRÍA</div>
+      <div class="inp-row">
+        <div class="inp-label">Altura (H) <em>metros</em></div>
+        <div class="slider-col"><input type="range" id="H" min="5" max="100" value="20" step="1"></div>
+        <div class="sval" id="H_v">20 m</div>
+      </div>
+      <div class="inp-row">
+        <div class="inp-label">Ángulo talud (β) <em>grados</em></div>
+        <div class="slider-col"><input type="range" id="beta" min="10" max="80" value="45" step="1"></div>
+        <div class="sval" id="beta_v">45°</div>
+      </div>
+
+      <div class="sec-hd">PROPIEDADES GEOTÉCNICAS</div>
+      <div class="inp-row">
+        <div class="inp-label">Cohesión c' <em>kPa</em></div>
+        <div class="slider-col"><input type="range" id="c" min="0" max="200" value="25" step="1"></div>
+        <div class="sval" id="c_v">25 kPa</div>
+      </div>
+      <div class="inp-row">
+        <div class="inp-label">Fricción φ' <em>grados</em></div>
+        <div class="slider-col"><input type="range" id="phi" min="5" max="50" value="30" step="1"></div>
+        <div class="sval" id="phi_v">30°</div>
+      </div>
+      <div class="inp-row">
+        <div class="inp-label">Peso esp. γ <em>kN/m³</em></div>
+        <div class="slider-col"><input type="range" id="gamma" min="10" max="30" value="18" step="0.5"></div>
+        <div class="sval" id="gamma_v">18 kN/m³</div>
+      </div>
+
+      <div class="sec-hd">HIDROGEOLOGÍA</div>
+      <div class="inp-row">
+        <div class="inp-label">Nivel freático <em>% de H saturado</em></div>
+        <div class="slider-col"><input type="range" id="nf" min="0" max="100" value="0" step="5"></div>
+        <div class="sval" id="nf_v">0%</div>
+      </div>
+
+      <div class="sec-hd">BISHOP — SUPERFICIE CIRCULAR</div>
+      <div class="inp-row">
+        <div class="inp-label">Radio (R) <em>metros</em></div>
+        <div class="slider-col"><input type="range" id="R" min="10" max="150" value="40" step="1"></div>
+        <div class="sval" id="R_v">40 m</div>
+      </div>
+      <div class="inp-row">
+        <div class="inp-label">Centro X <em>fracción de base</em></div>
+        <div class="slider-col"><input type="range" id="cx" min="0.1" max="0.9" value="0.5" step="0.01"></div>
+        <div class="sval" id="cx_v">0.50</div>
+      </div>
+      <div class="inp-row">
+        <div class="inp-label">Centro Y <em>sobre cima (×H)</em></div>
+        <div class="slider-col"><input type="range" id="cy" min="0.5" max="3.0" value="1.2" step="0.05"></div>
+        <div class="sval" id="cy_v">1.20</div>
+      </div>
+      <div class="inp-row">
+        <div class="inp-label">N° dovelas <em>precisión cálculo</em></div>
+        <div class="slider-col"><input type="range" id="ndov" min="5" max="30" value="12" step="1"></div>
+        <div class="sval" id="ndov_v">12</div>
+      </div>
+
+      <div class="sec-hd">INCERTIDUMBRE</div>
+      <div class="inp-row">
+        <div class="inp-label">Δc reducción <em>% para FS conservador</em></div>
+        <div class="slider-col"><input type="range" id="dc" min="0" max="50" value="20" step="1"></div>
+        <div class="sval" id="dc_v">20%</div>
+      </div>
+      <div class="inp-row">
+        <div class="inp-label">Δφ reducción <em>grados</em></div>
+        <div class="slider-col"><input type="range" id="dphi" min="0" max="15" value="5" step="1"></div>
+        <div class="sval" id="dphi_v">5°</div>
+      </div>
+
+      <div class="sec-hd">ANÁLISIS SÍSMICO</div>
+      <div class="seismic-toggle" onclick="toggleSeismic()">
+        <div class="toggle-track" id="seis-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">ACTIVAR PSEUDOESTÁTICO</div>
+      </div>
+      <div class="inp-row seismic-row" id="kh-row">
+        <div class="inp-label">Coef. sísmico k<sub>h</sub> <em>fracción de g</em></div>
+        <div class="slider-col"><input type="range" id="kh" min="0" max="0.4" value="0.1" step="0.01"></div>
+        <div class="sval" id="kh_v">0.10</div>
+      </div>
+
+      <!-- LEGEND -->
+      <div class="legend">
+        <div class="sec-hd" style="margin-top:0">LEYENDA FS</div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--danger)"></div><div class="leg-text">FS &lt; 1.0 — FALLA</div></div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--warn)"></div><div class="leg-text">1.0 – 1.3 — CRÍTICO</div></div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--marg)"></div><div class="leg-text">1.3 – 1.5 — MARGINAL</div></div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--safe)"></div><div class="leg-text">&gt; 1.5 — ESTABLE (EC7)</div></div>
+      </div>
+
+    </div>
+  </div><!-- end left panel -->
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- FS STRIP -->
+    <div class="fs-strip" id="fs-strip">
+      <div class="fs-card" id="card-det">
+        <div class="fsc-label">FS INFINITO — DET.</div>
+        <div class="fsc-val" id="fs-det">—</div>
+        <div class="fsc-state" id="st-det">—</div>
+      </div>
+      <div class="fs-card" id="card-cons">
+        <div class="fsc-label">FS INFINITO — CONS.</div>
+        <div class="fsc-val" id="fs-cons">—</div>
+        <div class="fsc-state" id="st-cons">con incertidumbre</div>
+      </div>
+      <div class="fs-card" id="card-bish">
+        <div class="fsc-label">FS BISHOP SIMP.</div>
+        <div class="fsc-val" id="fs-bish">—</div>
+        <div class="fsc-state" id="st-bish">sup. circular</div>
+      </div>
+      <div class="fs-card" id="card-seis" style="display:none">
+        <div class="fsc-label">FS SÍSMICO</div>
+        <div class="fsc-val" id="fs-seis">—</div>
+        <div class="fsc-state" id="st-seis">pseudoestático</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <div class="tab active" data-tab="visual">VISUALIZACIÓN</div>
+      <div class="tab" data-tab="bishop">BISHOP — DOVELAS</div>
+      <div class="tab" data-tab="sens">SENSIBILIDAD</div>
+      <div class="tab" data-tab="results">RESUMEN</div>
+    </div>
+
+    <!-- TAB CONTENT -->
+    <div class="tab-content">
+
+      <!-- TAB: VISUAL -->
+      <div class="tab-pane active" id="tab-visual">
+        <div class="visual-main">
+          <div class="canvas-wrap">
+            <div class="canvas-label">SECCIÓN TRANSVERSAL — TALUD INFINITO</div>
+            <canvas id="slopeCanvas"></canvas>
+            <div class="canvas-info">
+              H=<span id="i-H">20</span>m &nbsp;
+              β=<span id="i-b">45</span>° &nbsp;
+              c=<span id="i-c">25</span>kPa &nbsp;
+              φ=<span id="i-p">30</span>° &nbsp;
+              γ=<span id="i-g">18</span>kN/m³ &nbsp;
+              NF=<span id="i-n">0</span>%
+            </div>
+          </div>
+          <div class="sens-panel">
+            <div>
+              <div class="sens-lbl">FS vs β (°)</div>
+              <canvas class="sc" id="ch-beta" height="90"></canvas>
+            </div>
+            <div>
+              <div class="sens-lbl">FS vs φ (°)</div>
+              <canvas class="sc" id="ch-phi" height="90"></canvas>
+            </div>
+            <div>
+              <div class="sens-lbl">FS vs NF (%)</div>
+              <canvas class="sc" id="ch-nf" height="90"></canvas>
+            </div>
+            <div>
+              <div class="sens-lbl">FS vs c (kPa)</div>
+              <canvas class="sc" id="ch-c" height="90"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: BISHOP -->
+      <div class="tab-pane" id="tab-bishop">
+        <div class="bishop-layout">
+          <div class="bishop-main">
+            <div class="canvas-label">MÉTODO BISHOP SIMPLIFICADO — SUPERFICIES CIRCULARES</div>
+            <div class="bishop-canvas-wrap">
+              <canvas id="bishopCanvas"></canvas>
+            </div>
+            <div class="bishop-info">
+              R=<span id="b-R">40</span>m &nbsp;
+              Centro (<span id="b-cx">0.50</span>·L, <span id="b-cy">1.20</span>·H) &nbsp;
+              Dovelas=<span id="b-nd">12</span> &nbsp;
+              Iter=<span id="b-it">—</span>
+            </div>
+          </div>
+          <div class="bishop-side">
+            <div class="sec-hd" style="margin-top:0">PARÁMETROS BISHOP</div>
+            <div class="bishop-params" id="bishop-params-table"></div>
+            <div class="iter-bar">
+              <div class="iter-title">CONVERGENCIA ITERATIVA</div>
+              <div class="iter-row">
+                <div class="iter-label">Iteraciones</div>
+                <div class="iter-val" id="b-iters">—</div>
+              </div>
+              <div class="iter-row">
+                <div class="iter-label">FS previo</div>
+                <div class="iter-val" id="b-fsprev">—</div>
+              </div>
+              <div class="iter-row">
+                <div class="iter-label">FS final</div>
+                <div class="iter-val" id="b-fsfin">—</div>
+              </div>
+              <div class="iter-row">
+                <div class="iter-label">Convergencia</div>
+                <div class="iter-val" id="b-conv">—</div>
+              </div>
+              <div class="iter-row">
+                <div class="iter-label">Masa deslizante</div>
+                <div class="iter-val" id="b-mass">— kN/m</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: SENSITIVITY -->
+      <div class="tab-pane" id="tab-sens">
+        <div class="sens-grid">
+          <div class="sens-card">
+            <div class="sens-card-title">FS vs ÁNGULO β</div>
+            <canvas class="sens-big" id="sg-beta" height="160"></canvas>
+          </div>
+          <div class="sens-card">
+            <div class="sens-card-title">FS vs FRICCIÓN φ</div>
+            <canvas class="sens-big" id="sg-phi" height="160"></canvas>
+          </div>
+          <div class="sens-card">
+            <div class="sens-card-title">FS vs NIVEL FREÁTICO</div>
+            <canvas class="sens-big" id="sg-nf" height="160"></canvas>
+          </div>
+          <div class="sens-card">
+            <div class="sens-card-title">FS vs COHESIÓN c</div>
+            <canvas class="sens-big" id="sg-c" height="160"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: RESULTS -->
+      <div class="tab-pane" id="tab-results">
+        <div class="res-grid">
+          <div class="res-card" id="rcard-det">
+            <div class="res-card-lbl">FS DETERMINISTA</div>
+            <div class="res-card-val" id="rv-det">—</div>
+            <div class="res-card-state" id="rs-det">—</div>
+            <div class="res-card-method">Talud Infinito · Mohr-Coulomb</div>
+          </div>
+          <div class="res-card" id="rcard-cons">
+            <div class="res-card-lbl">FS CONSERVADOR</div>
+            <div class="res-card-val" id="rv-cons">—</div>
+            <div class="res-card-state" id="rs-cons">—</div>
+            <div class="res-card-method">c'·(1–Δc) · φ'–Δφ</div>
+          </div>
+          <div class="res-card" id="rcard-bish">
+            <div class="res-card-lbl">FS BISHOP SIMPLIFICADO</div>
+            <div class="res-card-val" id="rv-bish">—</div>
+            <div class="res-card-state" id="rs-bish">—</div>
+            <div class="res-card-method">Sup. circular · iteración convergente</div>
+          </div>
+          <div class="res-card" id="rcard-sat">
+            <div class="res-card-lbl">FS SATURADO (peor caso)</div>
+            <div class="res-card-val" id="rv-sat">—</div>
+            <div class="res-card-state" id="rs-sat">—</div>
+            <div class="res-card-method">NF = 100% · Talud Infinito</div>
+          </div>
+        </div>
+        <div class="crit-grid">
+          <div class="crit-card">
+            <div class="crit-card-lbl">φ CRÍTICO</div>
+            <div class="crit-card-val" id="cv-phi">—</div>
+            <div class="crit-card-sub">ángulo mín. estabilidad</div>
+          </div>
+          <div class="crit-card">
+            <div class="crit-card-lbl">c CRÍTICA</div>
+            <div class="crit-card-val" id="cv-c">—</div>
+            <div class="crit-card-sub">cohesión mín. FS=1</div>
+          </div>
+          <div class="crit-card">
+            <div class="crit-card-lbl">β CRÍTICO</div>
+            <div class="crit-card-val" id="cv-beta">—</div>
+            <div class="crit-card-sub">ángulo máx. corte</div>
+          </div>
+          <div class="crit-card">
+            <div class="crit-card-lbl">NF CRÍTICO</div>
+            <div class="crit-card-val" id="cv-nf">—</div>
+            <div class="crit-card-sub">nivel freático límite</div>
+          </div>
+        </div>
+        <div class="rec-box">
+          <div class="rec-box-lbl">RECOMENDACIÓN AUTOMÁTICA (EC7)</div>
+          <div class="rec-box-text" id="rec-text">—</div>
+        </div>
+      </div>
+
+    </div><!-- end tab-content -->
+  </div><!-- end right panel -->
+
+</div><!-- end app-body -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+const gw = 9.81;
+let seismicOn = false;
+let activeMethod = 'infinite';
+
+// ═══════════════════════════════════════════════════════
+//  INFINITE SLOPE (Mohr-Coulomb + pore pressure)
+// ═══════════════════════════════════════════════════════
+function calcFS_inf(H, beta_deg, c, phi_deg, gamma, nf_pct, kh=0) {
+  // Fórmula: Talud infinito con presión de poros — Das 9ª ed. / Coduto
+  // Asumiendo γ_sat ≈ γ (único parámetro de entrada)
+  //
+  //  σ'_n = (γ·H − γw·hw) · cos²β      ← presión de poros reduce la normal
+  //  τ    =  γ·H · sinβ·cosβ            ← peso TOTAL impulsa el deslizamiento
+  //  τ_s  =  kh·γ·H · cos²β            ← componente sísmica horizontal (Seed & Goodman)
+  //  FS   = (c' + σ'_n·tan(φ')) / (τ + τ_s)
+  const beta  = beta_deg * Math.PI / 180;
+  const phi   = phi_deg  * Math.PI / 180;
+  const hw    = H * nf_pct / 100;
+  const sigma = (gamma * H - gw * hw) * Math.cos(beta) ** 2;  // efectivo ✓
+  const tau   = gamma * H * Math.sin(beta) * Math.cos(beta);   // total ✓
+  const tau_s = kh * gamma * H * Math.cos(beta) ** 2;          // sísmico ✓
+  if ((tau + tau_s) <= 0) return 999;
+  return Math.max(0, (c + sigma * Math.tan(phi)) / (tau + tau_s));
+}
+
+// ═══════════════════════════════════════════════════════
+//  BISHOP SIMPLIFIED (iterative)
+// ═══════════════════════════════════════════════════════
+function calcBishop(H, beta_deg, c, phi_deg, gamma, nf_pct, R, cx_frac, cy_frac, n_slices) {
+  const beta  = beta_deg * Math.PI / 180;
+  const phi   = phi_deg  * Math.PI / 180;
+  // Build slope geometry: toe at origin, crest at (L, H)
+  const L = H / Math.tan(beta);  // horizontal distance
+  // Circle center
+  const Xc = cx_frac * L;
+  const Yc = cy_frac * H;
+
+  // Find entry and exit points of circle on slope/ground
+  // Slice from x_left to x_right where circle intersects ground surface
+  // Ground: y = 0 for x < 0 or x > L; slope: y = (x - 0)/L * H... simplified
+  // We'll define: bottom surface at y=0, slope face from (0,0) to (L,H), top surface at y=H for x>=L
+
+  function groundY(x) {
+    if (x <= 0) return 0;
+    if (x <= L) return (x / L) * H;
+    return H;
+  }
+
+  // Circle intersects where (x-Xc)^2 + (y-Yc)^2 = R^2
+  // Find leftmost and rightmost x where circle is below ground
+  let x_start = Xc - R;
+  let x_end   = Xc + R;
+  // clamp
+  x_start = Math.max(x_start, -0.5*L);
+  x_end   = Math.min(x_end,    1.8*L);
+
+  const dx = (x_end - x_start) / n_slices;
+  if (dx <= 0) return { fs: null, iters: 0, mass: 0, slices: [] };
+
+  // Build slices
+  const slices = [];
+  for (let i = 0; i < n_slices; i++) {
+    const x1 = x_start + i * dx;
+    const x2 = x1 + dx;
+    const xm = (x1 + x2) / 2;
+
+    // bottom of slice = point on circle
+    const circleY = Yc - Math.sqrt(Math.max(0, R**2 - (xm-Xc)**2));
+    // top of slice = ground surface
+    const topY = groundY(xm);
+    if (topY <= circleY) continue; // slice outside mass
+
+    const h_sl  = topY - circleY;     // height of slice
+    const alpha = Math.asin(Math.max(-1, Math.min(1, (xm - Xc) / R))); // base angle
+    const b = dx;
+
+    // pore pressure on base: simplified — ratio of hw
+    const hw = H * nf_pct / 100;
+    const h_sat = Math.max(0, Math.min(h_sl, hw)); // saturated part of slice
+    const u = gw * h_sat;
+
+    const W = gamma * h_sl * b; // weight per unit width
+
+    slices.push({ b, h_sl, alpha, W, u, xm });
+  }
+
+  if (slices.length === 0) return { fs: null, iters: 0, mass: 0, slices: [] };
+
+  // Bishop iteration
+  let FS = 1.5;
+  let iters = 0;
+  let FS_prev = 0;
+
+  for (let it = 0; it < 50; it++) {
+    let num = 0, den = 0;
+    for (const s of slices) {
+      const { b, h_sl, alpha, W, u } = s;
+      const mα = Math.cos(alpha) + Math.sin(alpha)*Math.tan(phi)/FS;
+      if (Math.abs(mα) < 1e-6) continue;
+      num += (c*b + (W - u*b)*Math.tan(phi)) / mα;
+      den += W * Math.sin(alpha);
+    }
+    FS_prev = FS;
+    FS = den !== 0 ? num / den : 999;
+    FS = Math.max(0.01, Math.min(FS, 99));
+    iters++;
+    if (Math.abs(FS - FS_prev) < 1e-4) break;
+  }
+
+  const mass = slices.reduce((s, sl) => s + sl.W, 0);
+  const conv = Math.abs(FS - FS_prev) < 0.001 ? '✓ OK' : '⚠ No conv.';
+
+  return { fs: FS, iters, fsPrev: FS_prev, conv, mass: mass.toFixed(0), slices };
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════
+function getState(fs) {
+  if (fs < 1.0)  return { lbl:'FALLA',    cls:'s-fail', bg:'bg-fail' };
+  if (fs < 1.3)  return { lbl:'CRÍTICO',  cls:'s-crit', bg:'bg-crit' };
+  if (fs < 1.5)  return { lbl:'MARGINAL', cls:'s-marg', bg:'bg-marg' };
+  return          { lbl:'ESTABLE',  cls:'s-safe', bg:'bg-safe' };
+}
+function fsColor(fs) {
+  if (fs < 1.0) return '#ff4455';
+  if (fs < 1.3) return '#ff8c00';
+  if (fs < 1.5) return '#f5c400';
+  return '#4ef0c0';
+}
+function g(id) { return document.getElementById(id); }
+function gv(id) { return parseFloat(g(id).value); }
+function setFSCard(valId, stId, cardId, fs, label) {
+  const st = getState(fs);
+  const el = g(valId);
+  if (!el) return;
+  el.textContent = fs > 90 ? '∞' : fs.toFixed(3);
+  el.className = 'fsc-val ' + st.cls;
+  const sel = g(stId);
+  if (sel) { sel.textContent = st.lbl; sel.className = 'fsc-state ' + st.cls; }
+  const card = g(cardId);
+  if (card) { card.className = 'fs-card ' + st.bg; card.style.color = fsColor(fs); }
+}
+function setResCard(valId, stId, cardId, fs) {
+  const st = getState(fs);
+  const el = g(valId); if (!el) return;
+  el.textContent = fs > 90 ? '∞' : fs.toFixed(3);
+  el.className = 'res-card-val ' + st.cls;
+  const sel = g(stId); if (sel) { sel.textContent = st.lbl; sel.className = 'res-card-state ' + st.cls; }
+  const card = g(cardId); if (card) { card.style.color = fsColor(fs); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  DRAW INFINITE SLOPE
+// ═══════════════════════════════════════════════════════
+function drawSlope(H, beta_deg, nf_pct, fs) {
+  const canvas = g('slopeCanvas');
+  const W = canvas.parentElement.clientWidth - 32;
+  const Ht = canvas.parentElement.clientHeight - 60;
+  canvas.width  = Math.max(300, W);
+  canvas.height = Math.max(180, Ht);
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width, CH = canvas.height;
+  ctx.clearRect(0, 0, CW, CH);
+
+  const m = { l:50, r:30, t:20, b:35 };
+  const pw = CW - m.l - m.r;
+  const ph = CH - m.t - m.b;
+
+  const beta_r = beta_deg * Math.PI / 180;
+  const sW = H / Math.tan(beta_r);
+  const tW = sW * 2.6, tH = H * 1.45;
+  const sc = Math.min(pw/tW, ph/tH);
+  const ox = m.l, oy = m.t + ph;
+
+  const tx = x => ox + x*sc;
+  const ty = y => oy - y*sc;
+
+  // grid
+  ctx.strokeStyle = 'rgba(34,45,56,0.7)';
+  ctx.lineWidth = 0.5;
+  const gs = Math.pow(10, Math.floor(Math.log10(tW/5)));
+  for (let x=0; x<=tW; x+=gs) { ctx.beginPath(); ctx.moveTo(tx(x),ty(0)); ctx.lineTo(tx(x),ty(tH)); ctx.stroke(); }
+  for (let y=0; y<=tH; y+=gs) { ctx.beginPath(); ctx.moveTo(tx(0),ty(y)); ctx.lineTo(tx(tW),ty(y)); ctx.stroke(); }
+
+  const bX = sW*0.32, tX = bX+sW;
+  const hw = H * nf_pct/100;
+
+  // SOIL
+  ctx.beginPath();
+  ctx.moveTo(tx(0),ty(0));
+  ctx.lineTo(tx(tW*0.97),ty(0));
+  ctx.lineTo(tx(tW*0.97),ty(H));
+  ctx.lineTo(tx(tX),ty(H));
+  ctx.lineTo(tx(bX),ty(0));
+  ctx.closePath();
+  const grd = ctx.createLinearGradient(0,ty(H),0,ty(0));
+  grd.addColorStop(0,'rgba(100,75,40,0.5)');
+  grd.addColorStop(0.5,'rgba(70,55,30,0.3)');
+  grd.addColorStop(1,'rgba(50,40,20,0.15)');
+  ctx.fillStyle = grd;
+  ctx.fill();
+
+  // WATER
+  if (hw > 0.5) {
+    ctx.beginPath();
+    ctx.moveTo(tx(0),ty(hw));
+    ctx.lineTo(tx(tW*0.97),ty(hw));
+    ctx.lineTo(tx(tW*0.97),ty(0));
+    ctx.lineTo(tx(0),ty(0));
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(74,143,255,0.12)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(tx(0),ty(hw));
+    ctx.lineTo(tx(tW*0.97),ty(hw));
+    ctx.strokeStyle = 'rgba(74,143,255,0.6)';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([7,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // water label
+    ctx.fillStyle = 'rgba(74,143,255,0.7)';
+    ctx.font = `9px ${getComputedStyle(document.documentElement).getPropertyValue('--fm')||'monospace'}`;
+    ctx.fillText(`NF=${nf_pct}%`, tx(tW*0.6), ty(hw)-5);
+  }
+
+  // SLOPE OUTLINE
+  ctx.beginPath();
+  ctx.moveTo(tx(0),ty(0));
+  ctx.lineTo(tx(bX),ty(0));
+  ctx.lineTo(tx(tX),ty(H));
+  ctx.lineTo(tx(tW*0.97),ty(H));
+  ctx.strokeStyle = '#e8c842';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // FAILURE PLANE
+  const col = fsColor(fs);
+  ctx.beginPath();
+  ctx.setLineDash([9,4]);
+  ctx.moveTo(tx(bX*0.5), ty(0));
+  const cp1x = tx(bX*0.8), cp1y = ty(H*0.08);
+  const cp2x = tx(bX+sW*0.5), cp2y = ty(H*0.2);
+  const epx  = tx(tX*0.88), epy = ty(H*0.78);
+  ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,epx,epy);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 1.8;
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // H dimension arrow
+  ctx.strokeStyle = 'rgba(232,200,66,0.35)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.moveTo(tx(bX-2.5),ty(0)); ctx.lineTo(tx(bX-2.5),ty(H)); ctx.stroke();
+  ctx.fillStyle = '#e8c842';
+  ctx.font = '9px DM Mono, monospace';
+  ctx.fillText(`H=${H}m`, tx(bX-3.5) - 36, ty(H/2) + 3);
+
+  // β angle arc
+  const arcR = Math.min(30, sc*sW*0.25);
+  ctx.beginPath();
+  ctx.arc(tx(bX), ty(0), arcR, -Math.PI/2 - beta_r, -Math.PI/2, false);
+  ctx.strokeStyle = 'rgba(232,200,66,0.5)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#e8c842';
+  ctx.fillText(`β=${beta_deg}°`, tx(bX)+6, ty(0)-10);
+
+  // FS label
+  ctx.font = 'bold 11px DM Mono, monospace';
+  ctx.fillStyle = col + 'bb';
+  ctx.fillText(`FS = ${fs > 90 ? '∞' : fs.toFixed(3)}`, tx(tW*0.04), ty(H*1.3));
+}
+
+// ═══════════════════════════════════════════════════════
+//  DRAW BISHOP CANVAS
+// ═══════════════════════════════════════════════════════
+function drawBishop(H, beta_deg, nf_pct, R, cx_f, cy_f, slices, fs) {
+  const canvas = g('bishopCanvas');
+  const pw = canvas.parentElement.clientWidth;
+  const ph = canvas.parentElement.clientHeight;
+  canvas.width  = Math.max(300, pw);
+  canvas.height = Math.max(200, ph);
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width, CH = canvas.height;
+  ctx.clearRect(0, 0, CW, CH);
+
+  const beta_r = beta_deg * Math.PI / 180;
+  const L = H / Math.tan(beta_r);
+  const m = { l:50, r:30, t:30, b:30 };
+  const drawW = CW - m.l - m.r;
+  const drawH = CH - m.t - m.b;
+
+  // scale to fit everything
+  const Xc = cx_f * L;
+  const Yc = cy_f * H;
+  const sceneW = L * 2.2;
+  const sceneH = (Yc + R + 0.2*H);
+  const sc = Math.min(drawW/sceneW, drawH/sceneH);
+  // center in draw area
+  const offX = m.l + (drawW - sceneW*sc)/2;
+  const offY = m.t + (drawH - sceneH*sc)/2 + sceneH*sc;
+
+  const tx = x => offX + x*sc;
+  const ty = y => offY - y*sc;
+
+  function groundY(x) {
+    if (x <= 0) return 0;
+    if (x <= L) return (x/L)*H;
+    return H;
+  }
+
+  // grid
+  ctx.strokeStyle = 'rgba(34,45,56,0.6)';
+  ctx.lineWidth = 0.5;
+  const gs = Math.pow(10, Math.floor(Math.log10(sceneW/5)));
+  for (let x=0; x<=sceneW; x+=gs) { ctx.beginPath(); ctx.moveTo(tx(x),ty(0)); ctx.lineTo(tx(x),ty(sceneH)); ctx.stroke(); }
+  for (let y=-R*0.5; y<=sceneH; y+=gs) { ctx.beginPath(); ctx.moveTo(tx(0),ty(y)); ctx.lineTo(tx(sceneW),ty(y)); ctx.stroke(); }
+
+  // SOIL FILL
+  ctx.beginPath();
+  ctx.moveTo(tx(0),ty(0));
+  ctx.lineTo(tx(L*2.1),ty(0));
+  ctx.lineTo(tx(L*2.1),ty(H));
+  ctx.lineTo(tx(L),ty(H));
+  ctx.lineTo(tx(0),ty(0));
+  ctx.closePath();
+  const grd = ctx.createLinearGradient(0,ty(H),0,ty(0));
+  grd.addColorStop(0,'rgba(90,65,35,0.45)');
+  grd.addColorStop(1,'rgba(50,38,20,0.12)');
+  ctx.fillStyle = grd;
+  ctx.fill();
+
+  // WATER TABLE
+  const hw = H * nf_pct/100;
+  if (hw > 0.3) {
+    ctx.beginPath();
+    ctx.moveTo(tx(0),ty(hw));
+    ctx.lineTo(tx(L*2.1),ty(hw));
+    ctx.lineTo(tx(L*2.1),ty(0));
+    ctx.lineTo(tx(0),ty(0));
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(74,143,255,0.1)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(tx(0),ty(hw)); ctx.lineTo(tx(L*2.1),ty(hw));
+    ctx.strokeStyle='rgba(74,143,255,0.5)'; ctx.lineWidth=1;
+    ctx.setLineDash([6,3]); ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  // GROUND SURFACE OUTLINE
+  ctx.beginPath();
+  ctx.moveTo(tx(0),ty(0));
+  ctx.lineTo(tx(L),ty(H));
+  ctx.lineTo(tx(L*2.1),ty(H));
+  ctx.strokeStyle='#e8c842'; ctx.lineWidth=2; ctx.stroke();
+
+  // SLICES
+  if (slices && slices.length > 0) {
+    const col = fsColor(fs || 1.5);
+    slices.forEach((s, idx) => {
+      const x1 = s.xm - s.b/2;
+      const x2 = s.xm + s.b/2;
+      const botY = Yc - Math.sqrt(Math.max(0, R**2 - (s.xm-Xc)**2));
+      const topY = groundY(s.xm);
+
+      ctx.beginPath();
+      ctx.moveTo(tx(x1), ty(topY));
+      ctx.lineTo(tx(x2), ty(topY));
+      ctx.lineTo(tx(x2), ty(botY));
+      ctx.lineTo(tx(x1), ty(botY));
+      ctx.closePath();
+      ctx.fillStyle = `rgba(78,240,192,${0.04 + 0.04*(idx%2)})`;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(78,240,192,0.25)';
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+
+      // alpha arrow
+      const am = s.alpha;
+      const bcy = Yc - Math.sqrt(Math.max(0, R**2-(s.xm-Xc)**2));
+      const aLen = Math.min(s.h_sl*0.35*sc, 14);
+      if (aLen > 4) {
+        ctx.beginPath();
+        ctx.moveTo(tx(s.xm), ty(bcy));
+        ctx.lineTo(tx(s.xm)+Math.sin(am)*aLen, ty(bcy)-Math.cos(am)*aLen);
+        ctx.strokeStyle = col+'88';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    });
+  }
+
+  // FAILURE CIRCLE
+  const col = fsColor(fs || 1.5);
+  ctx.beginPath();
+  ctx.arc(tx(Xc), ty(Yc), R*sc, 0, Math.PI*2);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([8,4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // CENTER DOT
+  ctx.beginPath();
+  ctx.arc(tx(Xc), ty(Yc), 5, 0, Math.PI*2);
+  ctx.fillStyle = col;
+  ctx.fill();
+  // center lines
+  ctx.strokeStyle = col+'44';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.moveTo(tx(Xc),ty(Yc)); ctx.lineTo(tx(Xc),ty(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(tx(Xc),ty(Yc)); ctx.lineTo(tx(0),ty(Yc)); ctx.stroke();
+
+  // R label
+  const angle = -Math.PI*0.6;
+  ctx.fillStyle = col+'bb';
+  ctx.font = '9px DM Mono, monospace';
+  ctx.fillText(`R=${R}m`, tx(Xc)+Math.cos(angle)*R*sc*0.6, ty(Yc)+Math.sin(angle)*R*sc*0.6);
+
+  // FS label
+  ctx.font = 'bold 11px DM Mono, monospace';
+  ctx.fillStyle = col+'cc';
+  ctx.fillText(`FS Bishop = ${fs && fs < 90 ? fs.toFixed(3) : '—'}`, tx(0.05*sceneW), ty(sceneH*0.95));
+}
+
+// ═══════════════════════════════════════════════════════
+//  MINI CHARTS
+// ═══════════════════════════════════════════════════════
+function drawChart(canvasId, xVals, fsVals, curX, label) {
+  const canvas = g(canvasId);
+  if (!canvas) return;
+  const W = canvas.parentElement.clientWidth || 240;
+  canvas.width = W;
+  const H = canvas.height || 90;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  const ml=28, mr=8, mt=8, mb=18;
+  const pw = W-ml-mr, ph = H-mt-mb;
+  const mnFS=0, mxFS=Math.max(3,...fsVals.filter(f=>f<90))*1.1;
+  const mnX=xVals[0], mxX=xVals[xVals.length-1];
+  const px = x => ml+(x-mnX)/(mxX-mnX)*pw;
+  const py = f => mt+ph-(f-mnFS)/(mxFS-mnFS)*ph;
+
+  // bg grid
+  ctx.strokeStyle='rgba(34,45,56,0.8)'; ctx.lineWidth=0.4;
+  [1.0,1.3,1.5,2.0].forEach(f=>{
+    if(f>mxFS) return;
+    ctx.beginPath(); ctx.moveTo(ml,py(f)); ctx.lineTo(W-mr,py(f)); ctx.stroke();
+    ctx.fillStyle='rgba(74,89,104,0.7)'; ctx.font='6px DM Mono, monospace';
+    ctx.fillText(f.toFixed(1),1,py(f)+3);
+  });
+  // danger line FS=1
+  ctx.beginPath(); ctx.moveTo(ml,py(1)); ctx.lineTo(W-mr,py(1));
+  ctx.strokeStyle='rgba(255,68,85,0.4)'; ctx.lineWidth=0.8; ctx.stroke();
+  // safe line 1.5
+  if(mxFS>1.5){
+    ctx.beginPath(); ctx.moveTo(ml,py(1.5)); ctx.lineTo(W-mr,py(1.5));
+    ctx.strokeStyle='rgba(78,240,192,0.25)'; ctx.lineWidth=0.6; ctx.stroke();
+  }
+
+  // area fill
+  const validFs = fsVals.map(f=>Math.min(f,mxFS));
+  ctx.beginPath();
+  ctx.moveTo(px(xVals[0]),py(validFs[0]));
+  xVals.forEach((x,i)=>ctx.lineTo(px(x),py(validFs[i])));
+  ctx.lineTo(px(xVals[xVals.length-1]),py(0));
+  ctx.lineTo(px(xVals[0]),py(0));
+  ctx.closePath();
+  const grd=ctx.createLinearGradient(0,mt,0,mt+ph);
+  grd.addColorStop(0,'rgba(78,240,192,0.12)');
+  grd.addColorStop(1,'rgba(78,240,192,0.01)');
+  ctx.fillStyle=grd; ctx.fill();
+
+  // colored line
+  for(let i=1;i<xVals.length;i++){
+    ctx.beginPath();
+    ctx.moveTo(px(xVals[i-1]),py(validFs[i-1]));
+    ctx.lineTo(px(xVals[i]),py(validFs[i]));
+    ctx.strokeStyle=fsColor(validFs[i]);
+    ctx.lineWidth=1.6; ctx.stroke();
+  }
+
+  // current dot
+  const ni=xVals.reduce((b,v,i)=>Math.abs(v-curX)<Math.abs(xVals[b]-curX)?i:b,0);
+  ctx.beginPath();
+  ctx.arc(px(xVals[ni]),py(validFs[ni]),3.5,0,Math.PI*2);
+  ctx.fillStyle=fsColor(validFs[ni]); ctx.fill();
+
+  // x axis labels
+  ctx.fillStyle='rgba(74,89,104,0.8)'; ctx.font='6px DM Mono, monospace';
+  const step=Math.ceil((mxX-mnX)/5);
+  for(let x=mnX;x<=mxX;x+=step) ctx.fillText(x,px(x)-4,H-3);
+}
+
+// ═══════════════════════════════════════════════════════
+//  CRITICAL VALUES
+// ═══════════════════════════════════════════════════════
+function findCritPhi(H,beta,c,gamma,nf){
+  for(let p=0;p<=89;p+=0.5) if(calcFS_inf(H,beta,c,p,gamma,nf)>=1.0) return p;
+  return null;
+}
+function findCritC(H,beta,phi,gamma,nf){
+  // c_crit tal que FS=1: c = τ_total − σ'_n·tan(φ)
+  const b  = beta * Math.PI / 180;
+  const p  = phi  * Math.PI / 180;
+  const hw = H * nf / 100;
+  const sigma = (gamma * H - gw * hw) * Math.cos(b) ** 2;  // efectivo
+  const tau   = gamma * H * Math.sin(b) * Math.cos(b);      // total ✓
+  return Math.max(0, tau - sigma * Math.tan(p));
+}
+function findCritBeta(H,c,phi,gamma,nf){
+  for(let b=80;b>=1;b-=0.5) if(calcFS_inf(H,b,c,phi,gamma,nf)<1.0) return b;
+  return null;
+}
+function findCritNF(H,beta,c,phi,gamma){
+  for(let n=0;n<=100;n+=1) if(calcFS_inf(H,beta,c,phi,gamma,n)<1.0) return n;
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════
+//  RECOMMENDATION
+// ═══════════════════════════════════════════════════════
+function getRecommendation(fs_det, fs_cons, fs_bish) {
+  const fs_min = Math.min(fs_det, fs_cons, fs_bish||999);
+  if (fs_min >= 1.5) return `✓ El talud cumple con FS ≥ 1.5 en todos los métodos. Condición ESTABLE según Eurocode 7 / ISRM. Se recomienda monitorización periódica del nivel freático y revisión ante eventos sísmicos.`;
+  if (fs_min >= 1.3) return `△ FS entre 1.3 y 1.5. Condición MARGINAL. El talud es estable pero con margen reducido. Se recomienda: (1) instrumentar con piezómetros, (2) revisar con Bishop y analizar superficies críticas, (3) considerar bermas o drenajes.`;
+  if (fs_min >= 1.0) return `⚠ FS CRÍTICO (${fs_min.toFixed(2)} < 1.3). Riesgo real de inestabilidad. Acciones urgentes: revisión in situ, análisis Bishop completo, drenaje superficial inmediato, considerar reducción de ángulo o bermas de contención.`;
+  return `⛔ FALLA INMINENTE — FS = ${fs_min.toFixed(2)} < 1.0. Evacuación del área y acción inmediata requerida. No intervenir sin estudio geotécnico de emergencia.`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  MAIN UPDATE
+// ═══════════════════════════════════════════════════════
+function update() {
+  const H     = gv('H');
+  const beta  = gv('beta');
+  const c     = gv('c');
+  const phi   = gv('phi');
+  const gamma = gv('gamma');
+  const nf    = gv('nf');
+  const R     = gv('R');
+  const cx_f  = gv('cx');
+  const cy_f  = gv('cy');
+  const ndov  = gv('ndov');
+  const dc    = gv('dc');
+  const dphi  = gv('dphi');
+  const kh    = seismicOn ? gv('kh') : 0;
+
+  // Update slider labels
+  const labels = {H:'m',beta:'°',c:'kPa',phi:'°',gamma:'kN/m³',nf:'%',R:'m',cx:'',cy:'',ndov:'',dc:'%',dphi:'°',kh:''};
+  for (const [id, unit] of Object.entries(labels)) {
+    const el = g(id+'_v'); if (!el) continue;
+    const v = gv(id);
+    el.textContent = (id==='cx'||id==='cy') ? v.toFixed(2) : v + (unit?' '+unit:'');
+  }
+
+  // Derived
+  const c_c  = c*(1-dc/100);
+  const p_c  = phi - dphi;
+
+  // FS values
+  const fs_det  = calcFS_inf(H, beta, c,   phi, gamma, nf);
+  const fs_cons = calcFS_inf(H, beta, c_c, p_c, gamma, nf);
+  const fs_sat  = calcFS_inf(H, beta, c,   phi, gamma, 100);
+  const fs_seis = calcFS_inf(H, beta, c,   phi, gamma, nf, kh);
+
+  const bishop  = calcBishop(H, beta, c, phi, gamma, nf, R, cx_f, cy_f, ndov);
+  const fs_bish = bishop.fs || 0;
+
+  // FS STRIP
+  setFSCard('fs-det', 'st-det', 'card-det', fs_det, 'det');
+  setFSCard('fs-cons', 'st-cons', 'card-cons', fs_cons, 'cons');
+  setFSCard('fs-bish', 'st-bish', 'card-bish', fs_bish, 'bish');
+  if (seismicOn) setFSCard('fs-seis', 'st-seis', 'card-seis', fs_seis, 'seis');
+
+  // Canvas infos
+  ['H','beta','c','phi','gamma','nf'].forEach(k => {
+    const el = g('i-'+k[0]); if(el) el.textContent = gv(k);
+  });
+  g('i-b').textContent  = beta;
+  g('i-p').textContent  = phi;
+  g('i-g').textContent  = gamma;
+  g('i-n').textContent  = nf;
+  g('i-H').textContent  = H;
+  g('i-c').textContent  = c;
+
+  g('b-R').textContent  = R;
+  g('b-cx').textContent = cx_f.toFixed(2);
+  g('b-cy').textContent = cy_f.toFixed(2);
+  g('b-nd').textContent = ndov;
+  g('b-it').textContent = bishop.iters || '—';
+
+  // Bishop side panel
+  const bpt = g('bishop-params-table');
+  if (bpt && bishop.slices) {
+    const rows = bishop.slices.slice(0,8).map(s =>
+      `<div class="bp-row">
+        <div class="bp-lbl">Dovela x=${s.xm.toFixed(1)}m <em>α=${(s.alpha*180/Math.PI).toFixed(1)}°</em></div>
+        <div class="bp-val">W=${s.W.toFixed(0)} kN/m</div>
+      </div>`
+    ).join('');
+    bpt.innerHTML = rows || '<div class="bp-row"><div class="bp-lbl" style="color:var(--text3)">Sin dovelas válidas en esta geometría</div></div>';
+  }
+
+  // Bishop convergence
+  g('b-iters').textContent  = bishop.iters || '—';
+  g('b-fsprev').textContent = bishop.fsPrev ? bishop.fsPrev.toFixed(4) : '—';
+  g('b-fsfin').textContent  = fs_bish > 0 ? fs_bish.toFixed(4) : '—';
+  g('b-conv').textContent   = bishop.conv || '—';
+  g('b-mass').textContent   = (bishop.mass || '—') + ' kN/m';
+
+  // Draw canvases
+  drawSlope(H, beta, nf, fs_det);
+  drawBishop(H, beta, nf, R, cx_f, cy_f, bishop.slices, fs_bish);
+
+  // Sensitivity charts (visual tab + sens tab)
+  const betas = [15,20,25,30,35,40,45,50,55,60,65,70,75];
+  const phis  = [10,15,20,25,30,35,40,45];
+  const nfs   = [0,10,20,30,40,50,60,70,80,90,100];
+  const cs    = [0,10,20,30,40,50,60,80,100,120,150,200];
+
+  const fsBetas = betas.map(b => calcFS_inf(H,b,c_c,p_c,gamma,nf));
+  const fsPhis  = phis.map(p  => calcFS_inf(H,beta,c_c,p,gamma,nf));
+  const fsNFs   = nfs.map(n   => calcFS_inf(H,beta,c_c,p_c,gamma,n));
+  const fsCs    = cs.map(cv   => calcFS_inf(H,beta,cv,p_c,gamma,nf));
+
+  drawChart('ch-beta',  betas, fsBetas, beta, 'β');
+  drawChart('ch-phi',   phis,  fsPhis,  p_c,  'φ');
+  drawChart('ch-nf',    nfs,   fsNFs,   nf,   'NF');
+  drawChart('ch-c',     cs,    fsCs,    c_c,  'c');
+  drawChart('sg-beta',  betas, fsBetas, beta, 'β');
+  drawChart('sg-phi',   phis,  fsPhis,  p_c,  'φ');
+  drawChart('sg-nf',    nfs,   fsNFs,   nf,   'NF');
+  drawChart('sg-c',     cs,    fsCs,    c_c,  'c');
+
+  // Critical values
+  const crPhi  = findCritPhi(H,beta,c,gamma,nf);
+  const crC    = findCritC(H,beta,phi,gamma,nf);
+  const crBeta = findCritBeta(H,c,phi,gamma,nf);
+  const crNF   = findCritNF(H,beta,c,phi,gamma);
+
+  g('cv-phi').textContent  = crPhi  !== null ? crPhi.toFixed(1)+'°' : '—';
+  g('cv-c').textContent    = crC.toFixed(1)+' kPa';
+  g('cv-beta').textContent = crBeta !== null ? crBeta.toFixed(1)+'°' : '> 80°';
+  g('cv-nf').textContent   = crNF   !== null ? crNF+'%' : '> 100%';
+
+  // Results tab cards
+  setResCard('rv-det',  'rs-det',  'rcard-det',  fs_det);
+  setResCard('rv-cons', 'rs-cons', 'rcard-cons', fs_cons);
+  setResCard('rv-bish', 'rs-bish', 'rcard-bish', fs_bish);
+  setResCard('rv-sat',  'rs-sat',  'rcard-sat',  fs_sat);
+
+  // Recommendation
+  const recEl = g('rec-text');
+  if (recEl) recEl.textContent = getRecommendation(fs_det, fs_cons, fs_bish);
+}
+
+// ═══════════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════════
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    const target = g('tab-' + tab.dataset.tab);
+    if (target) target.classList.add('active');
+    setTimeout(update, 50);
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+//  METHOD TOGGLE
+// ═══════════════════════════════════════════════════════
+function setMethod(m) {
+  activeMethod = m;
+  g('btn-infinite').classList.toggle('active', m==='infinite');
+  g('btn-bishop').classList.toggle('active', m==='bishop');
+  if (m === 'bishop') {
+    document.querySelectorAll('.tab').forEach(t => { if(t.dataset.tab==='bishop') t.click(); });
+  } else {
+    document.querySelectorAll('.tab').forEach(t => { if(t.dataset.tab==='visual') t.click(); });
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  SEISMIC TOGGLE
+// ═══════════════════════════════════════════════════════
+function toggleSeismic() {
+  seismicOn = !seismicOn;
+  const track = g('seis-track');
+  track.classList.toggle('on', seismicOn);
+  g('kh-row').classList.toggle('visible', seismicOn);
+  g('card-seis').style.display = seismicOn ? '' : 'none';
+  // Resize strip
+  const strip = g('fs-strip');
+  strip.className = 'fs-strip ' + (seismicOn ? 'cols-4' : 'cols-3');
+  update();
+}
+
+// ═══════════════════════════════════════════════════════
+//  EVENTS
+// ═══════════════════════════════════════════════════════
+['H','beta','c','phi','gamma','nf','R','cx','cy','ndov','dc','dphi','kh'].forEach(id => {
+  const el = g(id);
+  if (el) el.addEventListener('input', update);
+});
+
+window.addEventListener('resize', () => { update(); });
+
+// INIT
+update();
+</script>
+</body>
+</html>
