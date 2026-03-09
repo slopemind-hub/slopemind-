@@ -140,7 +140,7 @@ header {
 
 .inp-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
 .inp-label { font-size: 0.73rem; color: var(--text); flex: 1; min-width: 0; display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
-.inp-label em { display: block; font-style: normal; font-family: var(--fm); font-size: 0.5rem; color: var(--text3); margin-top: 1px; width: 100%; }
+.inp-label em { display: block; font-style: normal; font-family: var(--fm); font-size: 0.52rem; color: var(--text2); margin-top: 1px; width: 100%; }
 .slider-col { flex: 1.1; min-width: 0; }
 
 input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 2px; background: var(--border2); border-radius: 1px; outline: none; cursor: pointer; }
@@ -148,6 +148,25 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
 input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shadow: 0 0 8px rgba(232,200,66,0.5); }
 
 .sval { font-family: var(--fm); font-size: 0.62rem; color: var(--accent); text-align: right; min-width: 50px; }
+
+/* EDITABLE NUMBER INPUT */
+.num-input {
+  font-family: var(--fm);
+  font-size: 0.65rem;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border2);
+  width: 52px;
+  text-align: right;
+  outline: none;
+  padding: 1px 2px;
+  transition: border-color 0.2s;
+}
+.num-input:focus {
+  border-bottom-color: var(--accent);
+  background: rgba(232,200,66,0.05);
+}
 
 /* DERIVED VALUES BOX */
 .derived-box {
@@ -192,7 +211,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shado
 }
 .fs-card:last-child { border-right: none; }
 
-.fsc-label { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 2px; }
+.fsc-label { font-family: var(--fm); font-size: 0.62rem; letter-spacing: 2px; color: var(--text2); text-transform: uppercase; margin-bottom: 4px; }
 .fsc-val { font-family: var(--fd); font-size: 2.4rem; letter-spacing: 2px; line-height: 1; transition: color 0.3s; }
 .fsc-state { font-family: var(--fm); font-size: 0.55rem; letter-spacing: 2px; margin-top: 2px; transition: color 0.3s; }
 .fsc-method {
@@ -200,14 +219,15 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shado
   align-items: center;
   margin-top: 6px;
   font-family: var(--fm);
-  font-size: 0.55rem;
-  letter-spacing: 1.5px;
+  font-size: 0.58rem;
+  letter-spacing: 1px;
   color: var(--text);
-  background: rgba(46,61,78,0.6);
+  background: rgba(46,61,78,0.7);
   border: 1px solid var(--border2);
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 2px;
 }
+
 /* FS GAUGE BAR */
 .fs-gauge-wrap { margin-top: 6px; position: relative; height: 3px; background: var(--border); border-radius: 2px; overflow: visible; }
 .fs-gauge-bar { height: 100%; border-radius: 2px; transition: width 0.4s cubic-bezier(.4,0,.2,1), background 0.4s; max-width: 100%; }
@@ -275,6 +295,68 @@ canvas.sc { width: 100%; border-radius: 3px; border: 1px solid var(--border); ba
 .conv-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
 .conv-lbl { font-family: var(--fm); font-size: 0.58rem; color: var(--text2); }
 .conv-val { font-family: var(--fm); font-size: 0.62rem; color: var(--accent2); }
+
+/* CRITICAL SEARCH */
+.search-btn {
+  margin: 12px 14px 0;
+  width: calc(100% - 28px);
+  padding: 10px;
+  background: rgba(232,200,66,0.08);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  color: var(--accent);
+  font-family: var(--fm);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.search-btn:hover { background: rgba(232,200,66,0.16); }
+.search-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.search-btn.running { border-color: var(--accent2); color: var(--accent2); background: rgba(78,240,192,0.06); }
+
+.search-progress {
+  margin: 8px 14px 0;
+  display: none;
+}
+.search-progress.visible { display: block; }
+.progress-bar-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+.progress-bar-fill { height: 100%; background: var(--accent2); border-radius: 2px; transition: width 0.1s; width: 0%; }
+.progress-label { font-family: var(--fm); font-size: 0.5rem; color: var(--text3); }
+
+.search-result {
+  margin: 10px 14px 0;
+  padding: 10px 12px;
+  background: var(--surf2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  display: none;
+}
+.search-result.visible { display: block; }
+.sr-title { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--accent2); text-transform: uppercase; margin-bottom: 8px; }
+.sr-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.sr-lbl { font-family: var(--fm); font-size: 0.58rem; color: var(--text2); }
+.sr-val { font-family: var(--fm); font-size: 0.65rem; color: var(--accent); }
+.sr-fs { font-family: var(--fd); font-size: 1.6rem; line-height: 1; margin: 6px 0 2px; }
+.sr-apply-btn {
+  width: 100%; margin-top: 8px;
+  padding: 6px;
+  background: rgba(78,240,192,0.08);
+  border: 1px solid var(--accent2);
+  border-radius: 2px;
+  color: var(--accent2);
+  font-family: var(--fm);
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sr-apply-btn:hover { background: rgba(78,240,192,0.18); }
 
 /* TAB: SENSITIVITY */
 #tab-sens { display: none; padding: 14px; overflow-y: auto; gap: 14px; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
@@ -394,7 +476,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>metros</em>
         </div>
         <div class="slider-col"><input type="range" id="H" min="5" max="100" value="20" step="1"></div>
-        <div class="sval" id="H_v">20 m</div>
+        <input class="num-input" id="H_ni" type="number" value="20" min="5" max="100" step="1">
       </div>
 
       <div class="inp-row">
@@ -410,7 +492,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>grados</em>
         </div>
         <div class="slider-col"><input type="range" id="beta" min="10" max="80" value="45" step="1"></div>
-        <div class="sval" id="beta_v">45°</div>
+        <input class="num-input" id="beta_ni" type="number" value="45" min="10" max="80" step="1">
       </div>
 
       <div class="sec-hd">PROPIEDADES GEOTÉCNICAS</div>
@@ -427,7 +509,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>kPa</em>
         </div>
         <div class="slider-col"><input type="range" id="c" min="0" max="200" value="25" step="1"></div>
-        <div class="sval" id="c_v">25 kPa</div>
+        <input class="num-input" id="c_ni" type="number" value="25" min="0" max="200" step="1">
       </div>
 
       <div class="inp-row">
@@ -443,7 +525,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>grados</em>
         </div>
         <div class="slider-col"><input type="range" id="phi" min="5" max="50" value="30" step="1"></div>
-        <div class="sval" id="phi_v">30°</div>
+        <input class="num-input" id="phi_ni" type="number" value="30" min="5" max="50" step="1">
       </div>
 
       <div class="inp-row">
@@ -459,7 +541,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>kN/m³</em>
         </div>
         <div class="slider-col"><input type="range" id="gamma" min="10" max="30" value="18" step="0.5"></div>
-        <div class="sval" id="gamma_v">18 kN/m³</div>
+        <input class="num-input" id="gamma_ni" type="number" value="18" min="10" max="30" step="0.5">
       </div>
 
       <div class="sec-hd">HIDROGEOLOGÍA</div>
@@ -476,7 +558,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>% de H saturado</em>
         </div>
         <div class="slider-col"><input type="range" id="nf" min="0" max="100" value="0" step="5"></div>
-        <div class="sval" id="nf_v">0%</div>
+        <input class="num-input" id="nf_ni" type="number" value="0" min="0" max="100" step="5">
       </div>
 
       <div class="sec-hd">BISHOP — SUPERFICIE CIRCULAR</div>
@@ -493,18 +575,18 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>metros</em>
         </div>
         <div class="slider-col"><input type="range" id="R" min="10" max="150" value="40" step="1"></div>
-        <div class="sval" id="R_v">40 m</div>
+        <input class="num-input" id="R_ni" type="number" value="40" min="10" max="150" step="1">
       </div>
 
       <div class="inp-row">
         <div class="inp-label">Centro X <em>fracción de base (L)</em></div>
         <div class="slider-col"><input type="range" id="cx" min="0.1" max="0.9" value="0.5" step="0.01"></div>
-        <div class="sval" id="cx_v">0.50</div>
+        <input class="num-input" id="cx_ni" type="number" value="0.5" min="0.1" max="0.9" step="0.01">
       </div>
       <div class="inp-row">
         <div class="inp-label">Centro Y <em>sobre cima (×H)</em></div>
         <div class="slider-col"><input type="range" id="cy" min="0.5" max="3.0" value="1.2" step="0.05"></div>
-        <div class="sval" id="cy_v">1.20</div>
+        <input class="num-input" id="cy_ni" type="number" value="1.2" min="0.5" max="3.0" step="0.05">
       </div>
       <div class="inp-row">
         <div class="inp-label">
@@ -519,7 +601,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>precisión cálculo</em>
         </div>
         <div class="slider-col"><input type="range" id="ndov" min="5" max="30" value="12" step="1"></div>
-        <div class="sval" id="ndov_v">12</div>
+        <input class="num-input" id="ndov_ni" type="number" value="12" min="5" max="30" step="1">
       </div>
 
       <div class="sec-hd">INCERTIDUMBRE</div>
@@ -536,7 +618,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>% para FS conservador</em>
         </div>
         <div class="slider-col"><input type="range" id="dc" min="0" max="50" value="20" step="1"></div>
-        <div class="sval" id="dc_v">20%</div>
+        <input class="num-input" id="dc_ni" type="number" value="20" min="0" max="50" step="1">
       </div>
 
       <div class="inp-row">
@@ -552,7 +634,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>grados de reducción</em>
         </div>
         <div class="slider-col"><input type="range" id="dphi" min="0" max="15" value="5" step="1"></div>
-        <div class="sval" id="dphi_v">5°</div>
+        <input class="num-input" id="dphi_ni" type="number" value="5" min="0" max="15" step="1">
       </div>
 
       <!-- DERIVED VALUES -->
@@ -590,7 +672,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <em>fracción de g</em>
         </div>
         <div class="slider-col"><input type="range" id="kh" min="0" max="0.4" value="0.1" step="0.01"></div>
-        <div class="sval" id="kh_v">0.10</div>
+        <input class="num-input" id="kh_ni" type="number" value="0.1" min="0" max="0.4" step="0.01">
       </div>
 
       <!-- LEGEND -->
@@ -614,7 +696,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <div class="fsc-label">FS DETERMINISTA</div>
         <div class="fsc-val" id="fs-det">—</div>
         <div class="fsc-state" id="st-det">—</div>
-        <div class="fsc-method">Talud Infinito · Mohr-Coulomb</div>
+        <div class="fsc-method">⟁ MOHR-COULOMB</div>
         <div class="fs-gauge-wrap">
           <div class="fs-gauge-markers">
             <div class="fs-gauge-marker m10"></div>
@@ -628,7 +710,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <div class="fsc-label">FS CONSERVADOR</div>
         <div class="fsc-val" id="fs-cons">—</div>
         <div class="fsc-state" id="st-cons">—</div>
-        <div class="fsc-method">c'·(1–Δc) · φ'–Δφ · con incertidumbre</div>
+        <div class="fsc-method">◈ PARÁMETROS REDUCIDOS</div>
         <div class="fs-gauge-wrap">
           <div class="fs-gauge-markers">
             <div class="fs-gauge-marker m10"></div>
@@ -642,7 +724,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <div class="fsc-label">FS BISHOP SIMPLIFICADO</div>
         <div class="fsc-val" id="fs-bish">—</div>
         <div class="fsc-state" id="st-bish">—</div>
-        <div class="fsc-method">Superficie circular · iteración convergente</div>
+        <div class="fsc-method">◎ SUP. CIRCULAR</div>
         <div class="fs-gauge-wrap">
           <div class="fs-gauge-markers">
             <div class="fs-gauge-marker m10"></div>
@@ -656,7 +738,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <div class="fsc-label">FS SÍSMICO</div>
         <div class="fsc-val" id="fs-seis">—</div>
         <div class="fsc-state" id="st-seis">—</div>
-        <div class="fsc-method">Pseudoestático · Seed &amp; Goodman</div>
+        <div class="fsc-method">≋ PSEUDOESTÁTICO</div>
         <div class="fs-gauge-wrap">
           <div class="fs-gauge-markers">
             <div class="fs-gauge-marker m10"></div>
@@ -707,13 +789,37 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
       <div class="tab-pane" id="tab-bishop">
         <div class="bishop-layout">
           <div class="bishop-main">
-            <div class="canvas-label">MÉTODO BISHOP SIMPLIFICADO — SUPERFICIE CIRCULAR</div>
+            <div class="canvas-label">MÉTODO BISHOP SIMPLIFICADO — SUPERFICIE CIRCULAR &nbsp;·&nbsp; <span style="color:var(--text3)">Usa el botón ➜ para buscar la superficie más desfavorable automáticamente</span></div>
             <div class="bishop-canvas-wrap"><canvas id="bishopCanvas"></canvas></div>
             <div class="bishop-info">
               R=<span id="b-R">40</span>m &nbsp; Centro (<span id="b-cx">0.50</span>·L, <span id="b-cy">1.20</span>·H) &nbsp; Dovelas=<span id="b-nd">12</span> &nbsp; Iter=<span id="b-it">—</span>
             </div>
           </div>
           <div class="bishop-side">
+            <!-- SEARCH BUTTON -->
+            <button class="search-btn" id="search-btn" onclick="searchCriticalSurface()">
+              <span id="search-btn-icon">⊙</span> BUSCAR SUPERFICIE CRÍTICA
+            </button>
+
+            <!-- PROGRESS -->
+            <div class="search-progress" id="search-progress">
+              <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+              <div class="progress-label" id="progress-label">Explorando superficies...</div>
+            </div>
+
+            <!-- RESULT -->
+            <div class="search-result" id="search-result">
+              <div class="sr-title">◎ SUPERFICIE CRÍTICA ENCONTRADA</div>
+              <div class="sr-fs s-fail" id="sr-fs-val">—</div>
+              <div style="font-family:var(--fm);font-size:0.52rem;margin-bottom:8px" id="sr-fs-state">—</div>
+              <div class="sr-row"><div class="sr-lbl">Radio R</div><div class="sr-val" id="sr-R">—</div></div>
+              <div class="sr-row"><div class="sr-lbl">Centro X</div><div class="sr-val" id="sr-cx">—</div></div>
+              <div class="sr-row"><div class="sr-lbl">Centro Y</div><div class="sr-val" id="sr-cy">—</div></div>
+              <div class="sr-row"><div class="sr-lbl">Superficies exploradas</div><div class="sr-val" id="sr-count">—</div></div>
+              <button class="sr-apply-btn" onclick="applyCriticalSurface()">↗ APLICAR PARÁMETROS ÓPTIMOS</button>
+            </div>
+
+            <!-- CONVERGENCE -->
             <div class="conv-box">
               <div class="conv-title">CONVERGENCIA ITERATIVA</div>
               <div class="conv-row"><div class="conv-lbl">Iteraciones</div><div class="conv-val" id="b-iters">—</div></div>
@@ -956,8 +1062,101 @@ function calcBishop(H, beta_deg, c, phi_deg, gamma, nf_pct, R, cx_frac, cy_frac,
 }
 
 // ═══════════════════════════════════════════════════════
-//  UTILITIES
+//  CRITICAL SURFACE SEARCH
 // ═══════════════════════════════════════════════════════
+let criticalSearchResult = null;
+let exploredSurfaces = [];
+
+function searchCriticalSurface() {
+  const btn = g('search-btn');
+  btn.disabled = true;
+  btn.classList.add('running');
+  g('search-btn-icon').textContent = '◌';
+  g('search-progress').classList.add('visible');
+  g('search-result').classList.remove('visible');
+  exploredSurfaces = [];
+
+  const H      = gv('H'), beta = gv('beta'), c = gv('c');
+  const phi    = gv('phi'), gamma = gv('gamma'), nf = gv('nf');
+  const ndov   = gv('ndov');
+  const beta_r = beta * Math.PI / 180;
+  const L      = H / Math.tan(beta_r);
+
+  // Grid: R from 0.8H to 3.5H, cx from 0.2 to 0.8, cy from 0.8 to 2.5
+  const Rs  = [0.8,1.0,1.2,1.5,1.8,2.0,2.2,2.5,2.8,3.0,3.2,3.5].map(k => k*H);
+  const cxs = [0.2,0.3,0.4,0.5,0.6,0.7,0.8];
+  const cys = [0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.5];
+  const total = Rs.length * cxs.length * cys.length;
+  let done = 0;
+  let bestFS = Infinity, bestR = null, bestCx = null, bestCy = null;
+
+  // Run async in chunks to not freeze UI
+  function processChunk(ri) {
+    if (ri >= Rs.length) {
+      finishSearch(bestFS, bestR, bestCx, bestCy, total);
+      return;
+    }
+    const R = Rs[ri];
+    for (const cx of cxs) {
+      for (const cy of cys) {
+        const res = calcBishop(H, beta, c, phi, gamma, nf, R, cx, cy, ndov);
+        if (res.fs && res.fs > 0.01 && res.fs < 90 && res.slices.length >= 3) {
+          exploredSurfaces.push({ R, cx, cy, fs: res.fs, Xc: cx*L, Yc: cy*H });
+          if (res.fs < bestFS) { bestFS = res.fs; bestR = R; bestCx = cx; bestCy = cy; }
+        }
+        done++;
+      }
+    }
+    const pct = (done / total * 100).toFixed(0);
+    g('progress-fill').style.width = pct + '%';
+    g('progress-label').textContent = `Explorando... ${pct}% (${done}/${total} superficies)`;
+    setTimeout(() => processChunk(ri + 1), 0);
+  }
+
+  processChunk(0);
+}
+
+function finishSearch(bestFS, bestR, bestCx, bestCy, total) {
+  const btn = g('search-btn');
+  btn.disabled = false;
+  btn.classList.remove('running');
+  g('search-btn-icon').textContent = '⊙';
+  g('search-progress').classList.remove('visible');
+
+  if (!bestR) {
+    g('progress-label').textContent = 'No se encontró superficie válida.';
+    return;
+  }
+
+  criticalSearchResult = { fs: bestFS, R: bestR, cx: bestCx, cy: bestCy };
+
+  const st = getState(bestFS);
+  g('sr-fs-val').textContent = bestFS.toFixed(3);
+  g('sr-fs-val').className   = 'sr-fs ' + st.cls;
+  g('sr-fs-state').textContent = st.lbl;
+  g('sr-fs-state').style.color  = fsColor(bestFS);
+  g('sr-R').textContent  = bestR.toFixed(1) + ' m';
+  g('sr-cx').textContent = bestCx.toFixed(2) + ' × L';
+  g('sr-cy').textContent = bestCy.toFixed(2) + ' × H';
+  g('sr-count').textContent = exploredSurfaces.length;
+  g('search-result').classList.add('visible');
+
+  // Redraw bishop canvas with all explored surfaces
+  const H = gv('H'), beta = gv('beta'), nf = gv('nf');
+  const bishop = calcBishop(H, beta, gv('c'), gv('phi'), gv('gamma'), nf, bestR, bestCx, bestCy, gv('ndov'));
+  drawBishop(H, beta, nf, bestR, bestCx, bestCy, bishop.slices, bestFS, exploredSurfaces);
+}
+
+function applyCriticalSurface() {
+  if (!criticalSearchResult) return;
+  const { R, cx, cy } = criticalSearchResult;
+
+  // Apply to sliders and inputs
+  g('R').value  = Math.round(R);    const rni = g('R_ni');  if(rni) rni.value = Math.round(R);
+  g('cx').value = cx;               const cxni = g('cx_ni'); if(cxni) cxni.value = cx;
+  g('cy').value = cy;               const cyni = g('cy_ni'); if(cyni) cyni.value = cy;
+  update();
+}
 function getState(fs) {
   if (fs < 1.0) return { lbl:'FALLA',    cls:'s-fail', bg:'bg-fail' };
   if (fs < 1.3) return { lbl:'CRÍTICO',  cls:'s-crit', bg:'bg-crit' };
@@ -1100,7 +1299,7 @@ function drawSlope(H, beta_deg, nf_pct, fs) {
 // ═══════════════════════════════════════════════════════
 //  DRAW BISHOP CANVAS
 // ═══════════════════════════════════════════════════════
-function drawBishop(H, beta_deg, nf_pct, R, cx_f, cy_f, slices, fs) {
+function drawBishop(H, beta_deg, nf_pct, R, cx_f, cy_f, slices, fs, explored) {
   const canvas = g('bishopCanvas');
   const pw = canvas.parentElement.clientWidth;
   const ph = canvas.parentElement.clientHeight;
@@ -1148,6 +1347,22 @@ function drawBishop(H, beta_deg, nf_pct, R, cx_f, cy_f, slices, fs) {
   // GROUND
   ctx.beginPath(); ctx.moveTo(tx(0),ty(0)); ctx.lineTo(tx(L),ty(H)); ctx.lineTo(tx(L*2.1),ty(H));
   ctx.strokeStyle='#e8c842'; ctx.lineWidth=2; ctx.stroke();
+
+  // EXPLORED SURFACES (from search)
+  if (explored && explored.length > 0) {
+    const fsMin = Math.min(...explored.map(e=>e.fs));
+    const fsMax = Math.max(...explored.map(e=>e.fs));
+    explored.forEach(e => {
+      if (e.R === R && e.cx === cx_f && e.cy === cy_f) return; // skip critical, drawn later
+      const t = fsMax > fsMin ? (e.fs - fsMin)/(fsMax - fsMin) : 0.5;
+      const alpha = 0.06 + t * 0.1;
+      ctx.beginPath(); ctx.arc(tx(e.Xc), ty(e.Yc), e.R*sc, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(74,89,104,${alpha})`; ctx.lineWidth = 0.8; ctx.setLineDash([]); ctx.stroke();
+    });
+    // draw legend
+    ctx.fillStyle = 'rgba(74,89,104,0.6)'; ctx.font = '8px DM Mono,monospace';
+    ctx.fillText(`${explored.length} superficies exploradas`, tx(0.02*sceneW), ty(sceneH*0.88));
+  }
 
   // SLICES
   const col = fsColor(fs || 1.5);
@@ -1208,28 +1423,25 @@ function drawChart(canvasId, xVals, fsVals, curX, label) {
 
   // reference lines
   ctx.strokeStyle='rgba(34,45,56,0.8)'; ctx.lineWidth=0.4;
-  // Eje Y con valores
-  ctx.fillStyle='rgba(74,89,104,0.9)'; ctx.font='7px DM Mono,monospace';
-  ctx.fillText('FS',2, mt+6);
- [0.5,1.0,1.5,2.0,2.5].forEach(f=>{
-  if(f>mxFS) return;
-  ctx.fillStyle='rgba(74,89,104,0.6)';
-  ctx.fillText(f.toFixed(1),1,py(f)+3);
-  ctx.beginPath(); ctx.moveTo(ml-3,py(f)); ctx.lineTo(ml,py(f));
-  ctx.strokeStyle='rgba(74,89,104,0.4)'; ctx.lineWidth=0.6; ctx.stroke();
-  });
   [1.0,1.3,1.5,2.0].forEach(f=>{
     if(f>mxFS) return;
     ctx.beginPath(); ctx.moveTo(ml,py(f)); ctx.lineTo(W-mr,py(f)); ctx.stroke();
-    ctx.fillStyle='rgba(74,89,104,0.7)'; ctx.font='6px DM Mono,monospace';
+    ctx.fillStyle='rgba(140,155,170,0.9)'; ctx.font='8px DM Mono,monospace';
     ctx.fillText(f.toFixed(1),1,py(f)+3);
+    // tick mark
+    ctx.beginPath(); ctx.moveTo(ml-3,py(f)); ctx.lineTo(ml,py(f));
+    ctx.strokeStyle='rgba(140,155,170,0.4)'; ctx.lineWidth=0.8; ctx.stroke();
+    ctx.strokeStyle='rgba(34,45,56,0.8)'; ctx.lineWidth=0.4;
   });
   ctx.beginPath(); ctx.moveTo(ml,py(1)); ctx.lineTo(W-mr,py(1));
-  ctx.strokeStyle='rgba(255,68,85,0.4)'; ctx.lineWidth=0.8; ctx.stroke();
+  ctx.strokeStyle='rgba(255,68,85,0.5)'; ctx.lineWidth=1; ctx.stroke();
   if(mxFS>1.5){
     ctx.beginPath(); ctx.moveTo(ml,py(1.5)); ctx.lineTo(W-mr,py(1.5));
-    ctx.strokeStyle='rgba(78,240,192,0.25)'; ctx.lineWidth=0.6; ctx.stroke();
+    ctx.strokeStyle='rgba(78,240,192,0.3)'; ctx.lineWidth=0.8; ctx.stroke();
   }
+  // Y axis label
+  ctx.fillStyle='rgba(140,155,170,0.7)'; ctx.font='7px DM Mono,monospace';
+  ctx.fillText('FS',1,mt+6);
 
   // area
   const validFs=fsVals.map(f=>Math.min(f,mxFS));
@@ -1254,9 +1466,9 @@ function drawChart(canvasId, xVals, fsVals, curX, label) {
   ctx.fillStyle=fsColor(validFs[ni]); ctx.fill();
 
   // x labels
-  ctx.fillStyle='rgba(74,89,104,0.8)'; ctx.font='6px DM Mono,monospace';
+  ctx.fillStyle='rgba(140,155,170,0.85)'; ctx.font='8px DM Mono,monospace';
   const step=Math.ceil((mxX-mnX)/5);
-  for(let x=mnX;x<=mxX;x+=step) ctx.fillText(x,px(x)-4,H-3);
+  for(let x=mnX;x<=mxX;x+=step) ctx.fillText(x,px(x)-5,H-2);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1317,8 +1529,7 @@ function updateTornado(H,beta,c,phi,gamma,nf,fs_base) {
   if(!wrap) return;
   wrap.innerHTML = impacts.map(imp=>{
     const barW = (imp.impact/maxImpact*100).toFixed(1);
-    const pct = imp.impact / maxImpact;
-    const col = pct > 0.7 ? '#ff4455' : pct > 0.4 ? '#ff8c00' : pct > 0.2 ? '#f5c400' : '#4ef0c0';
+    const col = imp.impact > maxImpact*0.6 ? '#ff4455' : imp.impact > maxImpact*0.3 ? '#ff8c00' : '#4ef0c0';
     return `<div class="tornado-row">
       <div class="tornado-lbl">${imp.lbl}</div>
       <div class="tornado-bar-wrap">
@@ -1391,6 +1602,11 @@ function updateForcesTable(slices, phi_deg, fs_bish) {
 }
 
 // ═══════════════════════════════════════════════════════
+//  SLIDER IDS
+// ═══════════════════════════════════════════════════════
+const sliderIds = ['H','beta','c','phi','gamma','nf','R','cx','cy','ndov','dc','dphi','kh'];
+
+// ═══════════════════════════════════════════════════════
 //  MAIN UPDATE
 // ═══════════════════════════════════════════════════════
 function update() {
@@ -1399,13 +1615,11 @@ function update() {
   const ndov=gv('ndov'), dc=gv('dc'), dphi=gv('dphi');
   const kh=seismicOn?gv('kh'):0;
 
-  // Slider labels
-  const labels={H:'m',beta:'°',c:'kPa',phi:'°',gamma:'kN/m³',nf:'%',R:'m',cx:'',cy:'',ndov:'',dc:'%',dphi:'°',kh:''};
-  for(const [id,unit] of Object.entries(labels)){
-    const el=g(id+'_v'); if(!el) continue;
-    const v=gv(id);
-    el.textContent=(id==='cx'||id==='cy')?v.toFixed(2):v+(unit?' '+unit:'');
-  }
+  // Sync number inputs with slider values
+  sliderIds.forEach(id => {
+    const ni = g(id+'_ni');
+    if (ni) ni.value = gv(id);
+  });
 
   const c_c=c*(1-dc/100), p_c=phi-dphi;
   const hw_pres=(H*nf/100)*gw;
@@ -1447,7 +1661,7 @@ function update() {
 
   // Draw canvases
   drawSlope(H,beta,nf,fs_det);
-  drawBishop(H,beta,nf,R,cx_f,cy_f,bishop.slices,fs_bish);
+  drawBishop(H,beta,nf,R,cx_f,cy_f,bishop.slices,fs_bish, exploredSurfaces);
 
   // Sensitivity charts
   const betas=[15,20,25,30,35,40,45,50,55,60,65,70,75];
@@ -1721,12 +1935,27 @@ function exportPDF(){
 }
 
 // ═══════════════════════════════════════════════════════
-//  EVENTS
+//  EVENTS — slider ↔ input sync
 // ═══════════════════════════════════════════════════════
-['H','beta','c','phi','gamma','nf','R','cx','cy','ndov','dc','dphi','kh'].forEach(id=>{
-  const el=g(id); if(el) el.addEventListener('input',update);
+
+sliderIds.forEach(id => {
+  const slider = g(id);
+  const ni = g(id+'_ni');
+  if (slider) slider.addEventListener('input', () => {
+    if (ni) ni.value = slider.value;
+    update();
+  });
+  if (ni) ni.addEventListener('input', () => {
+    const val = parseFloat(ni.value);
+    const min = parseFloat(ni.min), max = parseFloat(ni.max);
+    if (!isNaN(val) && val >= min && val <= max) {
+      if (slider) slider.value = val;
+      update();
+    }
+  });
 });
-window.addEventListener('resize',()=>{ update(); });
+
+window.addEventListener('resize', () => { update(); });
 update();
 </script>
 </body>
