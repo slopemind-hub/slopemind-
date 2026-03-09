@@ -789,7 +789,13 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
       <div class="tab-pane" id="tab-bishop">
         <div class="bishop-layout">
           <div class="bishop-main">
-            <div class="canvas-label">MÉTODO BISHOP SIMPLIFICADO — SUPERFICIE CIRCULAR &nbsp;·&nbsp; <span style="color:var(--text3)">Usa el botón ➜ para buscar la superficie más desfavorable automáticamente</span></div>
+            <div class="canvas-label">BISHOP SIMPLIFICADO — SUPERFICIE CIRCULAR</div>
+            <div style="font-family:var(--fm);font-size:0.5rem;color:var(--text3);line-height:1.8;margin-bottom:6px;padding:8px 10px;background:var(--surf2);border-radius:3px;border-left:2px solid var(--border2)">
+              <div style="margin-bottom:5px"><span style="color:var(--accent);letter-spacing:1px">⊙ BUSCAR SUPERFICIE CRÍTICA</span><br>
+              Analiza automáticamente cientos de superficies circulares con diferentes radios y centros. Calcula el factor de seguridad de cada una y encuentra la <span style="color:var(--text)">más desfavorable</span> — aquella con mayor probabilidad de rotura. Cuanto más bajo el FS encontrado, más inestable es el talud.</div>
+              <div style="border-top:1px solid var(--border);padding-top:5px"><span style="color:var(--accent2);letter-spacing:1px">↗ USAR ESTA SUPERFICIE</span><br>
+              Carga en el modelo la superficie crítica encontrada — ajusta automáticamente el radio, el centro X y el centro Y — para que puedas visualizarla en detalle, revisar las fuerzas por dovela y exportarla al informe PDF.</div>
+            </div>
             <div class="bishop-canvas-wrap"><canvas id="bishopCanvas"></canvas></div>
             <div class="bishop-info">
               R=<span id="b-R">40</span>m &nbsp; Centro (<span id="b-cx">0.50</span>·L, <span id="b-cy">1.20</span>·H) &nbsp; Dovelas=<span id="b-nd">12</span> &nbsp; Iter=<span id="b-it">—</span>
@@ -816,7 +822,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
               <div class="sr-row"><div class="sr-lbl">Centro X</div><div class="sr-val" id="sr-cx">—</div></div>
               <div class="sr-row"><div class="sr-lbl">Centro Y</div><div class="sr-val" id="sr-cy">—</div></div>
               <div class="sr-row"><div class="sr-lbl">Superficies exploradas</div><div class="sr-val" id="sr-count">—</div></div>
-              <button class="sr-apply-btn" onclick="applyCriticalSurface()">↗ APLICAR PARÁMETROS ÓPTIMOS</button>
+              <button class="sr-apply-btn" onclick="applyCriticalSurface()">↗ USAR ESTA SUPERFICIE</button>
             </div>
 
             <!-- CONVERGENCE -->
@@ -1149,13 +1155,30 @@ function finishSearch(bestFS, bestR, bestCx, bestCy, total) {
 
 function applyCriticalSurface() {
   if (!criticalSearchResult) return;
-  const { R, cx, cy } = criticalSearchResult;
+  const { R, cx, cy, fs } = criticalSearchResult;
 
-  // Apply to sliders and inputs
-  g('R').value  = Math.round(R);    const rni = g('R_ni');  if(rni) rni.value = Math.round(R);
-  g('cx').value = cx;               const cxni = g('cx_ni'); if(cxni) cxni.value = cx;
-  g('cy').value = cy;               const cyni = g('cy_ni'); if(cyni) cyni.value = cy;
+  // Apply exact values — override slider min/max if needed
+  const Rslider = g('R');
+  Rslider.min = Math.min(parseFloat(Rslider.min), Math.floor(R));
+  Rslider.max = Math.max(parseFloat(Rslider.max), Math.ceil(R));
+  Rslider.value = R;
+  const rni = g('R_ni'); if(rni) { rni.min = Rslider.min; rni.max = Rslider.max; rni.value = R; }
+
+  const cxSlider = g('cx');
+  cxSlider.value = cx;
+  const cxni = g('cx_ni'); if(cxni) cxni.value = cx;
+
+  const cySlider = g('cy');
+  cySlider.max = Math.max(parseFloat(cySlider.max), cy);
+  cySlider.value = cy;
+  const cyni = g('cy_ni'); if(cyni) { cyni.max = cySlider.max; cyni.value = cy; }
+
   update();
+
+  // After update, force the Bishop FS card to show the exact searched value
+  // (avoids tiny floating point drift from slider quantization)
+  setFSCard('fs-bish','st-bish','card-bish','gauge-bish', fs);
+  setResCard('rv-bish','rs-bish','rcard-bish','sbar-bish', fs);
 }
 function getState(fs) {
   if (fs < 1.0) return { lbl:'FALLA',    cls:'s-fail', bg:'bg-fail' };
@@ -1364,24 +1387,40 @@ function drawBishop(H, beta_deg, nf_pct, R, cx_f, cy_f, slices, fs, explored) {
     ctx.fillText(`${explored.length} superficies exploradas`, tx(0.02*sceneW), ty(sceneH*0.88));
   }
 
-  // SLICES
+  // SLICES — clipped to ground surface
   const col = fsColor(fs || 1.5);
   if (slices && slices.length > 0) {
     slices.forEach((s, idx) => {
       const x1 = s.xm - s.b/2, x2 = s.xm + s.b/2;
       const botY = Yc - Math.sqrt(Math.max(0, R**2 - (s.xm-Xc)**2));
       const topY = groundY(s.xm);
+      // Only draw if slice is fully within slope geometry
+      if (topY <= botY) return;
+      if (tx(x2) < offX || tx(x1) > offX + drawW) return;
+
+      ctx.save();
+      // Clip to slope polygon
       ctx.beginPath();
-      ctx.moveTo(tx(x1),ty(topY)); ctx.lineTo(tx(x2),ty(topY)); ctx.lineTo(tx(x2),ty(botY)); ctx.lineTo(tx(x1),ty(botY)); ctx.closePath();
-      ctx.fillStyle = `rgba(78,240,192,${0.04+0.04*(idx%2)})`; ctx.fill();
-      ctx.strokeStyle = 'rgba(78,240,192,0.22)'; ctx.lineWidth = 0.6; ctx.stroke();
+      ctx.moveTo(tx(0),ty(0)); ctx.lineTo(tx(L),ty(H)); ctx.lineTo(tx(L*2.1),ty(H));
+      ctx.lineTo(tx(L*2.1),ty(-R*2)); ctx.lineTo(tx(-L),ty(-R*2)); ctx.lineTo(tx(-L),ty(0));
+      ctx.closePath();
+      ctx.clip();
+
+      ctx.beginPath();
+      ctx.moveTo(tx(x1),ty(topY)); ctx.lineTo(tx(x2),ty(topY));
+      ctx.lineTo(tx(x2),ty(botY)); ctx.lineTo(tx(x1),ty(botY)); ctx.closePath();
+      ctx.fillStyle = `rgba(78,240,192,${0.05+0.04*(idx%2)})`; ctx.fill();
+      ctx.strokeStyle = 'rgba(78,240,192,0.25)'; ctx.lineWidth = 0.6; ctx.stroke();
+
       // alpha arrow
-      const am = s.alpha, bcy = botY;
+      const am = s.alpha;
       const aLen = Math.min(s.h_sl*0.35*sc, 14);
       if (aLen > 4) {
-        ctx.beginPath(); ctx.moveTo(tx(s.xm),ty(bcy)); ctx.lineTo(tx(s.xm)+Math.sin(am)*aLen, ty(bcy)-Math.cos(am)*aLen);
+        ctx.beginPath(); ctx.moveTo(tx(s.xm),ty(botY));
+        ctx.lineTo(tx(s.xm)+Math.sin(am)*aLen, ty(botY)-Math.cos(am)*aLen);
         ctx.strokeStyle=col+'88'; ctx.lineWidth=0.8; ctx.stroke();
       }
+      ctx.restore();
     });
   }
 
