@@ -379,13 +379,16 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 #tab-results { display: none; padding: 14px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
 #tab-results.active { display: block; }
 
+#tab-scenarios { display: none; padding: 20px 24px; overflow-y: auto; flex-direction: column; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+#tab-scenarios.active { display: flex; }
+
 .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .res-card { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; padding: 12px 14px; position: relative; overflow: hidden; }
 .res-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: currentColor; }
-.res-card-lbl { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 4px; }
-.res-card-val { font-family: var(--fd); font-size: 2rem; letter-spacing: 1px; line-height: 1; }
-.res-card-state { font-family: var(--fm); font-size: 0.58rem; letter-spacing: 1.5px; margin-top: 3px; }
-.res-card-method { font-family: var(--fm); font-size: 0.48rem; color: var(--text3); margin-top: 2px; }
+.res-card-lbl { font-family: var(--fm); font-size: 0.55rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 4px; }
+.res-card-val { font-family: var(--fd); font-size: 2.2rem; letter-spacing: 1px; line-height: 1; }
+.res-card-state { font-family: var(--fm); font-size: 0.62rem; letter-spacing: 1.5px; margin-top: 3px; }
+.res-card-method { font-family: var(--fm); font-size: 0.55rem; color: var(--text3); margin-top: 2px; }
 
 /* SAFETY MARGIN BAR */
 .safety-bar-wrap { margin-top: 7px; }
@@ -403,12 +406,12 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 
 /* SUMMARY TABLE */
 .summary-table-wrap { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 12px; overflow: hidden; }
-.summary-table { width: 100%; border-collapse: collapse; font-family: var(--fm); font-size: 0.6rem; }
-.summary-table th { padding: 7px 12px; text-align: left; background: var(--surf2); color: var(--text3); font-size: 0.48rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; border-bottom: 1px solid var(--border); }
-.summary-table td { padding: 7px 12px; color: var(--text2); border-bottom: 1px solid rgba(34,45,56,0.5); }
+.summary-table { width: 100%; border-collapse: collapse; font-family: var(--fm); font-size: 0.68rem; }
+.summary-table th { padding: 9px 12px; text-align: left; background: var(--surf2); color: var(--text3); font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; border-bottom: 1px solid var(--border); }
+.summary-table td { padding: 9px 12px; color: var(--text2); border-bottom: 1px solid rgba(34,45,56,0.5); }
 .summary-table tr:last-child td { border-bottom: none; }
-.summary-table td.fs-val { font-size: 0.75rem; font-weight: 500; }
-.summary-table td.state-cell { font-size: 0.52rem; letter-spacing: 1px; }
+.summary-table td.fs-val { font-size: 0.82rem; font-weight: 500; }
+.summary-table td.state-cell { font-size: 0.6rem; letter-spacing: 1px; }
 
 .rec-box { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; padding: 12px 14px; }
 .rec-box-lbl { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 7px; }
@@ -430,26 +433,26 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .scen-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
 .scen-title { font-family:var(--fm); font-size:0.62rem; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:4px; }
 .scen-subtitle { font-family:var(--fb); font-size:0.75rem; color:var(--text3); line-height:1.55; max-width:520px; }
-.scen-save-btn { flex-shrink:0; padding:10px 16px; background:rgba(232,200,66,0.1); border:1px solid var(--accent); border-radius:3px; color:var(--accent); font-family:var(--fm); font-size:0.58rem; letter-spacing:1.5px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+.scen-save-btn { flex-shrink:0; padding:12px 20px; background:rgba(232,200,66,0.1); border:1px solid var(--accent); border-radius:3px; color:var(--accent); font-family:var(--fm); font-size:0.62rem; letter-spacing:1.5px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
 .scen-save-btn:hover { background:rgba(232,200,66,0.2); }
-.scen-slots { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
-.scen-empty { grid-column:1/-1; text-align:center; padding:40px 20px; font-family:var(--fb); font-size:0.8rem; color:var(--text3); line-height:1.8; border:1px dashed var(--border2); border-radius:4px; }
-.scen-slot { background:var(--surf2); border:1px solid var(--border2); border-radius:4px; padding:12px; position:relative; }
-.scen-slot-label { font-family:var(--fm); font-size:0.52rem; letter-spacing:2px; color:var(--text3); text-transform:uppercase; margin-bottom:6px; }
-.scen-slot-name { font-family:var(--fb); font-size:0.82rem; color:var(--text); font-weight:600; margin-bottom:8px; }
-.scen-slot-fs { font-family:var(--fd); font-size:2rem; line-height:1; margin-bottom:2px; }
-.scen-slot-state { font-family:var(--fm); font-size:0.52rem; letter-spacing:1.5px; margin-bottom:10px; }
-.scen-slot-params { font-family:var(--fm); font-size:0.5rem; color:var(--text3); line-height:1.7; }
-.scen-slot-del { position:absolute; top:8px; right:8px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:0.9rem; padding:2px 5px; border-radius:2px; transition:all 0.2s; }
+.scen-slots { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+.scen-empty { grid-column:1/-1; text-align:center; padding:50px 30px; font-family:var(--fb); font-size:0.9rem; color:var(--text3); line-height:2; border:1px dashed var(--border2); border-radius:4px; }
+.scen-slot { background:var(--surf2); border:1px solid var(--border2); border-radius:4px; padding:16px; position:relative; }
+.scen-slot-label { font-family:var(--fm); font-size:0.55rem; letter-spacing:2px; color:var(--text3); text-transform:uppercase; margin-bottom:6px; }
+.scen-slot-name { font-family:var(--fb); font-size:0.95rem; color:var(--text); font-weight:600; margin-bottom:10px; }
+.scen-slot-fs { font-family:var(--fd); font-size:2.4rem; line-height:1; margin-bottom:3px; }
+.scen-slot-state { font-family:var(--fm); font-size:0.58rem; letter-spacing:1.5px; margin-bottom:12px; }
+.scen-slot-params { font-family:var(--fm); font-size:0.58rem; color:var(--text3); line-height:1.8; }
+.scen-slot-del { position:absolute; top:10px; right:10px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:1rem; padding:3px 6px; border-radius:2px; transition:all 0.2s; }
 .scen-slot-del:hover { color:var(--danger); background:rgba(255,68,85,0.1); }
 .scen-compare-wrap { margin-top:8px; }
-.scen-compare-title { font-family:var(--fm); font-size:0.52rem; letter-spacing:2px; color:var(--text3); text-transform:uppercase; margin-bottom:8px; }
+.scen-compare-title { font-family:var(--fm); font-size:0.55rem; letter-spacing:2px; color:var(--text3); text-transform:uppercase; margin-bottom:8px; }
 .scen-table-wrap { overflow-x:auto; }
-.scen-table { width:100%; border-collapse:collapse; font-family:var(--fm); font-size:0.6rem; }
-.scen-table th { background:var(--surf2); color:var(--accent); font-size:0.52rem; letter-spacing:1.5px; padding:8px 12px; text-align:left; border-bottom:1px solid var(--border2); }
-.scen-table td { padding:7px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:middle; }
+.scen-table { width:100%; border-collapse:collapse; font-family:var(--fm); font-size:0.68rem; }
+.scen-table th { background:var(--surf2); color:var(--accent); font-size:0.58rem; letter-spacing:1.5px; padding:10px 14px; text-align:left; border-bottom:1px solid var(--border2); }
+.scen-table td { padding:9px 14px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:middle; font-size:0.68rem; }
 .scen-table tr:nth-child(even) td { background:rgba(20,28,36,0.5); }
-.scen-table td:first-child { color:var(--text3); font-size:0.52rem; }
+.scen-table td:first-child { color:var(--text3); font-size:0.6rem; }
 .scen-table td.best { color:var(--accent2); font-weight:600; }
 
 /* ── COLOR STATES ── */
@@ -1029,20 +1032,24 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 
       <!-- TAB: SCENARIOS -->
       <div class="tab-pane" id="tab-scenarios">
-        <div class="scen-header">
+
+        <!-- Header bar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:6px;">
           <div>
-            <div class="scen-title">COMPARADOR DE ESCENARIOS</div>
-            <div class="scen-subtitle">Guarda hasta 3 escenarios con distintos parámetros y compara sus resultados lado a lado. Ideal para analizar situaciones como talud seco, lluvia intensa o sismo.</div>
+            <div style="font-family:var(--fm);font-size:0.65rem;letter-spacing:2.5px;color:var(--accent);text-transform:uppercase;margin-bottom:5px;">◈ COMPARADOR DE ESCENARIOS</div>
+            <div style="font-family:var(--fb);font-size:0.85rem;color:var(--text2);line-height:1.55;">Guarda hasta 3 escenarios con distintos parámetros y compara sus resultados lado a lado.<br>Ideal para analizar talud seco, lluvia intensa o condición sísmica.</div>
           </div>
           <button class="scen-save-btn" onclick="saveScenario()">＋ GUARDAR ESCENARIO ACTUAL</button>
         </div>
 
+        <div style="height:1px;background:var(--border);margin:14px 0;"></div>
+
         <div class="scen-slots" id="scen-slots">
-          <div class="scen-empty">No hay escenarios guardados.<br>Configura los parámetros y pulsa <span style="color:var(--accent)">"Guardar escenario actual"</span> para empezar a comparar.</div>
+          <div class="scen-empty">No hay escenarios guardados todavía.<br><span style="color:var(--text2)">Configura los parámetros del talud y pulsa</span> <span style="color:var(--accent);font-weight:600">"Guardar escenario actual"</span> <span style="color:var(--text2)">para empezar a comparar.</span></div>
         </div>
 
         <div class="scen-compare-wrap" id="scen-compare-wrap" style="display:none">
-          <div class="scen-compare-title">COMPARATIVA DE RESULTADOS</div>
+          <div style="font-family:var(--fm);font-size:0.52rem;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;padding-top:4px;border-top:1px solid var(--border);">TABLA COMPARATIVA DE RESULTADOS</div>
           <div class="scen-table-wrap">
             <table class="scen-table" id="scen-table">
               <thead>
