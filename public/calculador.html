@@ -195,8 +195,19 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shado
 .fsc-label { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 2px; }
 .fsc-val { font-family: var(--fd); font-size: 2.4rem; letter-spacing: 2px; line-height: 1; transition: color 0.3s; }
 .fsc-state { font-family: var(--fm); font-size: 0.55rem; letter-spacing: 2px; margin-top: 2px; transition: color 0.3s; }
-.fsc-method { font-family: var(--fm); font-size: 0.42rem; color: var(--text3); margin-top: 1px; }
-
+.fsc-method {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  font-family: var(--fm);
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  color: var(--text);
+  background: rgba(46,61,78,0.6);
+  border: 1px solid var(--border2);
+  padding: 3px 8px;
+  border-radius: 2px;
+}
 /* FS GAUGE BAR */
 .fs-gauge-wrap { margin-top: 6px; position: relative; height: 3px; background: var(--border); border-radius: 2px; overflow: visible; }
 .fs-gauge-bar { height: 100%; border-radius: 2px; transition: width 0.4s cubic-bezier(.4,0,.2,1), background 0.4s; max-width: 100%; }
@@ -1197,6 +1208,16 @@ function drawChart(canvasId, xVals, fsVals, curX, label) {
 
   // reference lines
   ctx.strokeStyle='rgba(34,45,56,0.8)'; ctx.lineWidth=0.4;
+  // Eje Y con valores
+  ctx.fillStyle='rgba(74,89,104,0.9)'; ctx.font='7px DM Mono,monospace';
+  ctx.fillText('FS',2, mt+6);
+ [0.5,1.0,1.5,2.0,2.5].forEach(f=>{
+  if(f>mxFS) return;
+  ctx.fillStyle='rgba(74,89,104,0.6)';
+  ctx.fillText(f.toFixed(1),1,py(f)+3);
+  ctx.beginPath(); ctx.moveTo(ml-3,py(f)); ctx.lineTo(ml,py(f));
+  ctx.strokeStyle='rgba(74,89,104,0.4)'; ctx.lineWidth=0.6; ctx.stroke();
+  });
   [1.0,1.3,1.5,2.0].forEach(f=>{
     if(f>mxFS) return;
     ctx.beginPath(); ctx.moveTo(ml,py(f)); ctx.lineTo(W-mr,py(f)); ctx.stroke();
@@ -1296,7 +1317,8 @@ function updateTornado(H,beta,c,phi,gamma,nf,fs_base) {
   if(!wrap) return;
   wrap.innerHTML = impacts.map(imp=>{
     const barW = (imp.impact/maxImpact*100).toFixed(1);
-    const col = imp.impact > maxImpact*0.6 ? '#ff4455' : imp.impact > maxImpact*0.3 ? '#ff8c00' : '#4ef0c0';
+    const pct = imp.impact / maxImpact;
+    const col = pct > 0.7 ? '#ff4455' : pct > 0.4 ? '#ff8c00' : pct > 0.2 ? '#f5c400' : '#4ef0c0';
     return `<div class="tornado-row">
       <div class="tornado-lbl">${imp.lbl}</div>
       <div class="tornado-bar-wrap">
