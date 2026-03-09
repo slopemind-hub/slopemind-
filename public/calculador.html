@@ -414,6 +414,44 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .rec-box-lbl { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 7px; }
 .rec-box-text { font-size: 0.82rem; color: var(--text); line-height: 1.55; }
 
+/* ── STABILIZATION BOX ── */
+.stab-box { margin-top: 14px; padding: 14px 16px; background: var(--surf2); border: 1px solid var(--border2); border-radius: 4px; }
+.stab-title { font-family: var(--fm); font-size: 0.58rem; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
+.stab-subtitle { font-family: var(--fb); font-size: 0.72rem; color: var(--text3); margin-bottom: 12px; line-height: 1.5; }
+.stab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stab-card { background: var(--surf3); border: 1px solid var(--border); border-radius: 3px; padding: 10px 12px; }
+.stab-card-icon { font-size: 1.1rem; margin-bottom: 4px; }
+.stab-card-lbl { font-family: var(--fm); font-size: 0.5rem; letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; }
+.stab-card-action { font-family: var(--fd); font-size: 1.3rem; color: var(--accent2); line-height: 1; margin-bottom: 3px; }
+.stab-card-desc { font-family: var(--fb); font-size: 0.68rem; color: var(--text2); line-height: 1.45; }
+.stab-ok { display:flex; align-items:center; gap:8px; padding:10px 14px; background:rgba(78,240,192,0.07); border:1px solid rgba(78,240,192,0.25); border-radius:3px; font-family:var(--fb); font-size:0.78rem; color:var(--accent2); grid-column:1/-1; }
+
+/* ── SCENARIOS TAB ── */
+.scen-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
+.scen-title { font-family:var(--fm); font-size:0.62rem; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:4px; }
+.scen-subtitle { font-family:var(--fb); font-size:0.75rem; color:var(--text3); line-height:1.55; max-width:520px; }
+.scen-save-btn { flex-shrink:0; padding:10px 16px; background:rgba(232,200,66,0.1); border:1px solid var(--accent); border-radius:3px; color:var(--accent); font-family:var(--fm); font-size:0.58rem; letter-spacing:1.5px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+.scen-save-btn:hover { background:rgba(232,200,66,0.2); }
+.scen-slots { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+.scen-empty { grid-column:1/-1; text-align:center; padding:40px 20px; font-family:var(--fb); font-size:0.8rem; color:var(--text3); line-height:1.8; border:1px dashed var(--border2); border-radius:4px; }
+.scen-slot { background:var(--surf2); border:1px solid var(--border2); border-radius:4px; padding:12px; position:relative; }
+.scen-slot-label { font-family:var(--fm); font-size:0.52rem; letter-spacing:2px; color:var(--text3); text-transform:uppercase; margin-bottom:6px; }
+.scen-slot-name { font-family:var(--fb); font-size:0.82rem; color:var(--text); font-weight:600; margin-bottom:8px; }
+.scen-slot-fs { font-family:var(--fd); font-size:2rem; line-height:1; margin-bottom:2px; }
+.scen-slot-state { font-family:var(--fm); font-size:0.52rem; letter-spacing:1.5px; margin-bottom:10px; }
+.scen-slot-params { font-family:var(--fm); font-size:0.5rem; color:var(--text3); line-height:1.7; }
+.scen-slot-del { position:absolute; top:8px; right:8px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:0.9rem; padding:2px 5px; border-radius:2px; transition:all 0.2s; }
+.scen-slot-del:hover { color:var(--danger); background:rgba(255,68,85,0.1); }
+.scen-compare-wrap { margin-top:8px; }
+.scen-compare-title { font-family:var(--fm); font-size:0.52rem; letter-spacing:2px; color:var(--text3); text-transform:uppercase; margin-bottom:8px; }
+.scen-table-wrap { overflow-x:auto; }
+.scen-table { width:100%; border-collapse:collapse; font-family:var(--fm); font-size:0.6rem; }
+.scen-table th { background:var(--surf2); color:var(--accent); font-size:0.52rem; letter-spacing:1.5px; padding:8px 12px; text-align:left; border-bottom:1px solid var(--border2); }
+.scen-table td { padding:7px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:middle; }
+.scen-table tr:nth-child(even) td { background:rgba(20,28,36,0.5); }
+.scen-table td:first-child { color:var(--text3); font-size:0.52rem; }
+.scen-table td.best { color:var(--accent2); font-weight:600; }
+
 /* ── COLOR STATES ── */
 .s-fail  { color: var(--danger); }
 .s-crit  { color: var(--warn); }
@@ -756,6 +794,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
       <div class="tab" data-tab="bishop">BISHOP — DOVELAS</div>
       <div class="tab" data-tab="sens">SENSIBILIDAD</div>
       <div class="tab" data-tab="results">RESUMEN</div>
+      <div class="tab" data-tab="scenarios">ESCENARIOS</div>
     </div>
 
     <!-- TAB CONTENT -->
@@ -790,11 +829,15 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <div class="bishop-layout">
           <div class="bishop-main">
             <div class="canvas-label">BISHOP SIMPLIFICADO — SUPERFICIE CIRCULAR</div>
-            <div style="font-family:var(--fm);font-size:0.5rem;color:var(--text3);line-height:1.8;margin-bottom:6px;padding:8px 10px;background:var(--surf2);border-radius:3px;border-left:2px solid var(--border2)">
-              <div style="margin-bottom:5px"><span style="color:var(--accent);letter-spacing:1px">⊙ BUSCAR SUPERFICIE CRÍTICA</span><br>
-              Analiza automáticamente cientos de superficies circulares con diferentes radios y centros. Calcula el factor de seguridad de cada una y encuentra la <span style="color:var(--text)">más desfavorable</span> — aquella con mayor probabilidad de rotura. Cuanto más bajo el FS encontrado, más inestable es el talud.</div>
-              <div style="border-top:1px solid var(--border);padding-top:5px"><span style="color:var(--accent2);letter-spacing:1px">↗ USAR ESTA SUPERFICIE</span><br>
-              Carga en el modelo la superficie crítica encontrada — ajusta automáticamente el radio, el centro X y el centro Y — para que puedas visualizarla en detalle, revisar las fuerzas por dovela y exportarla al informe PDF.</div>
+            <div style="margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              <div style="padding:8px 10px;background:rgba(232,200,66,0.06);border:1px solid rgba(232,200,66,0.2);border-radius:3px;">
+                <div style="font-family:var(--fm);font-size:0.58rem;color:var(--accent);letter-spacing:1.5px;margin-bottom:4px;">⊙ BUSCAR SUPERFICIE CRÍTICA</div>
+                <div style="font-family:var(--fb);font-size:0.7rem;color:var(--text2);line-height:1.55;">Analiza cientos de superficies circulares automáticamente y encuentra la que tiene el <span style="color:var(--text);font-weight:600">factor de seguridad más bajo</span> — la rotura más probable del talud.</div>
+              </div>
+              <div style="padding:8px 10px;background:rgba(78,240,192,0.06);border:1px solid rgba(78,240,192,0.2);border-radius:3px;">
+                <div style="font-family:var(--fm);font-size:0.58rem;color:var(--accent2);letter-spacing:1.5px;margin-bottom:4px;">↗ USAR ESTA SUPERFICIE</div>
+                <div style="font-family:var(--fb);font-size:0.7rem;color:var(--text2);line-height:1.55;">Carga la superficie crítica encontrada en el modelo para <span style="color:var(--text);font-weight:600">visualizarla, analizar las fuerzas por dovela</span> y exportarla al informe PDF.</div>
+              </div>
             </div>
             <div class="bishop-canvas-wrap"><canvas id="bishopCanvas"></canvas></div>
             <div class="bishop-info">
@@ -975,9 +1018,46 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <div class="rec-box-lbl">RECOMENDACIÓN AUTOMÁTICA (EC7 / ISRM)</div>
           <div class="rec-box-text" id="rec-text">—</div>
         </div>
+
+        <!-- STABILIZATION ANALYSIS -->
+        <div class="stab-box">
+          <div class="stab-title">⚙ ANÁLISIS DE ESTABILIZACIÓN — ¿Qué cambiar para alcanzar FS ≥ 1.5?</div>
+          <div class="stab-subtitle">El software calcula automáticamente las medidas mínimas necesarias para llevar el talud a un estado ESTABLE según EC7.</div>
+          <div class="stab-grid" id="stab-grid">—</div>
+        </div>
       </div>
 
-    </div><!-- end tab-content -->
+      <!-- TAB: SCENARIOS -->
+      <div class="tab-pane" id="tab-scenarios">
+        <div class="scen-header">
+          <div>
+            <div class="scen-title">COMPARADOR DE ESCENARIOS</div>
+            <div class="scen-subtitle">Guarda hasta 3 escenarios con distintos parámetros y compara sus resultados lado a lado. Ideal para analizar situaciones como talud seco, lluvia intensa o sismo.</div>
+          </div>
+          <button class="scen-save-btn" onclick="saveScenario()">＋ GUARDAR ESCENARIO ACTUAL</button>
+        </div>
+
+        <div class="scen-slots" id="scen-slots">
+          <div class="scen-empty">No hay escenarios guardados.<br>Configura los parámetros y pulsa <span style="color:var(--accent)">"Guardar escenario actual"</span> para empezar a comparar.</div>
+        </div>
+
+        <div class="scen-compare-wrap" id="scen-compare-wrap" style="display:none">
+          <div class="scen-compare-title">COMPARATIVA DE RESULTADOS</div>
+          <div class="scen-table-wrap">
+            <table class="scen-table" id="scen-table">
+              <thead>
+                <tr>
+                  <th>PARÁMETRO</th>
+                  <th id="scen-th-0">—</th>
+                  <th id="scen-th-1">—</th>
+                  <th id="scen-th-2">—</th>
+                </tr>
+              </thead>
+              <tbody id="scen-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
   </div><!-- end right panel -->
 
 </div><!-- end app-body -->
@@ -1371,20 +1451,31 @@ function drawBishop(H, beta_deg, nf_pct, R, cx_f, cy_f, slices, fs, explored) {
   ctx.beginPath(); ctx.moveTo(tx(0),ty(0)); ctx.lineTo(tx(L),ty(H)); ctx.lineTo(tx(L*2.1),ty(H));
   ctx.strokeStyle='#e8c842'; ctx.lineWidth=2; ctx.stroke();
 
-  // EXPLORED SURFACES (from search)
+  // EXPLORED SURFACES (from search) — HEATMAP colored by FS
   if (explored && explored.length > 0) {
     const fsMin = Math.min(...explored.map(e=>e.fs));
     const fsMax = Math.max(...explored.map(e=>e.fs));
     explored.forEach(e => {
-      if (e.R === R && e.cx === cx_f && e.cy === cy_f) return; // skip critical, drawn later
+      if (e.R === R && e.cx === cx_f && e.cy === cy_f) return;
       const t = fsMax > fsMin ? (e.fs - fsMin)/(fsMax - fsMin) : 0.5;
-      const alpha = 0.06 + t * 0.1;
+      // Red (danger) → Yellow (warn) → Green (safe)
+      let r,g2,b;
+      if (t < 0.5) { r=255; g2=Math.round(t*2*200); b=0; }
+      else { r=Math.round((1-t)*2*255); g2=200; b=80; }
+      const alpha = 0.08 + t * 0.1;
       ctx.beginPath(); ctx.arc(tx(e.Xc), ty(e.Yc), e.R*sc, 0, Math.PI*2);
-      ctx.strokeStyle = `rgba(74,89,104,${alpha})`; ctx.lineWidth = 0.8; ctx.setLineDash([]); ctx.stroke();
+      ctx.strokeStyle = `rgba(${r},${g2},${b},${alpha})`; ctx.lineWidth = 0.9; ctx.setLineDash([]); ctx.stroke();
     });
-    // draw legend
-    ctx.fillStyle = 'rgba(74,89,104,0.6)'; ctx.font = '8px DM Mono,monospace';
-    ctx.fillText(`${explored.length} superficies exploradas`, tx(0.02*sceneW), ty(sceneH*0.88));
+
+    // Heatmap legend
+    const lgX = CW - 90, lgY = 18, lgW = 70, lgH = 6;
+    const lgGrd = ctx.createLinearGradient(lgX, 0, lgX+lgW, 0);
+    lgGrd.addColorStop(0,'rgba(255,60,60,0.8)'); lgGrd.addColorStop(0.5,'rgba(255,200,0,0.8)'); lgGrd.addColorStop(1,'rgba(60,220,120,0.8)');
+    ctx.fillStyle = lgGrd; ctx.fillRect(lgX, lgY, lgW, lgH);
+    ctx.fillStyle = 'rgba(140,155,170,0.7)'; ctx.font = '7px DM Mono,monospace';
+    ctx.fillText('PEOR', lgX - 2, lgY + lgH + 9);
+    ctx.fillText('MEJOR', lgX + lgW - 14, lgY + lgH + 9);
+    ctx.fillText(`${explored.length} sup.`, lgX + lgW/2 - 12, lgY - 3);
   }
 
   // SLICES — clipped to ground surface
@@ -1580,8 +1671,192 @@ function updateTornado(H,beta,c,phi,gamma,nf,fs_base) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  SUMMARY TABLE
+//  STABILIZATION ANALYSIS — CONTEXTUAL
 // ═══════════════════════════════════════════════════════
+function updateStabilization(H, beta, c, phi, gamma, nf, fs_det) {
+  const wrap = g('stab-grid'); if (!wrap) return;
+  const TARGET = 1.5;
+
+  if (fs_det >= TARGET) {
+    const margin = ((fs_det - TARGET) / TARGET * 100).toFixed(0);
+    wrap.innerHTML = `<div class="stab-ok">✓ El talud ya cumple FS ≥ 1.5 con un margen del +${margin}% sobre el límite EC7. No se requieren medidas de estabilización con los parámetros actuales.</div>`;
+    return;
+  }
+
+  const deficit = TARGET - fs_det;
+
+  // ── 1. REDUCIR ÁNGULO β ──────────────────────────────
+  let betaCrit = null;
+  for (let b = beta; b >= 5; b -= 0.5) {
+    if (calcFS_inf(H, b, c, phi, gamma, nf) >= TARGET) { betaCrit = b; break; }
+  }
+  const deltaBeta = betaCrit !== null ? (beta - betaCrit) : null;
+
+  let betaCard;
+  if (deltaBeta === null) {
+    betaCard = { action:'N/A', actionColor:'var(--danger)', desc:'Con los parámetros resistentes actuales (c, φ) no es posible alcanzar FS=1.5 reduciendo únicamente el ángulo. Se requieren medidas adicionales de mejora del suelo o drenaje.' };
+  } else if (deltaBeta <= 3) {
+    betaCard = { action:`−${deltaBeta.toFixed(1)}°`, desc:`Intervención mínima. Un <b>reperfilado superficial</b> es suficiente — bajo impacto, ejecutable en poco tiempo. Valorar combinarlo con revegetación para proteger el paramento.` };
+  } else if (deltaBeta <= 8) {
+    betaCard = { action:`−${deltaBeta.toFixed(1)}°`, desc:`Reperfilado moderado de ${beta}° → ${betaCrit.toFixed(1)}°. Considerar una solución <b>escalonada en bermas</b> para mejorar también la evacuación del agua superficial.` };
+  } else if (deltaBeta <= 15) {
+    betaCard = { action:`−${deltaBeta.toFixed(1)}°`, desc:`Reducción significativa que implica un movimiento de tierras considerable. Valorar si es más eficiente un <b>refuerzo en el pie del talud</b> que reducir tanto el ángulo.` };
+  } else {
+    betaCard = { action:`−${deltaBeta.toFixed(1)}°`, desc:`Reducción de ángulo muy elevada. A este nivel suele ser más viable una <b>solución estructural en la base</b> que un reperfilado completo — conviene evaluar la relación coste-beneficio antes de decidir.` };
+  }
+
+  // ── 2. REDUCIR NIVEL FREÁTICO (DRENAJE) ──────────────
+  let nfCrit = null;
+  for (let n = nf; n >= 0; n -= 1) {
+    if (calcFS_inf(H, beta, c, phi, gamma, n) >= TARGET) { nfCrit = n; break; }
+  }
+  const deltaNF = nfCrit !== null ? (nf - nfCrit) : null;
+
+  let drainCard;
+  if (nf === 0 || deltaNF === null) {
+    drainCard = { action:'N/A', actionColor:'var(--danger)', desc:'El talud ya está seco (NF=0%) o el drenaje por sí solo no es suficiente para alcanzar FS=1.5. El problema es principalmente geométrico o resistente, no hidráulico.' };
+  } else if (deltaNF <= 15) {
+    drainCard = { action:`NF −${deltaNF}%`, desc:`Reducción menor del nivel freático. Medidas de <b>drenaje superficial</b> pueden ser suficientes — conviene evaluar la fuente de aportación hídrica antes de dimensionar la solución.` };
+  } else if (deltaNF <= 30) {
+    drainCard = { action:`NF −${deltaNF}%`, desc:`Se recomienda explorar <b>drenaje subterráneo</b> además del superficial. La tipología dependerá de la permeabilidad del suelo y la geometría del acuífero — requiere estudio hidrogeológico previo.` };
+  } else if (deltaNF <= 55) {
+    drainCard = { action:`NF −${deltaNF}%`, desc:`Reducción significativa del NF necesaria. Probablemente insuficiente con drenaje pasivo — valorar si se necesita una <b>solución activa</b> o si es más eficiente combinar drenaje parcial con refuerzo estructural.` };
+  } else {
+    drainCard = { action:`NF −${deltaNF}%`, desc:`Reducción drástica requerida. La viabilidad del drenaje como única medida es cuestionable a este nivel — se recomienda plantear una solución <b>mixta o estructural</b> y contrastar con el hidrogeólogo.` };
+  }
+
+  // ── 3. MEJORA DEL SUELO / COHESIÓN ───────────────────
+  let cNeeded = null;
+  for (let cv = c; cv <= 600; cv += 0.5) {
+    if (calcFS_inf(H, beta, cv, phi, gamma, nf) >= TARGET) { cNeeded = cv; break; }
+  }
+  const deltaC = cNeeded !== null ? (cNeeded - c) : null;
+
+  let soilCard;
+  if (deltaC === null) {
+    soilCard = { action:'+∞ kPa', actionColor:'var(--danger)', desc:'No es posible alcanzar FS=1.5 mejorando únicamente la cohesión con la geometría actual. Se requiere una intervención combinada (drenaje + reperfilado + refuerzo estructural).' };
+  } else if (deltaC <= 10) {
+    soilCard = { action:`+${deltaC.toFixed(0)} kPa`, desc:`Incremento de cohesión pequeño. Alcanzable con <b>tratamientos superficiales o ligeros</b> del suelo. La solución más adecuada dependerá del tipo de material y la accesibilidad al talud.` };
+  } else if (deltaC <= 25) {
+    soilCard = { action:`+${deltaC.toFixed(0)} kPa`, desc:`Refuerzo moderado. Existen varias técnicas viables — conviene valorar cuál encaja mejor con la tipología del suelo, el acceso a la obra y el presupuesto disponible.` };
+  } else if (deltaC <= 60) {
+    soilCard = { action:`+${deltaC.toFixed(0)} kPa`, desc:`Refuerzo significativo necesario. A este nivel conviene valorar si el <b>refuerzo del suelo</b> sigue siendo la opción más económica frente a una solución estructural en el pie del talud.` };
+  } else {
+    soilCard = { action:`+${deltaC.toFixed(0)} kPa`, desc:`Incremento de cohesión muy alto. Difícilmente alcanzable solo con mejora del suelo — se recomienda replantear la solución global con una <b>intervención estructural</b> y un estudio geotécnico completo.` };
+  }
+
+  // Render cards
+  const cards = [
+    { icon:'📐', lbl:'Reducir ángulo de talud', ...betaCard },
+    { icon:'💧', lbl:'Mejora de drenaje', ...drainCard },
+    { icon:'🪨', lbl:'Mejora del suelo / Refuerzo', ...soilCard },
+  ];
+
+  wrap.innerHTML = cards.map(card => `
+    <div class="stab-card">
+      <div class="stab-card-icon">${card.icon}</div>
+      <div class="stab-card-lbl">${card.lbl}</div>
+      <div class="stab-card-action" style="color:${card.actionColor||'var(--accent2)'}">
+        ${card.action}
+      </div>
+      <div class="stab-card-desc">${card.desc}</div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  SCENARIOS
+// ═══════════════════════════════════════════════════════
+let scenarios = [];
+
+function saveScenario() {
+  if (scenarios.length >= 3) {
+    alert('Máximo 3 escenarios. Elimina uno antes de guardar.');
+    return;
+  }
+  const name = prompt('Nombre del escenario (ej: Talud seco, Lluvia intensa, Sismo):') || `Escenario ${scenarios.length + 1}`;
+  const H=gv('H'), beta=gv('beta'), c=gv('c'), phi=gv('phi');
+  const gamma=gv('gamma'), nf=gv('nf'), R=gv('R'), cx_f=gv('cx'), cy_f=gv('cy');
+  const ndov=gv('ndov'), dc=gv('dc'), dphi=gv('dphi');
+  const kh=seismicOn?gv('kh'):0;
+  const c_c=c*(1-dc/100), p_c=phi-dphi;
+  const fs_det  = calcFS_inf(H,beta,c,phi,gamma,nf);
+  const fs_cons = calcFS_inf(H,beta,c_c,p_c,gamma,nf);
+  const fs_sat  = calcFS_inf(H,beta,c,phi,gamma,100);
+  const fs_seis = calcFS_inf(H,beta,c,phi,gamma,nf,kh);
+  const bishop  = calcBishop(H,beta,c,phi,gamma,nf,R,cx_f,cy_f,ndov);
+  const fs_bish = bishop.fs||0;
+  scenarios.push({ name, H, beta, c, phi, gamma, nf, dc, dphi, kh, fs_det, fs_cons, fs_bish, fs_sat, fs_seis });
+  renderScenarios();
+}
+
+function deleteScenario(idx) {
+  scenarios.splice(idx, 1);
+  renderScenarios();
+}
+
+function renderScenarios() {
+  const slotsEl = g('scen-slots');
+  const compareEl = g('scen-compare-wrap');
+  if (!scenarios.length) {
+    slotsEl.innerHTML = `<div class="scen-empty">No hay escenarios guardados.<br>Configura los parámetros y pulsa <span style="color:var(--accent)">"Guardar escenario actual"</span> para empezar a comparar.</div>`;
+    compareEl.style.display = 'none';
+    return;
+  }
+
+  const labels = ['◆ ESCENARIO A','◇ ESCENARIO B','◈ ESCENARIO C'];
+  slotsEl.innerHTML = scenarios.map((s, i) => {
+    const st = getState(s.fs_det);
+    return `<div class="scen-slot">
+      <button class="scen-slot-del" onclick="deleteScenario(${i})">✕</button>
+      <div class="scen-slot-label">${labels[i]}</div>
+      <div class="scen-slot-name">${s.name}</div>
+      <div class="scen-slot-fs" style="color:${fsColor(s.fs_det)}">${s.fs_det.toFixed(3)}</div>
+      <div class="scen-slot-state" style="color:${fsColor(s.fs_det)}">${st.lbl}</div>
+      <div class="scen-slot-params">
+        H=${s.H}m &nbsp; β=${s.beta}° &nbsp; c=${s.c}kPa<br>
+        φ=${s.phi}° &nbsp; γ=${s.gamma}kN/m³ &nbsp; NF=${s.nf}%<br>
+        ${s.kh>0?`kh=${s.kh} (SÍSMICO)`:'Sin análisis sísmico'}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Comparison table
+  compareEl.style.display = 'block';
+  const ths = ['scen-th-0','scen-th-1','scen-th-2'];
+  ths.forEach((id,i) => {
+    const el = g(id);
+    if (el) el.textContent = scenarios[i] ? scenarios[i].name : '—';
+  });
+
+  const fields = [
+    { lbl:'Altura H', key:'H', unit:'m' },
+    { lbl:'Ángulo β', key:'beta', unit:'°' },
+    { lbl:'Cohesión c', key:'c', unit:' kPa' },
+    { lbl:'Fricción φ', key:'phi', unit:'°' },
+    { lbl:'Nivel freático NF', key:'nf', unit:'%' },
+    { lbl:'FS Determinista', key:'fs_det', unit:'', isFS:true },
+    { lbl:'FS Conservador', key:'fs_cons', unit:'', isFS:true },
+    { lbl:'FS Bishop', key:'fs_bish', unit:'', isFS:true },
+    { lbl:'FS Saturado', key:'fs_sat', unit:'', isFS:true },
+    { lbl:'FS Sísmico', key:'fs_seis', unit:'', isFS:true },
+  ];
+
+  const tbody = g('scen-tbody');
+  tbody.innerHTML = fields.map(f => {
+    const vals = scenarios.map(s => s[f.key]);
+    const bestVal = f.isFS ? Math.max(...vals) : null;
+    const cells = [0,1,2].map(i => {
+      if (!scenarios[i]) return '<td>—</td>';
+      const v = scenarios[i][f.key];
+      const isBest = f.isFS && v === bestVal;
+      const display = f.isFS ? v.toFixed(3) : v;
+      const color = f.isFS ? `style="color:${fsColor(v)}"` : '';
+      return `<td class="${isBest?'best':''}" ${color}>${display}${f.unit}</td>`;
+    }).join('');
+    return `<tr><td>${f.lbl}</td>${cells}</tr>`;
+  }).join('');
+}
 function updateSummaryTable(fs_det, fs_cons, fs_bish, fs_sat, c, phi, dc, dphi) {
   const tbody = g('summary-tbody'); if (!tbody) return;
   const rows = [
@@ -1751,6 +2026,7 @@ function update() {
   setResCard('rv-sat','rs-sat','rcard-sat','sbar-sat',fs_sat);
 
   updateSummaryTable(fs_det,fs_cons,fs_bish,fs_sat,c,phi,dc,dphi);
+  updateStabilization(H,beta,c,phi,gamma,nf,fs_det);
 
   // Recommendation
   const recEl=g('rec-text');
