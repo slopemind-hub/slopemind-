@@ -417,7 +417,130 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .rec-box-lbl { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 7px; }
 .rec-box-text { font-size: 0.82rem; color: var(--text); line-height: 1.55; }
 
-/* ── STABILIZATION BOX ── */
+/* ── EDITOR SIDE TABS ── */
+.ed-side-tabs { display:flex; border-bottom:1px solid var(--border); flex-shrink:0; }
+.ed-side-tab { flex:1; padding:8px 4px; text-align:center; font-family:var(--fm); font-size:0.48rem; letter-spacing:1.5px; color:var(--text3); cursor:pointer; transition:all 0.15s; border-bottom:2px solid transparent; margin-bottom:-1px; }
+.ed-side-tab:hover { color:var(--text2); }
+.ed-side-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+.ed-side-pane { display:none; flex:1; overflow-y:auto; flex-direction:column; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
+.ed-side-pane.active { display:flex; }
+
+/* ── COORDS TABLE ── */
+.coords-table-wrap { flex:1; overflow-y:auto; border:1px solid var(--border); border-radius:3px; max-height:320px; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
+.coords-table { width:100%; border-collapse:collapse; font-family:var(--fm); font-size:0.6rem; }
+.coords-table th { background:var(--surf2); color:var(--text3); font-size:0.48rem; letter-spacing:1.5px; padding:5px 6px; text-align:left; border-bottom:1px solid var(--border); position:sticky; top:0; }
+.coords-table td { padding:3px 4px; border-bottom:1px solid rgba(34,45,56,0.4); color:var(--text2); }
+.coords-table tr:hover td { background:rgba(232,200,66,0.04); }
+.coord-input { width:56px; background:var(--surf3); border:1px solid var(--border); border-radius:2px; color:var(--text); font-family:var(--fm); font-size:0.6rem; padding:3px 5px; outline:none; text-align:right; }
+.coord-input:focus { border-color:var(--accent); }
+.coord-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:0.75rem; padding:2px 4px; }
+.coord-del:hover { color:var(--danger); }
+
+/* ── IMPORT/EXPORT BTNS ── */
+.ed-import-btn { padding:4px 8px; background:transparent; border:1px solid var(--border2); border-radius:2px; color:var(--text2); font-family:var(--fm); font-size:0.5rem; letter-spacing:1px; cursor:pointer; transition:all 0.15s; }
+.ed-import-btn:hover { border-color:var(--accent2); color:var(--accent2); }
+
+/* ── CONDITIONS ── */
+.cond-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cond-btn { background:var(--surf2); border:1px solid var(--border); border-radius:3px; padding:10px 8px; text-align:center; cursor:pointer; transition:all 0.15s; }
+.cond-btn:hover { border-color:var(--border2); }
+.cond-btn.active { border-color:var(--accent3); background:rgba(74,143,255,0.08); }
+.cond-icon { font-size:1.2rem; margin-bottom:3px; }
+.cond-name { font-family:var(--fm); font-size:0.52rem; letter-spacing:1.5px; color:var(--text); margin-bottom:2px; }
+.cond-desc { font-family:var(--fm); font-size:0.48rem; color:var(--text3); }
+.cond-seismic { padding:4px 0; }
+
+/* ── WATER POINTS ── */
+/* water is now a polyline, existing styles reused */
+#tab-editor { display:none; flex-direction:row; overflow:hidden; }
+#tab-editor.active { display:flex; }
+
+.editor-canvas-area {
+  flex:1; display:flex; flex-direction:column; overflow:hidden; padding:10px 12px; gap:8px;
+}
+.editor-toolbar {
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+  padding:6px 10px; background:var(--surf2); border:1px solid var(--border); border-radius:3px;
+}
+.editor-tool-btn {
+  padding:5px 11px; background:transparent; border:1px solid var(--border2);
+  border-radius:2px; color:var(--text2); font-family:var(--fm); font-size:0.55rem;
+  letter-spacing:1px; cursor:pointer; transition:all 0.15s; white-space:nowrap;
+}
+.editor-tool-btn:hover { border-color:var(--accent); color:var(--accent); }
+.editor-tool-btn.active { background:rgba(232,200,66,0.12); border-color:var(--accent); color:var(--accent); }
+.editor-tool-btn.water { border-color:var(--accent3); color:var(--accent3); }
+.editor-tool-btn.water.active { background:rgba(74,143,255,0.12); }
+.editor-tool-btn.danger { border-color:var(--danger); color:var(--danger); }
+.editor-tool-btn.danger:hover { background:rgba(255,68,85,0.1); }
+.tool-sep { width:1px; height:18px; background:var(--border); margin:0 3px; }
+.editor-hint {
+  font-family:var(--fm); font-size:0.52rem; color:var(--text3); margin-left:auto;
+}
+
+#editorCanvas {
+  flex:1; width:100%; min-height:0; border-radius:4px;
+  background:#090d12; border:1px solid var(--border); cursor:crosshair;
+}
+
+.editor-side {
+  width:260px; border-left:1px solid var(--border); background:var(--surf1);
+  overflow-y:auto; display:flex; flex-direction:column; scrollbar-width:thin; scrollbar-color:var(--border2) transparent;
+}
+.editor-side-section { padding:12px 14px; border-bottom:1px solid var(--border); }
+.editor-side-title { font-family:var(--fm); font-size:0.52rem; letter-spacing:2px; color:var(--text3); text-transform:uppercase; margin-bottom:10px; }
+
+/* Layer list */
+.layer-list { display:flex; flex-direction:column; gap:6px; }
+.layer-item {
+  background:var(--surf2); border:1px solid var(--border); border-radius:3px;
+  padding:8px 10px; cursor:pointer; transition:all 0.15s; position:relative;
+}
+.layer-item:hover { border-color:var(--border2); }
+.layer-item.selected { border-color:var(--accent); background:rgba(232,200,66,0.05); }
+.layer-item-header { display:flex; align-items:center; gap:7px; margin-bottom:5px; }
+.layer-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.layer-name { font-family:var(--fb); font-size:0.78rem; color:var(--text); font-weight:500; flex:1; }
+.layer-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:0.8rem; padding:0 3px; }
+.layer-del:hover { color:var(--danger); }
+.layer-props { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; }
+.layer-prop { text-align:center; }
+.layer-prop-val { font-family:var(--fm); font-size:0.65rem; color:var(--accent2); }
+.layer-prop-lbl { font-family:var(--fm); font-size:0.42rem; color:var(--text3); letter-spacing:1px; }
+
+.add-layer-btn {
+  width:100%; padding:7px; background:transparent; border:1px dashed var(--border2);
+  border-radius:2px; color:var(--text3); font-family:var(--fm); font-size:0.55rem;
+  letter-spacing:1px; cursor:pointer; transition:all 0.2s; margin-top:6px;
+}
+.add-layer-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+/* Layer editor form */
+.layer-edit-form { display:flex; flex-direction:column; gap:8px; }
+.layer-edit-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.layer-edit-lbl { font-family:var(--fm); font-size:0.58rem; color:var(--text2); flex:1; }
+.layer-edit-input {
+  width:72px; background:var(--surf3); border:1px solid var(--border2);
+  border-radius:2px; color:var(--text); font-family:var(--fm); font-size:0.65rem;
+  padding:4px 6px; outline:none; text-align:right;
+}
+.layer-edit-input:focus { border-color:var(--accent); }
+.layer-color-row { display:flex; gap:5px; flex-wrap:wrap; margin-top:2px; }
+.color-dot {
+  width:18px; height:18px; border-radius:50%; cursor:pointer;
+  border:2px solid transparent; transition:all 0.15s;
+}
+.color-dot.selected { border-color:white; transform:scale(1.2); }
+
+/* FS result in editor */
+.editor-fs-bar {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+  padding:8px 10px; background:var(--surf2); border:1px solid var(--border); border-radius:3px;
+}
+.editor-fs-cell { text-align:center; }
+.editor-fs-lbl { font-family:var(--fm); font-size:0.45rem; letter-spacing:1.5px; color:var(--text3); text-transform:uppercase; margin-bottom:2px; }
+.editor-fs-val { font-family:var(--fd); font-size:1.5rem; line-height:1; }
+.editor-fs-state { font-family:var(--fm); font-size:0.5rem; letter-spacing:1px; margin-top:1px; }
 .stab-box { margin-top: 14px; padding: 14px 16px; background: var(--surf2); border: 1px solid var(--border2); border-radius: 4px; }
 .stab-title { font-family: var(--fm); font-size: 0.58rem; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
 .stab-subtitle { font-family: var(--fb); font-size: 0.72rem; color: var(--text3); margin-bottom: 12px; line-height: 1.5; }
@@ -793,6 +916,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 
     <!-- TABS -->
     <div class="tab-bar">
+      <div class="tab" data-tab="editor">✏ EDITOR 2D</div>
       <div class="tab active" data-tab="visual">VISUALIZACIÓN</div>
       <div class="tab" data-tab="bishop">BISHOP — DOVELAS</div>
       <div class="tab" data-tab="sens">SENSIBILIDAD</div>
@@ -802,6 +926,195 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 
     <!-- TAB CONTENT -->
     <div class="tab-content">
+
+      <!-- TAB: EDITOR 2D -->
+      <div class="tab-pane" id="tab-editor">
+        <div class="editor-canvas-area">
+          <!-- Toolbar -->
+          <div class="editor-toolbar">
+            <button class="editor-tool-btn active" id="tool-terrain" onclick="setTool('terrain')">⬡ TERRENO</button>
+            <button class="editor-tool-btn water" id="tool-water" onclick="setTool('water')">〰 FREÁTICO</button>
+            <button class="editor-tool-btn" id="tool-boundary" onclick="setTool('boundary')" style="border-color:var(--warn);color:var(--warn)" title="Dibuja el límite inferior de la capa seleccionada">▱ LÍMITE CAPA</button>
+            <button class="editor-tool-btn" id="tool-move" onclick="setTool('move')">✥ MOVER</button>
+            <button class="editor-tool-btn" id="tool-bishop" onclick="setTool('bishop')" style="border-color:var(--accent2);color:var(--accent2)">◎ BISHOP</button>
+            <div class="tool-sep"></div>
+            <button class="editor-tool-btn" id="tool-undo" onclick="undo()" style="opacity:0.35" title="Deshacer (Ctrl+Z)">↩ DESHACER</button>
+            <button class="editor-tool-btn" id="tool-redo" onclick="redo()" style="opacity:0.35" title="Rehacer (Ctrl+Y)">↪ REHACER</button>
+            <div class="tool-sep"></div>
+            <button class="editor-tool-btn" onclick="resetZoom()" title="Restablecer zoom">⊡ ZOOM</button>
+            <button class="editor-tool-btn" onclick="loadDefaultGeometry()" style="border-color:var(--accent2);color:var(--accent2)">⟳ EJEMPLO</button>
+            <button class="editor-tool-btn danger" onclick="clearEditor()">✕ LIMPIAR</button>
+            <div class="tool-sep"></div>
+            <span class="editor-hint" id="editor-hint">Clic para añadir puntos · Clic derecho para eliminar · Rueda=zoom · Ctrl+drag=paneo</span>
+            <span style="font-family:var(--fm);font-size:0.52rem;color:var(--accent2);margin-left:auto;min-width:140px;text-align:right" id="ed-cursor"></span>
+          </div>
+          <!-- FS live bar -->
+          <div class="editor-fs-bar">
+            <div class="editor-fs-cell">
+              <div class="editor-fs-lbl">FS DETERMINISTA</div>
+              <div class="editor-fs-val" id="efs-det" style="color:var(--text3)">—</div>
+              <div class="editor-fs-state" id="est-det" style="color:var(--text3)">—</div>
+            </div>
+            <div class="editor-fs-cell">
+              <div class="editor-fs-lbl">FS BISHOP</div>
+              <div class="editor-fs-val" id="efs-bish" style="color:var(--text3)">—</div>
+              <div class="editor-fs-state" id="est-bish" style="color:var(--text3)">—</div>
+            </div>
+            <div class="editor-fs-cell">
+              <div class="editor-fs-lbl">FS CONSERVADOR</div>
+              <div class="editor-fs-val" id="efs-cons" style="color:var(--text3)">—</div>
+              <div class="editor-fs-state" id="est-cons" style="color:var(--text3)">—</div>
+            </div>
+          </div>
+          <!-- Main canvas -->
+          <canvas id="editorCanvas"></canvas>
+        </div>
+
+        <!-- Side panel -->
+        <div class="editor-side">
+
+          <!-- TABS within side panel -->
+          <div class="ed-side-tabs">
+            <div class="ed-side-tab active" data-side="layers" onclick="setSideTab('layers')">CAPAS</div>
+            <div class="ed-side-tab" data-side="coords" onclick="setSideTab('coords')">COORDENADAS</div>
+            <div class="ed-side-tab" data-side="conditions" onclick="setSideTab('conditions')">CONDICIONES</div>
+          </div>
+
+          <!-- LAYERS tab -->
+          <div class="ed-side-pane active" id="side-layers">
+            <div class="editor-side-section">
+              <div class="editor-side-title">CAPAS DE SUELO</div>
+              <div class="layer-list" id="layer-list"></div>
+              <button class="add-layer-btn" onclick="addLayer()">＋ AÑADIR CAPA</button>
+            </div>
+            <div class="editor-side-section" id="layer-edit-panel" style="display:none">
+              <div class="editor-side-title">EDITAR CAPA</div>
+              <div class="layer-edit-form">
+                <div class="layer-edit-row">
+                  <div class="layer-edit-lbl">Nombre</div>
+                  <input class="layer-edit-input" style="width:110px" id="le-name" type="text" oninput="updateSelectedLayer()">
+                </div>
+                <div class="layer-edit-row">
+                  <div class="layer-edit-lbl">Tipo de suelo</div>
+                  <select class="layer-edit-input" id="le-type" style="width:110px" onchange="updateSelectedLayer()">
+                    <option value="clay">Arcilla (CL/CH)</option>
+                    <option value="silt">Limo (ML/MH)</option>
+                    <option value="sand">Arena (SP/SW)</option>
+                    <option value="gravel">Grava (GP/GW)</option>
+                    <option value="rock">Roca / Macizo</option>
+                    <option value="fill">Relleno compac.</option>
+                    <option value="peat">Turba / Orgánico</option>
+                  </select>
+                </div>
+                <div class="layer-edit-row">
+                  <div class="layer-edit-lbl">Cohesión c' (kPa)</div>
+                  <input class="layer-edit-input" id="le-c" type="number" min="0" max="500" step="1" oninput="updateSelectedLayer()">
+                </div>
+                <div class="layer-edit-row">
+                  <div class="layer-edit-lbl">Fricción φ' (°)</div>
+                  <input class="layer-edit-input" id="le-phi" type="number" min="0" max="60" step="0.5" oninput="updateSelectedLayer()">
+                </div>
+                <div class="layer-edit-row">
+                  <div class="layer-edit-lbl">Peso esp. γ (kN/m³)</div>
+                  <input class="layer-edit-input" id="le-gamma" type="number" min="8" max="30" step="0.5" oninput="updateSelectedLayer()">
+                </div>
+                <div class="layer-edit-row">
+                  <div class="layer-edit-lbl">Límite inferior (m)</div>
+                  <input class="layer-edit-input" id="le-boundary" type="number" step="0.5" placeholder="auto" oninput="updateSelectedLayer()" title="Cota Y del límite inferior de esta capa">
+                </div>
+                <div class="layer-edit-row" style="align-items:flex-start;flex-direction:column;gap:5px">
+                  <div class="layer-edit-lbl">Color</div>
+                  <div class="layer-color-row" id="le-colors"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COORDINATES tab -->
+          <div class="ed-side-pane" id="side-coords">
+            <div class="editor-side-section" style="flex:1;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="editor-side-title" style="margin-bottom:0">PUNTOS DEL PERFIL</div>
+                <div style="display:flex;gap:5px">
+                  <label class="ed-import-btn" title="Importar CSV (X,Y por línea)">
+                    ↑ CSV <input type="file" accept=".csv,.txt" style="display:none" onchange="importCSV(event)">
+                  </label>
+                  <button class="ed-import-btn" onclick="exportCSV()">↓ CSV</button>
+                </div>
+              </div>
+              <div style="font-family:var(--fm);font-size:0.48rem;color:var(--text3);margin-bottom:4px">
+                Formato CSV: una línea por punto, X,Y en metros. Edita directamente en la tabla.
+              </div>
+              <div class="coords-table-wrap">
+                <table class="coords-table">
+                  <thead><tr><th>#</th><th>X (m)</th><th>Y (m)</th><th></th></tr></thead>
+                  <tbody id="coords-tbody"></tbody>
+                </table>
+              </div>
+              <button class="add-layer-btn" onclick="addPointManual()">＋ AÑADIR PUNTO</button>
+            </div>
+          </div>
+
+          <!-- CONDITIONS tab -->
+          <div class="ed-side-pane" id="side-conditions">
+            <div class="editor-side-section">
+              <div class="editor-side-title">CONDICIÓN HIDROLÓGICA</div>
+              <div class="cond-grid">
+                <div class="cond-btn active" id="cond-dry" onclick="setCondition('dry')">
+                  <div class="cond-icon">☀</div>
+                  <div class="cond-name">SECO</div>
+                  <div class="cond-desc">NF = 0%</div>
+                </div>
+                <div class="cond-btn" id="cond-normal" onclick="setCondition('normal')">
+                  <div class="cond-icon">〰</div>
+                  <div class="cond-name">NORMAL</div>
+                  <div class="cond-desc">NF actual</div>
+                </div>
+                <div class="cond-btn" id="cond-rain" onclick="setCondition('rain')">
+                  <div class="cond-icon">🌧</div>
+                  <div class="cond-name">LLUVIA</div>
+                  <div class="cond-desc">NF = 80%</div>
+                </div>
+                <div class="cond-btn" id="cond-sat" onclick="setCondition('sat')">
+                  <div class="cond-icon">💧</div>
+                  <div class="cond-name">SATURADO</div>
+                  <div class="cond-desc">NF = 100%</div>
+                </div>
+              </div>
+            </div>
+            <div class="editor-side-section">
+              <div class="editor-side-title">CONDICIÓN SÍSMICA</div>
+              <div class="cond-seismic">
+                <label style="display:flex;align-items:center;gap:8px;font-family:var(--fb);font-size:0.78rem;color:var(--text2);cursor:pointer">
+                  <input type="checkbox" id="ed-seismic" onchange="calcEditorFS();drawEditor()" style="accent-color:var(--accent)">
+                  Análisis pseudoestático
+                </label>
+                <div class="layer-edit-row" style="margin-top:8px">
+                  <div class="layer-edit-lbl">kh (coef. sísmico)</div>
+                  <input class="layer-edit-input" id="ed-kh" type="number" value="0.1" min="0" max="0.5" step="0.01" oninput="calcEditorFS();drawEditor()">
+                </div>
+              </div>
+            </div>
+            <div class="editor-side-section">
+              <div class="editor-side-title">EXPORTAR</div>
+              <button class="add-layer-btn" style="margin-bottom:6px" onclick="exportEditorPNG()">↓ EXPORTAR IMAGEN PNG</button>
+              <div style="font-family:var(--fm);font-size:0.48rem;color:var(--text3);line-height:1.6">Descarga el canvas actual como imagen de alta resolución para incluir en informes.</div>
+            </div>
+            <div class="editor-side-section">
+              <div class="editor-side-title">INSTRUCCIONES RÁPIDAS</div>
+              <div style="font-family:var(--fb);font-size:0.7rem;color:var(--text3);line-height:1.85;">
+                <b style="color:var(--text2)">⬡ Terreno</b> — clic añade punto, clic derecho elimina<br>
+                <b style="color:var(--text2)">〰 Freático</b> — dibuja línea freática libre punto a punto<br>
+                <b style="color:var(--text2)">✥ Mover</b> — arrastra puntos del perfil o del freático<br>
+                <b style="color:var(--text2)">◎ Bishop</b> — superficie crítica sobre perfil real<br>
+                <b style="color:var(--accent)">Rueda</b> = zoom · <b style="color:var(--accent)">Ctrl+drag</b> = paneo<br>
+                <b style="color:var(--accent)">Ctrl+Z</b> = deshacer · <b style="color:var(--accent)">Mayús</b> = sin snap
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
 
       <!-- TAB: VISUAL -->
       <div class="tab-pane active" id="tab-visual">
@@ -2277,8 +2590,848 @@ sliderIds.forEach(id => {
   });
 });
 
-window.addEventListener('resize', () => { update(); });
+window.addEventListener('resize', () => { update(); drawEditor(); });
 update();
+
+// ═══════════════════════════════════════════════════════
+//  EDITOR 2D — INTERACTIVE GEOMETRY ENGINE
+// ═══════════════════════════════════════════════════════
+
+const LAYER_COLORS = ['#b87a3a','#5a7a32','#3a6e6a','#6a3a6e','#3a5a8a','#7a6a32','#8a3a3a','#3a7a3a','#5a5a8a','#8a5a3a'];
+
+// SOIL TYPE CONFIG — color + USCS name + default params
+const SOIL_PRESETS = {
+  clay:   {label:'Arcilla',    c:25, phi:18, gamma:18, color:'#b87a3a'},
+  silt:   {label:'Limo',       c:10, phi:22, gamma:17, color:'#9a8a5a'},
+  sand:   {label:'Arena',      c:0,  phi:32, gamma:18, color:'#c8a850'},
+  gravel: {label:'Grava',      c:0,  phi:38, gamma:20, color:'#7a7a6a'},
+  rock:   {label:'Roca',       c:80, phi:45, gamma:25, color:'#6a6a7a'},
+  fill:   {label:'Relleno',    c:5,  phi:28, gamma:17, color:'#8a6a4a'},
+  peat:   {label:'Turba',      c:5,  phi:15, gamma:12, color:'#4a5a2a'},
+};
+
+// ══════════════════════════════════════════════════════════
+//  EDITOR 2D STATE
+// ══════════════════════════════════════════════════════════
+let editorTool='terrain', editorLayers=[], selectedLayerIdx=0;
+let terrainPoints=[], waterPoints=[];
+// Each layer has: {name,c,phi,gamma,type,color,boundaryPts:[{x,y}]}
+// boundaryPts = BOTTOM boundary of that layer = TOP boundary of next layer
+let draggingPtIdx=-1, draggingWaterIdx=-1, draggingBoundaryLayer=-1, draggingBoundaryIdx=-1;
+let hoveredPtIdx=-1, hoveredWaterIdx=-1, hoveredBoundaryLayer=-1, hoveredBoundaryIdx=-1;
+let editorInited=false, edCondition='dry';
+let undoStack=[], redoStack=[];
+let edView={offsetX:0,offsetY:0,scale:1};
+let isPanning=false, panStart=null, panViewStart=null;
+let cursorWorld=null, editorBishop=null;
+const SNAP_GRID=2.5;
+let edWorld={minX:-5,maxX:110,minY:-5,maxY:42};
+const ED_MARGIN={l:56,r:20,t:20,b:44};
+
+function edCanvas(){return document.getElementById('editorCanvas');}
+
+// ── TRANSFORM ──────────────────────────────────────────────
+function getTransform(){
+  const c=edCanvas();if(!c)return{s:1,ox:0,oy:0};
+  const m=ED_MARGIN,pw=c.width-m.l-m.r,ph=c.height-m.t-m.b;
+  const s=Math.min(pw/(edWorld.maxX-edWorld.minX),ph/(edWorld.maxY-edWorld.minY))*edView.scale;
+  const ox=m.l+edView.offsetX+(pw-(edWorld.maxX-edWorld.minX)*s)/2;
+  const oy=m.t+ph+edView.offsetY+edWorld.minY*s;
+  return {s,ox,oy};
+}
+function worldToCanvas(wx,wy){const{s,ox,oy}=getTransform();return{x:ox+wx*s,y:oy-wy*s};}
+function canvasToWorld(cx,cy){const{s,ox,oy}=getTransform();return{x:(cx-ox)/s,y:(oy-cy)/s};}
+function snapPoint(wp,e){if(e&&e.shiftKey)return wp;return{x:Math.round(wp.x/SNAP_GRID)*SNAP_GRID,y:Math.round(wp.y/SNAP_GRID)*SNAP_GRID};}
+
+// ── UNDO / REDO ──────────────────────────────────────────────
+function saveState(){
+  undoStack.push({pts:JSON.parse(JSON.stringify(terrainPoints)),wp:JSON.parse(JSON.stringify(waterPoints)),layers:JSON.parse(JSON.stringify(editorLayers))});
+  if(undoStack.length>60)undoStack.shift();
+  redoStack=[];updateUndoButtons();
+}
+function undo(){
+  if(!undoStack.length)return;
+  redoStack.push({pts:JSON.parse(JSON.stringify(terrainPoints)),wp:JSON.parse(JSON.stringify(waterPoints)),layers:JSON.parse(JSON.stringify(editorLayers))});
+  const s=undoStack.pop();terrainPoints=s.pts;waterPoints=s.wp;editorLayers=s.layers;afterEdit();
+}
+function redo(){
+  if(!redoStack.length)return;
+  undoStack.push({pts:JSON.parse(JSON.stringify(terrainPoints)),wp:JSON.parse(JSON.stringify(waterPoints)),layers:JSON.parse(JSON.stringify(editorLayers))});
+  const s=redoStack.pop();terrainPoints=s.pts;waterPoints=s.wp;editorLayers=s.layers;afterEdit();
+}
+function updateUndoButtons(){
+  const ub=g('tool-undo'),rb=g('tool-redo');
+  if(ub)ub.style.opacity=undoStack.length?'1':'0.35';
+  if(rb)rb.style.opacity=redoStack.length?'1':'0.35';
+}
+function afterEdit(){renderLayerList();renderCoordsTable();drawEditor();calcEditorFS();updateUndoButtons();}
+
+// ── INIT ──────────────────────────────────────────────────────
+function initEditor(){
+  if(editorInited){drawEditor();return;}
+  editorInited=true;
+  const c=edCanvas();
+  c.addEventListener('mousedown',edMouseDown);
+  c.addEventListener('mousemove',edMouseMove);
+  c.addEventListener('mouseup',edMouseUp);
+  c.addEventListener('mouseleave',edMouseLeave);
+  c.addEventListener('wheel',edWheel,{passive:false});
+  c.addEventListener('contextmenu',edContextMenu);
+  document.addEventListener('keydown',edKeyDown);
+  initLayers();loadDefaultGeometry();updateUndoButtons();
+}
+
+function initLayers(){
+  editorLayers=[
+    {name:'Arcilla superficial',c:25,phi:18,gamma:18,color:'#b87a3a',type:'clay',boundaryPts:[]},
+    {name:'Arena media',        c:0, phi:32,gamma:18,color:'#c8a850',type:'sand',boundaryPts:[]},
+    {name:'Roca base',          c:80,phi:45,gamma:25,color:'#6a6a7a',type:'rock',boundaryPts:[]},
+  ];
+  selectedLayerIdx=0;renderLayerList();
+}
+
+function loadDefaultGeometry(){
+  terrainPoints=[{x:0,y:0},{x:15,y:0},{x:42,y:25},{x:57,y:30},{x:100,y:30}];
+  waterPoints=[{x:0,y:10},{x:15,y:10},{x:42,y:15},{x:100,y:15}];
+  // Always reset layers to known 3-layer state
+  editorLayers=[
+    {name:'Arcilla superficial',c:25,phi:18,gamma:18,color:'#b87a3a',type:'clay',
+     boundaryPts:[{x:0,y:-3},{x:20,y:-2},{x:50,y:8},{x:80,y:11},{x:100,y:12}]},
+    {name:'Arena media',c:0,phi:32,gamma:18,color:'#c8a850',type:'sand',
+     boundaryPts:[{x:0,y:-10},{x:30,y:-8},{x:60,y:2},{x:100,y:3}]},
+    {name:'Roca base',c:80,phi:45,gamma:25,color:'#6a6a7a',type:'rock',
+     boundaryPts:[]},
+  ];
+  selectedLayerIdx=0;
+  edWorld={minX:-5,maxX:110,minY:-18,maxY:42};
+  edView={offsetX:0,offsetY:0,scale:1};
+  undoStack=[];redoStack=[];
+  afterEdit();
+}
+
+function clearEditor(){
+  saveState();terrainPoints=[];waterPoints=[];editorBishop=null;
+  editorLayers.forEach(l=>l.boundaryPts=[]);
+  edView={offsetX:0,offsetY:0,scale:1};undoStack=[];redoStack=[];
+  afterEdit();
+  ['efs-det','efs-bish','efs-cons'].forEach(id=>{const e=g(id);if(e){e.textContent='--';e.style.color='var(--text3)';}});
+  ['est-det','est-bish','est-cons'].forEach(id=>{const e=g(id);if(e)e.textContent='--';});
+}
+
+// ── TOOL SELECTION ────────────────────────────────────────────
+function setTool(tool){
+  editorTool=tool;
+  document.querySelectorAll('.editor-tool-btn[id^="tool-"]').forEach(b=>{if(!['tool-undo','tool-redo'].includes(b.id))b.classList.remove('active');});
+  g('tool-'+tool)?.classList.add('active');
+  const hints={
+    terrain:'Clic: añadir punto perfil · Der: eliminar · Mayús: sin snap',
+    water:'Clic: añadir punto freático libre · Der: eliminar · Arrastra: mover',
+    boundary:'Clic: añadir punto al límite inferior de la CAPA SELECCIONADA · Der: eliminar',
+    move:'Arrastra puntos (terreno / freático / límites) · Ctrl+drag: paneo · Rueda: zoom',
+    bishop:'Busca y dibuja la superficie crítica Bishop sobre el perfil real multi-capa'
+  };
+  const h=g('editor-hint');if(h)h.textContent=hints[tool]||'';
+  edCanvas().style.cursor=tool==='move'?'grab':'crosshair';
+  if(tool==='bishop'){editorBishop=null;calcEditorBishop();drawEditor();}
+}
+
+// ── SIDE TABS ─────────────────────────────────────────────────
+function setSideTab(tab){
+  document.querySelectorAll('.ed-side-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ed-side-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelector('.ed-side-tab[data-side="'+tab+'"]')?.classList.add('active');
+  g('side-'+tab)?.classList.add('active');
+  if(tab==='coords')renderCoordsTable();
+}
+
+// ── CONDITIONS ────────────────────────────────────────────────
+function setCondition(cond){
+  edCondition=cond;
+  document.querySelectorAll('.cond-btn').forEach(b=>b.classList.remove('active'));
+  g('cond-'+cond)?.classList.add('active');
+  const yVals=terrainPoints.map(p=>p.y);
+  const yMin=yVals.length?Math.min(...yVals):0,yMax=yVals.length?Math.max(...yVals):30,H=yMax-yMin;
+  const f={dry:0,normal:0.4,rain:0.8,sat:1.0}[cond]||0;
+  if(cond==='dry'){waterPoints=[];}
+  else{const wY=yMin+H*f;waterPoints=terrainPoints.map(p=>({x:p.x,y:wY}));}
+  drawEditor();calcEditorFS();
+}
+
+// ── CANVAS POS & HIT TESTING ─────────────────────────────────
+function getCanvasPos(e){const r=edCanvas().getBoundingClientRect();return{cx:(e.clientX-r.left)*(edCanvas().width/r.width),cy:(e.clientY-r.top)*(edCanvas().height/r.height)};}
+function findNearest(pts,cx,cy,r){r=r||15;let minD=r,best=-1;pts.forEach((p,i)=>{const cp=worldToCanvas(p.x,p.y),d=Math.hypot(cx-cp.x,cy-cp.y);if(d<minD){minD=d;best=i;}});return best;}
+function findNearestTerrain(cx,cy,r){return findNearest(terrainPoints,cx,cy,r);}
+function findNearestWater(cx,cy,r){return findNearest(waterPoints,cx,cy,r);}
+function findNearestBoundary(cx,cy,r){
+  r=r||15;let bestLayer=-1,bestIdx=-1,minD=r;
+  editorLayers.forEach((l,li)=>{
+    if(!l.boundaryPts)return;
+    l.boundaryPts.forEach((p,pi)=>{const cp=worldToCanvas(p.x,p.y),d=Math.hypot(cx-cp.x,cy-cp.y);if(d<minD){minD=d;bestLayer=li;bestIdx=pi;}});
+  });
+  return{layer:bestLayer,idx:bestIdx};
+}
+
+// ── MOUSE EVENTS ──────────────────────────────────────────────
+function edMouseDown(e){
+  const{cx,cy}=getCanvasPos(e),wp=canvasToWorld(cx,cy);
+  if(e.button===1||(e.button===0&&e.ctrlKey)){isPanning=true;panStart={cx,cy};panViewStart={...edView};edCanvas().style.cursor='grabbing';e.preventDefault();return;}
+  if(e.button!==0)return;
+  if(editorTool==='terrain'){
+    saveState();terrainPoints.push(snapPoint(wp,e));terrainPoints.sort((a,b)=>a.x-b.x);autoFitWorld();afterEdit();
+  }else if(editorTool==='water'){
+    saveState();waterPoints.push(snapPoint(wp,e));waterPoints.sort((a,b)=>a.x-b.x);afterEdit();
+  }else if(editorTool==='boundary'){
+    const l=editorLayers[selectedLayerIdx];if(!l)return;
+    saveState();if(!l.boundaryPts)l.boundaryPts=[];
+    l.boundaryPts.push(snapPoint(wp,e));l.boundaryPts.sort((a,b)=>a.x-b.x);afterEdit();
+  }else if(editorTool==='move'){
+    const ni=findNearestTerrain(cx,cy),nw=findNearestWater(cx,cy),nb=findNearestBoundary(cx,cy);
+    if(ni>=0){saveState();draggingPtIdx=ni;edCanvas().style.cursor='grabbing';}
+    else if(nw>=0){saveState();draggingWaterIdx=nw;edCanvas().style.cursor='grabbing';}
+    else if(nb.layer>=0){saveState();draggingBoundaryLayer=nb.layer;draggingBoundaryIdx=nb.idx;edCanvas().style.cursor='grabbing';}
+  }else if(editorTool==='bishop'){editorBishop=null;calcEditorBishop();drawEditor();}
+}
+
+function edMouseMove(e){
+  const{cx,cy}=getCanvasPos(e),wp=canvasToWorld(cx,cy);
+  cursorWorld=snapPoint(wp,e);
+  const el=g('ed-cursor');if(el)el.textContent='X: '+cursorWorld.x.toFixed(1)+'m  Y: '+cursorWorld.y.toFixed(1)+'m';
+  if(isPanning&&panStart){edView.offsetX=panViewStart.offsetX+(cx-panStart.cx);edView.offsetY=panViewStart.offsetY+(cy-panStart.cy);drawEditor();return;}
+  const nh=editorTool==='move'?findNearestTerrain(cx,cy,16):-1;
+  const nwh=editorTool==='move'?findNearestWater(cx,cy,16):-1;
+  const nbh=editorTool==='move'?findNearestBoundary(cx,cy,16):{layer:-1,idx:-1};
+  if(nh!==hoveredPtIdx||nwh!==hoveredWaterIdx||nbh.layer!==hoveredBoundaryLayer||nbh.idx!==hoveredBoundaryIdx){
+    hoveredPtIdx=nh;hoveredWaterIdx=nwh;hoveredBoundaryLayer=nbh.layer;hoveredBoundaryIdx=nbh.idx;drawEditor();
+  }
+  if(draggingPtIdx>=0){terrainPoints[draggingPtIdx]=snapPoint(wp,e);terrainPoints.sort((a,b)=>a.x-b.x);drawEditor();calcEditorFS();}
+  else if(draggingWaterIdx>=0){waterPoints[draggingWaterIdx]=snapPoint(wp,e);waterPoints.sort((a,b)=>a.x-b.x);drawEditor();calcEditorFS();}
+  else if(draggingBoundaryLayer>=0){
+    const l=editorLayers[draggingBoundaryLayer];if(l&&l.boundaryPts){l.boundaryPts[draggingBoundaryIdx]=snapPoint(wp,e);l.boundaryPts.sort((a,b)=>a.x-b.x);drawEditor();calcEditorFS();}
+  }
+  if(['terrain','water','boundary'].includes(editorTool)&&draggingPtIdx<0&&draggingWaterIdx<0&&draggingBoundaryLayer<0){drawEditor();drawSnapGhost(cx,cy,snapPoint(wp,e));}
+}
+
+function edMouseUp(){
+  isPanning=false;panStart=null;
+  if(draggingPtIdx>=0||draggingWaterIdx>=0||draggingBoundaryLayer>=0)renderCoordsTable();
+  draggingPtIdx=-1;draggingWaterIdx=-1;draggingBoundaryLayer=-1;draggingBoundaryIdx=-1;
+  edCanvas().style.cursor=editorTool==='move'?'grab':'crosshair';
+}
+function edMouseLeave(){
+  cursorWorld=null;hoveredPtIdx=-1;hoveredWaterIdx=-1;hoveredBoundaryLayer=-1;hoveredBoundaryIdx=-1;
+  isPanning=false;panStart=null;draggingPtIdx=-1;draggingWaterIdx=-1;draggingBoundaryLayer=-1;draggingBoundaryIdx=-1;
+  const el=g('ed-cursor');if(el)el.textContent='';drawEditor();
+}
+function edContextMenu(e){
+  e.preventDefault();const{cx,cy}=getCanvasPos(e);
+  const ni=findNearestTerrain(cx,cy,18),nw=findNearestWater(cx,cy,18),nb=findNearestBoundary(cx,cy,18);
+  if(ni>=0){saveState();terrainPoints.splice(ni,1);afterEdit();}
+  else if(nw>=0){saveState();waterPoints.splice(nw,1);afterEdit();}
+  else if(nb.layer>=0){saveState();editorLayers[nb.layer].boundaryPts.splice(nb.idx,1);afterEdit();}
+}
+function edKeyDown(e){
+  const at=document.querySelector('.tab.active');if(!at||at.dataset.tab!=='editor')return;
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}
+  if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.shiftKey&&e.key==='z'))){e.preventDefault();redo();}
+  if(e.key==='Delete'||e.key==='Backspace'){
+    if(hoveredPtIdx>=0){saveState();terrainPoints.splice(hoveredPtIdx,1);hoveredPtIdx=-1;afterEdit();}
+    else if(hoveredWaterIdx>=0){saveState();waterPoints.splice(hoveredWaterIdx,1);hoveredWaterIdx=-1;afterEdit();}
+    else if(hoveredBoundaryLayer>=0&&hoveredBoundaryIdx>=0){saveState();editorLayers[hoveredBoundaryLayer].boundaryPts.splice(hoveredBoundaryIdx,1);hoveredBoundaryLayer=-1;hoveredBoundaryIdx=-1;afterEdit();}
+  }
+}
+function edWheel(e){
+  e.preventDefault();const{cx,cy}=getCanvasPos(e),zf=e.deltaY<0?1.13:0.88;
+  const wB=canvasToWorld(cx,cy);edView.scale=Math.max(0.2,Math.min(15,edView.scale*zf));
+  const wA=canvasToWorld(cx,cy);const{s}=getTransform();
+  edView.offsetX+=(wA.x-wB.x)*s;edView.offsetY-=(wA.y-wB.y)*s;drawEditor();
+}
+function resetZoom(){edView={offsetX:0,offsetY:0,scale:1};autoFitWorld();drawEditor();}
+function autoFitWorld(){
+  if(terrainPoints.length<2)return;
+  const xs=terrainPoints.map(p=>p.x),ys=terrainPoints.map(p=>p.y);
+  const rx=Math.max(...xs)-Math.min(...xs),ry=Math.max(...ys)-Math.min(...ys);
+  // Include boundary points in extent
+  let allY=[...ys];
+  editorLayers.forEach(l=>{if(l.boundaryPts)l.boundaryPts.forEach(p=>allY.push(p.y));});
+  edWorld={minX:Math.min(...xs)-rx*0.12,maxX:Math.max(...xs)+rx*0.12,minY:Math.min(...allY)-ry*0.25,maxY:Math.max(...ys)+ry*0.3};
+}
+
+// ── SNAP GHOST ────────────────────────────────────────────────
+function drawSnapGhost(cx,cy,snapped){
+  const ctx=edCanvas().getContext('2d'),cp=worldToCanvas(snapped.x,snapped.y);
+  ctx.strokeStyle='rgba(232,200,66,0.55)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(cp.x-12,cp.y);ctx.lineTo(cp.x+12,cp.y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cp.x,cp.y-12);ctx.lineTo(cp.x,cp.y+12);ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();ctx.arc(cp.x,cp.y,4,0,Math.PI*2);ctx.strokeStyle='rgba(232,200,66,0.7)';ctx.lineWidth=1.5;ctx.stroke();
+  let all=editorTool==='water'?waterPoints:editorTool==='boundary'?(editorLayers[selectedLayerIdx]?.boundaryPts||[]):terrainPoints;
+  if(all.length>0){const last=all[all.length-1],lcp=worldToCanvas(last.x,last.y);ctx.beginPath();ctx.moveTo(lcp.x,lcp.y);ctx.lineTo(cp.x,cp.y);ctx.strokeStyle='rgba(232,200,66,0.2)';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);ctx.stroke();ctx.setLineDash([]);}
+}
+
+// ══════════════════════════════════════════════════════════
+//  HATCH PATTERNS — USCS / GEOLOGY STANDARD
+// ══════════════════════════════════════════════════════════
+function drawHatchInClip(ctx,type,color,poly){
+  ctx.save();
+  ctx.beginPath();poly.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.closePath();ctx.clip();
+  const minX=Math.min(...poly.map(p=>p.x))-2,maxX=Math.max(...poly.map(p=>p.x))+2;
+  const minY=Math.min(...poly.map(p=>p.y))-2,maxY=Math.max(...poly.map(p=>p.y))+2;
+  const W=maxX-minX,H=maxY-minY;
+
+  if(type==='clay'){
+    // ISO standard clay: horizontal lines + downward ticks every 10px
+    ctx.strokeStyle=color+'80';ctx.lineWidth=0.9;
+    for(let y=minY;y<=maxY;y+=7){
+      ctx.beginPath();ctx.moveTo(minX,y);ctx.lineTo(maxX,y);ctx.stroke();
+    }
+    ctx.strokeStyle=color+'aa';ctx.lineWidth=0.9;
+    for(let y=minY+3.5;y<=maxY;y+=7){
+      for(let x=minX+5;x<=maxX;x+=10){
+        ctx.beginPath();ctx.moveTo(x,y-3);ctx.lineTo(x,y+3);ctx.stroke();
+      }
+    }
+  }
+  else if(type==='silt'){
+    // Fine diagonal lines + dots — distinct from clay
+    ctx.strokeStyle=color+'55';ctx.lineWidth=0.7;
+    for(let d=minX-H;d<=maxX+H;d+=7){
+      ctx.beginPath();ctx.moveTo(d,minY);ctx.lineTo(d+H,maxY);ctx.stroke();
+    }
+    // small v-marks
+    ctx.strokeStyle=color+'70';ctx.lineWidth=0.8;
+    for(let y=minY+6;y<=maxY;y+=12){
+      for(let x=minX+4;x<=maxX;x+=12){
+        ctx.beginPath();ctx.moveTo(x-3,y-3);ctx.lineTo(x,y);ctx.lineTo(x+3,y-3);ctx.stroke();
+      }
+    }
+  }
+  else if(type==='sand'){
+    // USCS: dense stipple — the most recognizable sand symbol
+    ctx.fillStyle=color+'90';
+    const sp=4.5;
+    for(let row=0,y=minY+sp/2;y<=maxY;y+=sp,row++){
+      const xOff=row%2===0?0:sp/2;
+      for(let x=minX+xOff;x<=maxX;x+=sp){
+        ctx.beginPath();ctx.arc(x,y,0.9,0,Math.PI*2);ctx.fill();
+      }
+    }
+    // Occasional larger dots for variation
+    ctx.fillStyle=color+'55';
+    for(let y=minY+9;y<=maxY;y+=18){
+      for(let x=minX+9;x<=maxX;x+=18){
+        ctx.beginPath();ctx.arc(x,y,1.8,0,Math.PI*2);ctx.fill();
+      }
+    }
+  }
+  else if(type==='gravel'){
+    // USCS: ellipse outlines arranged in staggered rows — cobblestone
+    ctx.strokeStyle=color+'88';ctx.lineWidth=1.1;
+    const rw=9,rh=5,spx=21,spy=13;
+    for(let row=0,y=minY+spy/2;y<=maxY;y+=spy,row++){
+      const xOff=row%2===0?0:spx/2;
+      for(let x=minX+xOff+rw;x<=maxX;x+=spx){
+        ctx.beginPath();ctx.ellipse(x,y,rw,rh,0,0,Math.PI*2);ctx.stroke();
+        // small dot inside
+        ctx.fillStyle=color+'40';ctx.beginPath();ctx.arc(x,y,1.5,0,Math.PI*2);ctx.fill();
+      }
+    }
+  }
+  else if(type==='rock'){
+    // Bold brick pattern — unmistakable
+    ctx.strokeStyle=color+'aa';ctx.lineWidth=1.5;
+    const bh=12,bw=24;
+    // Horizontal mortar lines
+    for(let y=minY;y<=maxY;y+=bh){ctx.beginPath();ctx.moveTo(minX,y);ctx.lineTo(maxX,y);ctx.stroke();}
+    // Staggered vertical joints
+    let row=0;
+    for(let y=minY+bh/2;y<=maxY;y+=bh){
+      const xOff=row%2===0?0:bw/2;
+      for(let x=minX+xOff;x<=maxX;x+=bw){ctx.beginPath();ctx.moveTo(x,y-bh/2);ctx.lineTo(x,y+bh/2);ctx.stroke();}
+      row++;
+    }
+    // Slight diagonal shading inside blocks for depth
+    ctx.strokeStyle=color+'25';ctx.lineWidth=0.5;
+    for(let y=minY;y<=maxY;y+=bh){
+      for(let x=minX;x<=maxX;x+=bw){
+        ctx.beginPath();ctx.moveTo(x+2,y+2);ctx.lineTo(x+bw-2,y+bh-2);ctx.stroke();
+      }
+    }
+  }
+  else if(type==='fill'){
+    // Compacted fill: crosshatch ±45°
+    ctx.strokeStyle=color+'60';ctx.lineWidth=0.8;
+    for(let d=minX-H;d<=maxX+H;d+=9){
+      ctx.beginPath();ctx.moveTo(d,minY);ctx.lineTo(d+H,maxY);ctx.stroke();
+    }
+    for(let d=minX-H;d<=maxX+H;d+=9){
+      ctx.beginPath();ctx.moveTo(d+H,minY);ctx.lineTo(d,maxY);ctx.stroke();
+    }
+    // Small dots at intersections
+    ctx.fillStyle=color+'70';
+    for(let y=minY+4;y<=maxY;y+=9){
+      for(let x=minX+(y%18<9?0:4);x<=maxX;x+=9){
+        ctx.beginPath();ctx.arc(x,y,1,0,Math.PI*2);ctx.fill();
+      }
+    }
+  }
+  else if(type==='peat'){
+    // Organic: horizontal + sinusoidal waves + small circles (ASTM D4083 inspired)
+    ctx.strokeStyle=color+'70';ctx.lineWidth=0.9;
+    for(let y=minY;y<=maxY;y+=9){
+      ctx.beginPath();ctx.moveTo(minX,y);
+      for(let x=minX;x<=maxX;x+=4){
+        ctx.lineTo(x,y+Math.sin((x-minX)*0.4)*2.5);
+      }
+      ctx.stroke();
+    }
+    // Small organic circles scattered
+    ctx.fillStyle=color+'55';ctx.strokeStyle=color+'80';ctx.lineWidth=0.7;
+    for(let y=minY+4;y<=maxY;y+=14){
+      for(let x=minX+6;x<=maxX;x+=14){
+        const r=2.5+(Math.sin(x*0.3+y*0.2)*0.8);
+        ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+// ── INTERPOLATION HELPERS ─────────────────────────────────────
+function interpPolyline(pts,x){
+  if(!pts||pts.length===0)return null;
+  if(pts.length===1)return pts[0].y;
+  if(x<=pts[0].x)return pts[0].y;
+  if(x>=pts[pts.length-1].x)return pts[pts.length-1].y;
+  for(let i=0;i<pts.length-1;i++){
+    if(x>=pts[i].x&&x<=pts[i+1].x){const t=(x-pts[i].x)/(pts[i+1].x-pts[i].x);return pts[i].y+t*(pts[i+1].y-pts[i].y);}
+  }
+  return null;
+}
+function waterYatX(x){return interpPolyline(waterPoints,x);}
+function profileYatX(x){return interpPolyline(terrainPoints,x);}
+function boundaryYatX(layerIdx,x){return interpPolyline(editorLayers[layerIdx]?.boundaryPts,x);}
+
+// Layer at a given world (x, y) — multi-layer stacking
+function layerAtX(x,y){
+  for(let i=0;i<editorLayers.length-1;i++){
+    const bY=boundaryYatX(i,x);
+    if(bY!==null&&y>=bY)return editorLayers[i+1];
+  }
+  return editorLayers[0];
+}
+
+// ── BUILD LAYER POLYGON (proper stacking) ─────────────────────
+function buildLayerPoly(layerIdx){
+  // top = terrain (layer 0) or previous layer's boundary
+  const topPts = layerIdx===0 ? terrainPoints : (editorLayers[layerIdx-1].boundaryPts||[]);
+  const botPts = editorLayers[layerIdx].boundaryPts||[];
+  if(topPts.length<2) return null;
+
+  // Extend boundaries to fill full terrain width
+  const xMin=terrainPoints[0].x, xMax=terrainPoints[terrainPoints.length-1].x;
+
+  // Build canvas poly: top L→R, bottom R→L
+  const poly=[];
+  // If botPts exist, clip bottom at botPts; else extend to deep bottom
+  const yDeep=Math.min(...terrainPoints.map(p=>p.y))-20;
+  const botY_c=worldToCanvas(0,yDeep).y;
+
+  // Top boundary (left→right)
+  topPts.forEach(p=>poly.push(worldToCanvas(p.x,p.y)));
+
+  if(botPts.length>=2){
+    // Right edge: connect top-right to bottom-right
+    const topR=topPts[topPts.length-1],botR=botPts[botPts.length-1];
+    if(Math.abs(topR.x-botR.x)>0.5){
+      // Interpolate or extrapolate
+      const bAtTopRx=interpPolyline(botPts,topR.x);
+      if(bAtTopRx!==null) poly.push(worldToCanvas(topR.x,bAtTopRx));
+      else poly.push(worldToCanvas(Math.max(topR.x,botR.x),botR.y));
+    }
+    // Bottom boundary (right→left)
+    for(let i=botPts.length-1;i>=0;i--) poly.push(worldToCanvas(botPts[i].x,botPts[i].y));
+    // Left edge
+    const topL=topPts[0],botL=botPts[0];
+    if(Math.abs(topL.x-botL.x)>0.5){
+      const bAtTopLx=interpPolyline(botPts,topL.x);
+      if(bAtTopLx!==null) poly.push(worldToCanvas(topL.x,bAtTopLx));
+    }
+  }else{
+    // No bottom defined — fill to bottom of canvas
+    const lastTop=topPts[topPts.length-1],firstTop=topPts[0];
+    poly.push({x:worldToCanvas(lastTop.x,0).x,y:botY_c});
+    poly.push({x:worldToCanvas(firstTop.x,0).x,y:botY_c});
+  }
+  return poly;
+}
+
+// ── BISHOP MULTI-LAYER ────────────────────────────────────────
+function calcEditorBishop(){
+  if(terrainPoints.length<3)return null;
+  const yVals=terrainPoints.map(p=>p.y),xVals=terrainPoints.map(p=>p.x);
+  const H=Math.max(...yVals)-Math.min(...yVals),L=Math.max(...xVals)-Math.min(...xVals);
+  let bestFS=Infinity,bestCircle=null;
+  const Rc=[H*0.7,H*0.9,H*1.1,H*1.35,H*1.6,H*1.9,H*2.3,H*2.7];
+  const xcC=[0.2,0.3,0.38,0.45,0.52,0.6,0.68].map(f=>Math.min(...xVals)+f*L);
+  const ycC=[1.05,1.15,1.28,1.42,1.58].map(f=>Math.max(...yVals)*f);
+  for(const R of Rc)for(const Xc of xcC)for(const Yc of ycC){
+    const res=bishopOnProfile(R,Xc,Yc,20);
+    if(res&&res.fs>0.1&&res.fs<90&&res.slices.length>=4&&res.fs<bestFS){bestFS=res.fs;bestCircle={R,Xc,Yc,...res};}
+  }
+  editorBishop=bestCircle;return bestCircle;
+}
+
+function bishopOnProfile(R,Xc,Yc,n){
+  const x0=Xc-R,x1=Xc+R,dx=(x1-x0)/n,slices=[];
+  for(let i=0;i<n;i++){
+    const xa=x0+i*dx,xb=xa+dx,xm=(xa+xb)/2;
+    const ur=R*R-(xm-Xc)*(xm-Xc);if(ur<0)continue;
+    const circleBot=Yc-Math.sqrt(ur),topY=profileYatX(xm);
+    if(topY===null||topY<=circleBot+0.01)continue;
+    const h_sl=topY-circleBot,alpha=Math.asin(Math.max(-1,Math.min(1,(xm-Xc)/R)));
+    const layer=layerAtX(xm,(topY+circleBot)/2),{c,phi,gamma}=layer,phi_r=phi*Math.PI/180;
+    const W=gamma*h_sl*dx,wY=waterYatX(xm),hw=wY!=null?Math.max(0,Math.min(h_sl,wY-circleBot)):0,u=gw*hw;
+    slices.push({xm,b:dx,h_sl,alpha,W,u,topY,circleBot,c,phi_r});
+  }
+  if(slices.length<4)return null;
+  let FS=1.5;
+  for(let it=0;it<80;it++){
+    let num=0,den=0;
+    for(const s of slices){const ma=Math.cos(s.alpha)+Math.sin(s.alpha)*Math.tan(s.phi_r)/FS;if(Math.abs(ma)<1e-6)continue;num+=(s.c*s.b+(s.W-s.u*s.b)*Math.tan(s.phi_r))/ma;den+=s.W*Math.sin(s.alpha);}
+    const nFS=den>1e-6?num/den:999;if(Math.abs(nFS-FS)<5e-5){FS=nFS;break;}FS=Math.max(0.01,Math.min(nFS,99));
+  }
+  return{fs:FS,slices};
+}
+
+// ══════════════════════════════════════════════════════════
+//  MAIN DRAW
+// ══════════════════════════════════════════════════════════
+function drawEditor(){
+  const canvas=edCanvas();if(!canvas)return;
+  const parent=canvas.parentElement;
+  canvas.width=Math.max(400,parent.clientWidth-26);canvas.height=Math.max(280,parent.clientHeight-116);
+  const ctx=canvas.getContext('2d'),CW=canvas.width,CH=canvas.height;
+  ctx.clearRect(0,0,CW,CH);
+  const m=ED_MARGIN,pw=CW-m.l-m.r,ph=CH-m.t-m.b,{s:sc}=getTransform();
+  const visMinX=canvasToWorld(m.l,0).x,visMaxX=canvasToWorld(m.l+pw,0).x;
+  const visMinY=canvasToWorld(0,m.t+ph).y,visMaxY=canvasToWorld(0,m.t).y;
+  const rawGSX=(visMaxX-visMinX)/6,rawGSY=(visMaxY-visMinY)/5;
+  const gsX=Math.pow(10,Math.floor(Math.log10(Math.max(rawGSX,0.1)))),gsY=Math.pow(10,Math.floor(Math.log10(Math.max(rawGSY,0.1))));
+
+  // ── GRID ──
+  ctx.save();ctx.beginPath();ctx.rect(m.l,m.t,pw,ph);ctx.clip();
+  ctx.strokeStyle='rgba(34,45,56,0.85)';ctx.lineWidth=0.5;
+  for(let x=Math.ceil(visMinX/gsX)*gsX;x<=visMaxX;x+=gsX){const px=worldToCanvas(x,0).x;ctx.beginPath();ctx.moveTo(px,m.t);ctx.lineTo(px,m.t+ph);ctx.stroke();}
+  for(let y=Math.ceil(visMinY/gsY)*gsY;y<=visMaxY;y+=gsY){const py=worldToCanvas(0,y).y;ctx.beginPath();ctx.moveTo(m.l,py);ctx.lineTo(m.l+pw,py);ctx.stroke();}
+  if(sc*SNAP_GRID>10){ctx.fillStyle='rgba(46,61,78,0.55)';for(let x=Math.ceil(visMinX/SNAP_GRID)*SNAP_GRID;x<=visMaxX;x+=SNAP_GRID)for(let y=Math.ceil(visMinY/SNAP_GRID)*SNAP_GRID;y<=visMaxY;y+=SNAP_GRID){const cp=worldToCanvas(x,y);ctx.beginPath();ctx.arc(cp.x,cp.y,0.9,0,Math.PI*2);ctx.fill();}}
+  ctx.restore();
+
+  // ── AXIS LABELS ──
+  ctx.fillStyle='rgba(74,89,104,0.7)';ctx.font='8px DM Mono,monospace';
+  for(let x=Math.ceil(visMinX/gsX)*gsX;x<=visMaxX;x+=gsX){const px=worldToCanvas(x,0).x;if(px>=m.l&&px<=m.l+pw)ctx.fillText(x.toFixed(0),px-7,m.t+ph+14);}
+  for(let y=Math.ceil(visMinY/gsY)*gsY;y<=visMaxY;y+=gsY){const py=worldToCanvas(0,y).y;if(py>=m.t&&py<=m.t+ph)ctx.fillText(y.toFixed(0),2,py+3);}
+  ctx.fillStyle='rgba(140,155,170,0.4)';ctx.font='8px DM Mono,monospace';
+  ctx.fillText('x (m)',m.l+pw/2-10,m.t+ph+30);
+  ctx.save();ctx.translate(14,m.t+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText('y (m)',-12,0);ctx.restore();
+
+  // ── CLIPPED GEOMETRY ──
+  ctx.save();ctx.beginPath();ctx.rect(m.l,m.t,pw,ph);ctx.clip();
+  const pts=terrainPoints;
+  if(pts.length<2){
+    ctx.restore();ctx.fillStyle='rgba(140,155,170,0.18)';ctx.font='15px DM Sans,sans-serif';ctx.textAlign='center';
+    ctx.fillText('Clic para añadir puntos del perfil del terreno',CW/2,CH/2);
+    ctx.font='11px DM Mono,monospace';ctx.fillText('Pulsa EJEMPLO para cargar una geometría de muestra',CW/2,CH/2+24);
+    ctx.textAlign='left';return;
+  }
+
+  const yVals=pts.map(p=>p.y),xVals=pts.map(p=>p.x);
+
+  // ── SOIL LAYERS — BOTTOM TO TOP for correct overlap ──
+  for(let li=editorLayers.length-1;li>=0;li--){
+    const layer=editorLayers[li];
+    const poly=buildLayerPoly(li);if(!poly||poly.length<3)continue;
+
+    // Gradient fill
+    const layerTopY=poly[0]?poly[0].y:m.t, layerBotY=poly[Math.floor(poly.length/2)]?poly[Math.floor(poly.length/2)].y:m.t+ph;
+    const grd=ctx.createLinearGradient(0,Math.min(layerTopY,m.t),0,Math.max(layerBotY,m.t+ph));
+    grd.addColorStop(0,layer.color+'88');grd.addColorStop(1,layer.color+'33');
+    ctx.beginPath();poly.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.closePath();
+    ctx.fillStyle=grd;ctx.fill();
+
+    // HATCH (rich USCS patterns)
+    drawHatchInClip(ctx,layer.type||'clay',layer.color,poly);
+
+    // Layer name label at centroid
+    const cxPts=poly.map(p=>p.x),cyPts=poly.map(p=>p.y);
+    const labelX=(Math.min(...cxPts)+Math.max(...cxPts))/2;
+    const labelY=(Math.min(...cyPts)+Math.max(...cyPts))/2;
+    if(labelX>m.l&&labelX<m.l+pw&&labelY>m.t&&labelY<m.t+ph){
+      ctx.save();
+      const tw=ctx.measureText(layer.name).width+14;
+      ctx.fillStyle='rgba(8,11,13,0.62)';
+      ctx.beginPath();ctx.roundRect(labelX-tw/2,labelY-9,tw,16,3);ctx.fill();
+      ctx.strokeStyle=layer.color+'88';ctx.lineWidth=0.8;ctx.stroke();
+      ctx.fillStyle=layer.color+'ff';ctx.font='bold 8.5px DM Mono,monospace';ctx.textAlign='center';
+      ctx.fillText(layer.name,labelX,labelY+3);
+      ctx.textAlign='left';ctx.restore();
+    }
+  }
+
+  // ── STRATUM BOUNDARIES ──
+  editorLayers.forEach((layer,li)=>{
+    const bPts=layer.boundaryPts;if(!bPts||bPts.length<2)return;
+    // Draw boundary line
+    ctx.beginPath();bPts.forEach((p,i)=>{const cp=worldToCanvas(p.x,p.y);i===0?ctx.moveTo(cp.x,cp.y):ctx.lineTo(cp.x,cp.y);});
+    ctx.strokeStyle=layer.color+'cc';ctx.lineWidth=2;ctx.setLineDash([10,4]);ctx.stroke();ctx.setLineDash([]);
+    // Depth annotation at left edge
+    const leftMost=bPts[0],cp0=worldToCanvas(leftMost.x,leftMost.y);
+    const yWorld=leftMost.y.toFixed(1);
+    ctx.fillStyle='rgba(8,11,13,0.7)';ctx.fillRect(m.l,cp0.y-8,44,14);
+    ctx.strokeStyle=layer.color+'88';ctx.lineWidth=0.7;ctx.strokeRect(m.l,cp0.y-8,44,14);
+    ctx.fillStyle=layer.color+'ee';ctx.font='bold 8px DM Mono,monospace';
+    ctx.fillText('y='+yWorld+'m',m.l+3,cp0.y+3);
+    // Boundary control points
+    bPts.forEach((p,pi)=>{
+      const cp=worldToCanvas(p.x,p.y);
+      const isHov=hoveredBoundaryLayer===li&&hoveredBoundaryIdx===pi;
+      const isDrag=draggingBoundaryLayer===li&&draggingBoundaryIdx===pi;
+      const r=isDrag||isHov?7:4;
+      ctx.beginPath();ctx.arc(cp.x,cp.y,r,0,Math.PI*2);
+      ctx.fillStyle=isDrag?'#fff':isHov?layer.color+'ff':layer.color+'cc';ctx.fill();
+      ctx.strokeStyle='#080b0d';ctx.lineWidth=1.2;ctx.stroke();
+    });
+    // Layer label on boundary line (next layer starts here)
+    const nextLayer=editorLayers[li+1];
+    if(nextLayer&&bPts.length>0){
+      const midPt=bPts[Math.floor(bPts.length/2)],mcp=worldToCanvas(midPt.x,midPt.y);
+      ctx.fillStyle='rgba(8,11,13,0.7)';ctx.fillRect(mcp.x-2,mcp.y-18,Math.min(100,pw/3),13);
+      ctx.fillStyle=nextLayer.color+'dd';ctx.font='7.5px DM Mono,monospace';
+      ctx.fillText(nextLayer.name,mcp.x+2,mcp.y-8);
+    }
+  });
+
+  // ── WATER TABLE ──
+  if(waterPoints.length>=2){
+    const wPts=waterPoints,yDeep=Math.min(...yVals)-20;
+    const bottomY_c=worldToCanvas(0,yDeep).y;
+    ctx.save();ctx.beginPath();
+    const wcp0=worldToCanvas(wPts[0].x,wPts[0].y);ctx.moveTo(wcp0.x,bottomY_c);
+    wPts.forEach(p=>{const cp=worldToCanvas(p.x,p.y);ctx.lineTo(cp.x,cp.y);});
+    const wcpL=worldToCanvas(wPts[wPts.length-1].x,wPts[wPts.length-1].y);ctx.lineTo(wcpL.x,bottomY_c);ctx.closePath();ctx.clip();
+    ctx.fillStyle='rgba(74,143,255,0.10)';ctx.fillRect(0,0,CW,CH);ctx.restore();
+    // Water line with glow
+    ctx.shadowColor='rgba(74,143,255,0.4)';ctx.shadowBlur=4;
+    ctx.beginPath();wPts.forEach((p,i)=>{const cp=worldToCanvas(p.x,p.y);i===0?ctx.moveTo(cp.x,cp.y):ctx.lineTo(cp.x,cp.y);});
+    ctx.strokeStyle='rgba(74,143,255,0.9)';ctx.lineWidth=2;ctx.setLineDash([9,4]);ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
+    const mid=wPts[Math.floor(wPts.length/2)],mcp=worldToCanvas(mid.x,mid.y);
+    ctx.fillStyle='rgba(74,143,255,0.9)';ctx.font='bold 9px DM Mono,monospace';
+    ctx.fillText('NF = '+mid.y.toFixed(1)+' m',mcp.x-22,mcp.y-9);
+    // Water control points
+    wPts.forEach((p,i)=>{const cp=worldToCanvas(p.x,p.y),r=hoveredWaterIdx===i?7:4;ctx.beginPath();ctx.arc(cp.x,cp.y,r,0,Math.PI*2);ctx.fillStyle=hoveredWaterIdx===i?'rgba(74,143,255,1)':'rgba(74,143,255,0.75)';ctx.fill();ctx.strokeStyle='#fff3';ctx.lineWidth=1;ctx.stroke();});
+  }
+
+  // ── BISHOP OVERLAY ──
+  if(editorBishop){
+    const{R,Xc,Yc,fs,slices}=editorBishop,col=fsColor(fs||1.5);
+    if(slices)slices.forEach((s,i)=>{
+      const x1=s.xm-s.b/2,x2=s.xm+s.b/2;
+      const cp1=worldToCanvas(x1,s.topY),cp2=worldToCanvas(x2,s.topY),cb1=worldToCanvas(x1,s.circleBot),cb2=worldToCanvas(x2,s.circleBot);
+      ctx.beginPath();ctx.moveTo(cp1.x,cp1.y);ctx.lineTo(cp2.x,cp2.y);ctx.lineTo(cb2.x,cb2.y);ctx.lineTo(cb1.x,cb1.y);ctx.closePath();
+      ctx.fillStyle='rgba(78,240,192,'+(0.07+0.05*(i%2))+')';ctx.fill();
+      ctx.strokeStyle='rgba(78,240,192,0.35)';ctx.lineWidth=0.7;ctx.stroke();
+      // W force vector
+      const cmt=worldToCanvas(s.xm,s.topY),cmb=worldToCanvas(s.xm,s.circleBot);
+      const arrowLen=Math.min(22,(cmb.y-cmt.y)*0.45);
+      if(arrowLen>6){
+        ctx.strokeStyle='rgba(78,240,192,0.6)';ctx.fillStyle='rgba(78,240,192,0.6)';ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(cmt.x,cmt.y+2);ctx.lineTo(cmt.x,cmt.y+arrowLen);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(cmt.x,cmt.y+arrowLen);ctx.lineTo(cmt.x-3,cmt.y+arrowLen-5);ctx.lineTo(cmt.x+3,cmt.y+arrowLen-5);ctx.closePath();ctx.fill();
+      }
+    });
+    const cc=worldToCanvas(Xc,Yc);
+    ctx.shadowColor=col+'66';ctx.shadowBlur=6;
+    ctx.beginPath();ctx.arc(cc.x,cc.y,R*sc,0,Math.PI*2);ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.setLineDash([8,4]);ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
+    ctx.beginPath();ctx.arc(cc.x,cc.y,5,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+    ctx.strokeStyle=col+'44';ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(cc.x,m.t);ctx.lineTo(cc.x,m.t+ph);ctx.stroke();ctx.beginPath();ctx.moveTo(m.l,cc.y);ctx.lineTo(m.l+pw,cc.y);ctx.stroke();
+    const ang=-Math.PI*0.62,rEnd={x:cc.x+Math.cos(ang)*R*sc,y:cc.y+Math.sin(ang)*R*sc};
+    ctx.strokeStyle=col+'66';ctx.lineWidth=0.9;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(cc.x,cc.y);ctx.lineTo(rEnd.x,rEnd.y);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=col+'cc';ctx.font='9px DM Mono,monospace';ctx.fillText('R='+R.toFixed(1)+'m  Xc='+Xc.toFixed(1)+'m',rEnd.x+3,rEnd.y-3);
+    ctx.font='bold 13px DM Mono,monospace';ctx.fillStyle=col;ctx.fillText('Bishop FS = '+fs.toFixed(3)+'  ['+getState(fs).lbl+']',m.l+10,m.t+ph-12);
+  }
+
+  // ── TERRAIN PROFILE (on top of everything) ──
+  ctx.beginPath();pts.forEach((p,i)=>{const cp=worldToCanvas(p.x,p.y);i===0?ctx.moveTo(cp.x,cp.y):ctx.lineTo(cp.x,cp.y);});
+  ctx.shadowColor='rgba(232,200,66,0.4)';ctx.shadowBlur=4;
+  ctx.strokeStyle='#e8c842';ctx.lineWidth=2.8;ctx.setLineDash([]);ctx.stroke();ctx.shadowBlur=0;
+
+  // ── TERRAIN CONTROL POINTS ──
+  pts.forEach((p,i)=>{
+    const cp=worldToCanvas(p.x,p.y),r=(draggingPtIdx===i||hoveredPtIdx===i)?8:5;
+    const col=draggingPtIdx===i?'#fff':hoveredPtIdx===i?'#ffe566':'#e8c842';
+    ctx.beginPath();ctx.arc(cp.x,cp.y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();ctx.strokeStyle='#080b0d';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='rgba(232,200,66,0.65)';ctx.font='7.5px DM Mono,monospace';ctx.fillText('('+p.x.toFixed(1)+','+p.y.toFixed(1)+')',cp.x+9,cp.y-7);
+  });
+
+  // ── DIMENSIONS ──
+  if(pts.length>=2){
+    const H=Math.max(...yVals)-Math.min(...yVals),L=Math.max(...xVals)-Math.min(...xVals),beta=Math.atan2(H,L)*180/Math.PI;
+    const xRef=pts[0].x-(edWorld.maxX-edWorld.minX)*0.025;
+    const cBot=worldToCanvas(xRef,Math.min(...yVals)),cTop=worldToCanvas(xRef,Math.max(...yVals));
+    ctx.strokeStyle='rgba(232,200,66,0.3)';ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(cBot.x,cBot.y);ctx.lineTo(cTop.x,cTop.y);ctx.stroke();
+    [cBot,cTop].forEach(cp=>{ctx.beginPath();ctx.moveTo(cp.x-4,cp.y);ctx.lineTo(cp.x+4,cp.y);ctx.strokeStyle='rgba(232,200,66,0.45)';ctx.stroke();});
+    ctx.fillStyle='#e8c842';ctx.font='9px DM Mono,monospace';ctx.fillText('H='+H.toFixed(1)+'m',cBot.x-46,(cBot.y+cTop.y)/2+3);
+    ctx.font='bold 11px DM Mono,monospace';ctx.fillStyle='rgba(232,200,66,0.55)';ctx.fillText('β='+beta.toFixed(1)+'°  L='+L.toFixed(1)+'m',m.l+8,m.t+16);
+  }
+
+  // ── GEOTECHNICAL LEGEND (bottom-left) ──
+  drawGeoLegend(ctx,m,pw,ph);
+
+  ctx.restore();
+
+  // ── ZOOM INDICATOR ──
+  if(edView.scale!==1){ctx.fillStyle='rgba(74,89,104,0.55)';ctx.font='8px DM Mono,monospace';ctx.fillText('×'+edView.scale.toFixed(2),m.l+pw-32,m.t+12);}
+}
+
+function drawGeoLegend(ctx,m,pw,ph){
+  const lines=editorLayers.length+(waterPoints.length>=2?1:0);
+  const lw=130,lh=lines*16+18;
+  const lx=m.l+8,ly=m.t+ph-lh-8;
+  ctx.fillStyle='rgba(9,13,18,0.82)';ctx.fillRect(lx-4,ly-4,lw,lh);
+  ctx.strokeStyle='rgba(34,45,56,1)';ctx.lineWidth=0.8;ctx.strokeRect(lx-4,ly-4,lw,lh);
+  ctx.font='7px DM Mono,monospace';ctx.fillStyle='rgba(74,89,104,0.95)';ctx.fillText('LITOLOGÍA',lx,ly+6);
+  editorLayers.forEach((l,i)=>{
+    const y=ly+17+i*16;
+    // Mini hatch swatch 14×11
+    const miniPoly=[{x:lx,y:y-8},{x:lx+14,y:y-8},{x:lx+14,y:y+4},{x:lx,y:y+4}];
+    ctx.fillStyle=l.color+'99';ctx.fillRect(lx,y-8,14,12);
+    drawHatchInClip(ctx,l.type||'clay',l.color,miniPoly);
+    ctx.strokeStyle=l.color+'cc';ctx.lineWidth=0.7;ctx.strokeRect(lx,y-8,14,12);
+    ctx.fillStyle='rgba(221,227,234,0.92)';ctx.font='8.5px DM Mono,monospace';
+    ctx.fillText(l.name,lx+18,y+2);
+  });
+  if(waterPoints.length>=2){
+    const y=ly+17+editorLayers.length*16;
+    ctx.strokeStyle='rgba(74,143,255,0.85)';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.moveTo(lx,y-2);ctx.lineTo(lx+14,y-2);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(74,143,255,0.85)';ctx.font='8.5px DM Mono,monospace';
+    ctx.fillText('Nivel freático',lx+18,y+2);
+  }
+}
+
+// ── CALC FS ───────────────────────────────────────────────────
+function calcEditorFS(){
+  if(terrainPoints.length<2)return;
+  const pts=terrainPoints,yVals=pts.map(p=>p.y),xVals=pts.map(p=>p.x);
+  const H=Math.max(...yVals)-Math.min(...yVals),L=Math.max(...xVals)-Math.min(...xVals);
+  if(H<0.5||L<0.5)return;
+  const beta=Math.atan2(H,L)*180/Math.PI,layer=editorLayers[0],{c,phi,gamma}=layer;
+  const yBase=Math.min(...yVals);
+  let nf=0;
+  if(waterPoints.length>=2){const xMid=(Math.max(...xVals)+Math.min(...xVals))/2,wY=waterYatX(xMid);if(wY!=null)nf=Math.min(100,Math.max(0,(wY-yBase)/H*100));}
+  const seismic=g('ed-seismic')?.checked||false,kh=parseFloat(g('ed-kh')?.value||'0.1');
+  const fs_det=calcFS_inf(H,beta,c,phi,gamma,nf,seismic?kh:0);
+  const fs_cons=calcFS_inf(H,beta,c*(1-gv('dc')/100),phi-gv('dphi'),gamma,nf,seismic?kh:0);
+  const bc=calcEditorBishop();editorBishop=bc;const fs_bish=editorBishop?.fs||0;
+  [{valId:'efs-det',stId:'est-det',fs:fs_det},{valId:'efs-bish',stId:'est-bish',fs:fs_bish},{valId:'efs-cons',stId:'est-cons',fs:fs_cons}].forEach(({valId,stId,fs})=>{
+    const st=getState(fs),el=g(valId),sel=g(stId);
+    if(el){el.textContent=fs>90?'∞':fs.toFixed(3);el.style.color=fsColor(fs);}
+    if(sel){sel.textContent=st.lbl;sel.style.color=fsColor(fs);}
+  });
+  if(editorTool==='bishop')drawEditor();
+}
+
+// ── COORDINATES TABLE ─────────────────────────────────────────
+function renderCoordsTable(){
+  const tb=g('coords-tbody');if(!tb)return;
+  tb.innerHTML=terrainPoints.map((p,i)=>'<tr><td style="color:var(--accent);text-align:center">'+(i+1)+'</td><td><input class="coord-input" type="number" step="0.1" value="'+p.x.toFixed(1)+'" onchange="updateCoord('+i+',\'x\',this.value)"></td><td><input class="coord-input" type="number" step="0.1" value="'+p.y.toFixed(1)+'" onchange="updateCoord('+i+',\'y\',this.value)"></td><td><button class="coord-del" onclick="deleteCoord('+i+')">✕</button></td></tr>').join('');
+}
+function updateCoord(i,axis,val){const v=parseFloat(val);if(isNaN(v))return;saveState();terrainPoints[i][axis]=v;terrainPoints.sort((a,b)=>a.x-b.x);autoFitWorld();drawEditor();calcEditorFS();}
+function deleteCoord(i){saveState();terrainPoints.splice(i,1);afterEdit();}
+function addPointManual(){saveState();const last=terrainPoints[terrainPoints.length-1]||{x:0,y:0};terrainPoints.push({x:Math.round((last.x+5)*10)/10,y:last.y});terrainPoints.sort((a,b)=>a.x-b.x);afterEdit();}
+
+// ── CSV ───────────────────────────────────────────────────────
+function importCSV(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split('\n').filter(l=>l.trim()&&!l.trim().startsWith('#'));
+    const pts=[];lines.forEach(line=>{const p=line.split(/[,;\t ]+/).map(Number);if(p.length>=2&&!isNaN(p[0])&&!isNaN(p[1]))pts.push({x:p[0],y:p[1]});});
+    if(pts.length>=2){saveState();terrainPoints=pts.sort((a,b)=>a.x-b.x);autoFitWorld();afterEdit();}
+    else alert('CSV inválido. Formato: X,Y por línea (mínimo 2 puntos).');
+  };reader.readAsText(file);event.target.value='';
+}
+function exportCSV(){const lines=['# SlopeMind perfil terreno','# X, Y',...terrainPoints.map(p=>p.x.toFixed(2)+','+p.y.toFixed(2))];const blob=new Blob([lines.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='slopemind_perfil.csv';a.click();}
+function exportEditorPNG(){const canvas=edCanvas();if(!canvas)return;const oW=canvas.width,oH=canvas.height;canvas.width=oW*2;canvas.height=oH*2;const ctx=canvas.getContext('2d');ctx.scale(2,2);drawEditor();const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='slopemind_editor.png';a.click();canvas.width=oW;canvas.height=oH;drawEditor();}
+
+// ── LAYER MANAGEMENT ──────────────────────────────────────────
+function renderLayerList(){
+  const list=g('layer-list');if(!list)return;
+  list.innerHTML=editorLayers.map((l,i)=>{
+    const nBpts=l.boundaryPts?l.boundaryPts.length:0;
+    const USCS={clay:'CL',silt:'ML',sand:'SP',gravel:'GP',rock:'Rk',fill:'Fi',peat:'Pt'}[l.type]||'?';
+    return '<div class="layer-item '+(i===selectedLayerIdx?'selected':'')+'" onclick="selectLayer('+i+')">'+
+    '<div class="layer-item-header">'+
+    '<div class="layer-dot" style="background:'+l.color+'" title="'+l.type+'"></div>'+
+    '<div style="flex:1"><div class="layer-name">'+l.name+'</div>'+
+    '<div style="font-family:var(--fm);font-size:0.46rem;color:var(--text3);margin-top:1px">'+USCS+' · '+nBpts+' pts límite</div></div>'+
+    (editorLayers.length>1?'<button class="layer-del" onclick="event.stopPropagation();deleteLayer('+i+')">✕</button>':'')+
+    '</div>'+
+    '<div class="layer-props">'+
+    '<div class="layer-prop"><div class="layer-prop-val">'+l.c+'</div><div class="layer-prop-lbl">c kPa</div></div>'+
+    '<div class="layer-prop"><div class="layer-prop-val">'+l.phi+'°</div><div class="layer-prop-lbl">φ\'</div></div>'+
+    '<div class="layer-prop"><div class="layer-prop-val">'+l.gamma+'</div><div class="layer-prop-lbl">γ kN/m³</div></div>'+
+    '</div></div>';
+  }).join('');
+  const panel=g('layer-edit-panel');if(!panel)return;
+  panel.style.display='block';const l=editorLayers[selectedLayerIdx];if(!l)return;
+  if(g('le-name'))g('le-name').value=l.name;if(g('le-c'))g('le-c').value=l.c;if(g('le-phi'))g('le-phi').value=l.phi;if(g('le-gamma'))g('le-gamma').value=l.gamma;
+  if(g('le-type'))g('le-type').value=l.type||'clay';
+  // Remove old le-boundary if exists (we use boundaryPts now)
+  if(g('le-colors'))g('le-colors').innerHTML=LAYER_COLORS.map(col=>'<div class="color-dot '+(col===l.color?'selected':'')+'" style="background:'+col+'" onclick="setLayerColor(\''+col+'\')"></div>').join('');
+}
+
+function selectLayer(idx){
+  selectedLayerIdx=idx;
+  renderLayerList();drawEditor();calcEditorFS();
+  // Auto-switch to boundary tool for that layer
+  if(editorTool==='boundary')setTool('boundary');
+}
+
+function addLayer(){
+  saveState();
+  const type='clay';const preset=SOIL_PRESETS[type];
+  editorLayers.push({name:'Capa '+(editorLayers.length+1),c:preset.c,phi:preset.phi,gamma:preset.gamma,color:LAYER_COLORS[editorLayers.length%LAYER_COLORS.length],type:type,boundaryPts:[]});
+  selectedLayerIdx=editorLayers.length-1;renderLayerList();drawEditor();
+}
+function deleteLayer(idx){
+  if(editorLayers.length<=1)return;
+  saveState();editorLayers.splice(idx,1);
+  selectedLayerIdx=Math.min(selectedLayerIdx,editorLayers.length-1);afterEdit();
+}
+function updateSelectedLayer(){
+  const l=editorLayers[selectedLayerIdx];if(!l)return;
+  if(g('le-name'))l.name=g('le-name').value||l.name;
+  if(g('le-c'))l.c=parseFloat(g('le-c').value)||l.c;
+  if(g('le-phi'))l.phi=parseFloat(g('le-phi').value)||l.phi;
+  if(g('le-gamma'))l.gamma=parseFloat(g('le-gamma').value)||l.gamma;
+  if(g('le-type')){
+    const newType=g('le-type').value;
+    // Auto-fill params from preset when changing type
+    if(newType!==l.type&&SOIL_PRESETS[newType]){const p=SOIL_PRESETS[newType];l.c=p.c;l.phi=p.phi;l.gamma=p.gamma;if(g('le-c'))g('le-c').value=p.c;if(g('le-phi'))g('le-phi').value=p.phi;if(g('le-gamma'))g('le-gamma').value=p.gamma;}
+    l.type=newType;
+  }
+  renderLayerList();calcEditorFS();drawEditor();
+}
+function setLayerColor(col){editorLayers[selectedLayerIdx].color=col;renderLayerList();drawEditor();}
+function clearLayerBoundary(){
+  if(!editorLayers[selectedLayerIdx])return;
+  saveState();editorLayers[selectedLayerIdx].boundaryPts=[];afterEdit();
+}
+
+// ── INIT ON TAB OPEN ──────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{if(tab.dataset.tab==='editor')setTimeout(()=>{initEditor();drawEditor();},60);});
+});
+
 </script>
 </body>
 </html>
