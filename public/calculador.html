@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://api.anthropic.com; frame-ancestors 'self' https://*.vercel.app">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SLOPEMIND v2.0 – Stability & Risk Engine</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -381,6 +382,57 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 
 #tab-scenarios { display: none; padding: 20px 24px; overflow-y: auto; flex-direction: column; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
 #tab-scenarios.active { display: flex; }
+/* ── AI ASSISTANT ── */
+#tab-asistente { display:none; padding:0; overflow:hidden; flex-direction:column; }
+#tab-asistente.active { display:flex; }
+.ai-layout { display:grid; grid-template-columns:1fr 280px; height:100%; overflow:hidden; }
+.ai-chat-col { display:flex; flex-direction:column; overflow:hidden; border-right:1px solid var(--border); }
+.ai-messages { flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:12px; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
+.ai-msg { display:flex; flex-direction:column; gap:4px; max-width:88%; }
+.ai-msg.user { align-self:flex-end; align-items:flex-end; }
+.ai-msg.ai   { align-self:flex-start; align-items:flex-start; }
+.ai-bubble { padding:10px 13px; border-radius:10px; font-family:var(--fb); font-size:0.8rem; line-height:1.65; }
+.ai-msg.user .ai-bubble { background:rgba(232,200,66,0.12); border:1px solid rgba(232,200,66,0.25); color:var(--text); border-radius:10px 10px 2px 10px; }
+.ai-msg.ai   .ai-bubble { background:var(--surf2); border:1px solid var(--border2); color:var(--text); border-radius:10px 10px 10px 2px; }
+.ai-bubble b { color:var(--accent); }
+.ai-bubble code { font-family:var(--fm); font-size:0.75rem; background:rgba(255,255,255,0.06); padding:1px 5px; border-radius:3px; color:var(--accent2); }
+.ai-bubble .ai-source { font-family:var(--fm); font-size:0.55rem; color:var(--text3); margin-top:6px; border-top:1px solid var(--border); padding-top:5px; letter-spacing:0.5px; }
+.ai-bubble .ai-warning { background:rgba(255,140,0,0.08); border:1px solid rgba(255,140,0,0.25); border-radius:4px; padding:5px 8px; margin-top:6px; font-size:0.72rem; color:var(--warn); }
+.ai-bubble .ai-extract { background:rgba(78,240,192,0.06); border:1px solid rgba(78,240,192,0.2); border-radius:4px; padding:6px 10px; margin-top:6px; font-size:0.75rem; }
+.ai-bubble .ai-extract-row { display:flex; justify-content:space-between; align-items:center; padding:2px 0; border-bottom:1px solid rgba(78,240,192,0.1); }
+.ai-bubble .ai-extract-row:last-child { border:none; }
+.ai-bubble .ai-extract-key { color:var(--text3); font-size:0.68rem; }
+.ai-bubble .ai-extract-val { color:var(--accent2); font-family:var(--fm); font-size:0.72rem; font-weight:600; }
+.ai-bubble .ai-apply-btn { margin-top:8px; padding:5px 12px; background:rgba(78,240,192,0.12); border:1px solid var(--accent2); border-radius:3px; color:var(--accent2); font-family:var(--fm); font-size:0.55rem; letter-spacing:1.5px; cursor:pointer; }
+.ai-bubble .ai-apply-btn:hover { background:rgba(78,240,192,0.22); }
+.ai-name { font-family:var(--fm); font-size:0.48rem; letter-spacing:1.5px; color:var(--text3); margin-bottom:2px; }
+.ai-thinking { display:flex; align-items:center; gap:6px; padding:8px 12px; background:var(--surf2); border:1px solid var(--border2); border-radius:8px; font-family:var(--fm); font-size:0.6rem; color:var(--text3); }
+.ai-dot { width:5px; height:5px; border-radius:50%; background:var(--accent2); animation:aidot 1.2s infinite; }
+.ai-dot:nth-child(2){animation-delay:0.2s;} .ai-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes aidot{0%,80%,100%{opacity:0.2;transform:scale(0.8);}40%{opacity:1;transform:scale(1.1);}}
+.ai-input-row { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--border); background:var(--surf1); }
+.ai-input { flex:1; background:var(--surf2); border:1px solid var(--border2); border-radius:6px; color:var(--text); font-family:var(--fb); font-size:0.8rem; padding:9px 12px; outline:none; resize:none; min-height:38px; max-height:100px; }
+.ai-input:focus { border-color:var(--accent2); }
+.ai-send-btn { padding:9px 16px; background:var(--accent2); border:none; border-radius:6px; color:#080b0d; font-family:var(--fm); font-size:0.55rem; letter-spacing:1.5px; cursor:pointer; font-weight:700; flex-shrink:0; }
+.ai-send-btn:hover { background:#6af5d0; }
+.ai-send-btn:disabled { opacity:0.4; cursor:not-allowed; }
+.ai-right-col { display:flex; flex-direction:column; overflow-y:auto; padding:14px; gap:12px; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
+.ai-right-section { background:var(--surf2); border:1px solid var(--border); border-radius:6px; padding:12px; }
+.ai-right-title { font-family:var(--fm); font-size:0.48rem; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:8px; }
+.ai-upload-zone { border:1.5px dashed var(--border2); border-radius:5px; padding:14px 10px; text-align:center; cursor:pointer; transition:all 0.15s; }
+.ai-upload-zone:hover { border-color:var(--accent2); background:rgba(78,240,192,0.04); }
+.ai-upload-icon { font-size:1.4rem; margin-bottom:5px; }
+.ai-upload-text { font-family:var(--fb); font-size:0.72rem; color:var(--text2); }
+.ai-upload-sub { font-family:var(--fm); font-size:0.52rem; color:var(--text3); margin-top:3px; }
+.ai-quick-btn { width:100%; text-align:left; padding:7px 10px; background:var(--surf3); border:1px solid var(--border); border-radius:4px; color:var(--text2); font-family:var(--fb); font-size:0.72rem; cursor:pointer; margin-bottom:5px; transition:all 0.15s; line-height:1.4; }
+.ai-quick-btn:hover { border-color:var(--accent2); color:var(--text); background:rgba(78,240,192,0.05); }
+.ai-context-badge { display:inline-block; padding:2px 7px; background:rgba(232,200,66,0.1); border:1px solid rgba(232,200,66,0.25); border-radius:10px; font-family:var(--fm); font-size:0.48rem; color:var(--accent); letter-spacing:1px; margin-bottom:6px; }
+.ai-param-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border); }
+.ai-param-row:last-child { border:none; }
+.ai-param-lbl { font-family:var(--fm); font-size:0.55rem; color:var(--text3); }
+.ai-param-val { font-family:var(--fm); font-size:0.65rem; color:var(--text); }
+.tab[data-tab="asistente"] { color:var(--accent2); }
+.tab[data-tab="asistente"].active { border-bottom-color:var(--accent2); }
 
 .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .res-card { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; padding: 12px 14px; position: relative; overflow: hidden; }
@@ -922,6 +974,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
       <div class="tab" data-tab="sens">SENSIBILIDAD</div>
       <div class="tab" data-tab="results">RESUMEN</div>
       <div class="tab" data-tab="scenarios">ESCENARIOS</div>
+      <div class="tab" data-tab="asistente" id="tab-btn-asistente">⬡ ASISTENTE IA</div>
     </div>
 
     <!-- TAB CONTENT -->
@@ -1378,6 +1431,74 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           </div>
         </div>
       </div>
+      <!-- TAB: ASISTENTE IA -->
+      <div class="tab-pane" id="tab-asistente">
+        <div class="ai-layout">
+
+          <!-- Chat column -->
+          <div class="ai-chat-col">
+            <div class="ai-messages" id="ai-messages">
+              <!-- Welcome message -->
+              <div class="ai-msg ai">
+                <div class="ai-name">⬡ SLOPEMIND AI · ASISTENTE GEOTÉCNICO</div>
+                <div class="ai-bubble">
+                  Hola. Soy el asistente geotécnico de SlopeMind.<br><br>
+                  Puedo ayudarte a <b>extraer parámetros de informes de laboratorio</b> (sube un PDF), validar tus datos contra normativa <b>EC7 / ISRM</b>, interpretar los factores de seguridad obtenidos, o responder preguntas técnicas sobre estabilidad de taludes.<br><br>
+                  <span style="color:var(--warn);font-size:0.72rem">⚠ Importante: Siempre indico la fuente de cada valor y el nivel de incertidumbre. Cuando no lo sé, lo digo. Este software no sustituye la revisión de un ingeniero geotécnico colegiado.</span>
+                </div>
+              </div>
+            </div>
+            <div class="ai-input-row">
+              <textarea class="ai-input" id="ai-input" placeholder="Pregunta sobre parámetros, metodología, resultados… o sube un PDF de laboratorio →" rows="1" onkeydown="aiKeyDown(event)"></textarea>
+              <button class="ai-send-btn" id="ai-send" onclick="aiSend()">ENVIAR</button>
+            </div>
+          </div>
+
+          <!-- Right column: context + tools -->
+          <div class="ai-right-col">
+
+            <!-- Context actual -->
+            <div class="ai-right-section">
+              <div class="ai-right-title">CONTEXTO ACTUAL</div>
+              <div class="ai-context-badge">PARÁMETROS EN USO</div>
+              <div id="ai-ctx-params">
+                <div class="ai-param-row"><span class="ai-param-lbl">H (altura)</span><span class="ai-param-val" id="ai-p-H">—</span></div>
+                <div class="ai-param-row"><span class="ai-param-lbl">β (ángulo)</span><span class="ai-param-val" id="ai-p-beta">—</span></div>
+                <div class="ai-param-row"><span class="ai-param-lbl">c' (cohesión)</span><span class="ai-param-val" id="ai-p-c">—</span></div>
+                <div class="ai-param-row"><span class="ai-param-lbl">φ' (fricción)</span><span class="ai-param-val" id="ai-p-phi">—</span></div>
+                <div class="ai-param-row"><span class="ai-param-lbl">γ (peso esp.)</span><span class="ai-param-val" id="ai-p-gamma">—</span></div>
+                <div class="ai-param-row"><span class="ai-param-lbl">NF (freático)</span><span class="ai-param-val" id="ai-p-nf">—</span></div>
+                <div class="ai-param-row"><span class="ai-param-lbl">FS Determinista</span><span class="ai-param-val" id="ai-p-fs">—</span></div>
+              </div>
+              <button class="ai-quick-btn" style="margin-top:8px" onclick="aiAskContext()">⟳ Analizar parámetros actuales</button>
+            </div>
+
+            <!-- PDF Upload -->
+            <div class="ai-right-section">
+              <div class="ai-right-title">IMPORTAR INFORME PDF</div>
+              <label class="ai-upload-zone" for="ai-pdf-input">
+                <div class="ai-upload-icon">📄</div>
+                <div class="ai-upload-text">Soltar PDF de ensayo / sondeo</div>
+                <div class="ai-upload-sub">Triaxial · SPT · Presiómetro · Informe geotécnico</div>
+                <input type="file" id="ai-pdf-input" accept=".pdf" style="display:none" onchange="aiProcessPDF(event)">
+              </label>
+              <div id="ai-pdf-status" style="font-family:var(--fm);font-size:0.52rem;color:var(--text3);margin-top:6px;display:none"></div>
+            </div>
+
+            <!-- Quick questions -->
+            <div class="ai-right-section">
+              <div class="ai-right-title">CONSULTAS RÁPIDAS</div>
+              <button class="ai-quick-btn" onclick="aiQuick('¿Son coherentes los parámetros actuales con suelo típico? Valida contra rangos EC7.')">✓ Validar parámetros vs EC7</button>
+              <button class="ai-quick-btn" onclick="aiQuick('Interpreta el factor de seguridad obtenido y qué significa para la seguridad del talud.')">📊 Interpretar FS obtenido</button>
+              <button class="ai-quick-btn" onclick="aiQuick('¿Qué ensayos de laboratorio necesito para determinar c y phi con fiabilidad en este tipo de suelo?')">🔬 ¿Qué ensayos necesito?</button>
+              <button class="ai-quick-btn" onclick="aiQuick('¿Qué medidas de estabilización recomienda EC7 para un talud con este factor de seguridad?')">🔧 Medidas de estabilización</button>
+              <button class="ai-quick-btn" onclick="aiQuick('Explica el método Bishop Simplificado: hipótesis, limitaciones y cuándo usarlo.')">📖 Explicar método Bishop</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
   </div><!-- end right panel -->
 
 </div><!-- end app-body -->
@@ -2394,180 +2515,660 @@ function toggleSeismic(){
 //  EXPORT PDF
 // ═══════════════════════════════════════════════════════
 function exportPDF(){
-  const { jsPDF }=window.jspdf;
-  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  const W=210,H=297,margin=18;
-  const negro=[28,25,23],gris1=[68,64,60],gris2=[120,113,108],gris3=[214,211,205];
-  const accent=[184,154,48],rojo=[192,57,43],naranja=[192,98,11],amarillo=[138,112,0],verde=[45,125,90];
-  function pdfFsColor(fs){ if(fs<1.0)return rojo; if(fs<1.3)return naranja; if(fs<1.5)return amarillo; return verde; }
-  function pdfGetState(fs){ if(fs<1.0)return 'FALLA'; if(fs<1.3)return 'CRITICO'; if(fs<1.5)return 'MARGINAL'; return 'ESTABLE'; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const W=210, H_PAGE=297, M=15;
 
-  const H_v=gv('H'),beta_v=gv('beta'),c_v=gv('c'),phi_v=gv('phi'),gam_v=gv('gamma'),nf_v=gv('nf');
-  const R_v=gv('R'),cx_v=gv('cx'),cy_v=gv('cy'),ndov_v=gv('ndov'),dc_v=gv('dc'),dphi_v=gv('dphi');
-  const kh_v=seismicOn?gv('kh'):0;
-  const c_c=c_v*(1-dc_v/100),p_c=phi_v-dphi_v;
-  const fs_det=calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,nf_v);
-  const fs_cons=calcFS_inf(H_v,beta_v,c_c,p_c,gam_v,nf_v);
-  const fs_sat=calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,100);
-  const fs_seis=calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,nf_v,kh_v);
-  const bishop=calcBishop(H_v,beta_v,c_v,phi_v,gam_v,nf_v,R_v,cx_v,cy_v,ndov_v);
-  const fs_bish=bishop.fs||0;
-  const crPhi=findCritPhi(H_v,beta_v,c_v,gam_v,nf_v);
-  const crC=findCritC(H_v,beta_v,phi_v,gam_v,nf_v);
-  const crBeta=findCritBeta(H_v,c_v,phi_v,gam_v,nf_v);
-  const crNF=findCritNF(H_v,beta_v,c_v,phi_v,gam_v);
-  const fecha=new Date().toLocaleDateString('es-ES',{year:'numeric',month:'long',day:'numeric'});
-  const proyNombre=g('projectName').value.trim()||'Sin nombre de proyecto';
+  // ── COLOUR PALETTE (warm professional) ──
+  const C = {
+    ink:    [22,27,34],
+    ink2:   [55,65,78],
+    ink3:   [100,115,130],
+    line:   [210,215,220],
+    bg1:    [248,249,250],
+    bg2:    [240,243,246],
+    gold:   [184,154,48],
+    goldL:  [232,200,66],
+    green:  [34,110,75],
+    yellow: [140,115,0],
+    orange: [185,88,0],
+    red:    [175,40,40],
+    blue:   [40,90,175],
+    teal:   [30,140,130],
+    white:  [255,255,255],
+    page:   [252,252,253],
+  };
 
-  let y=0;
+  // ── HELPERS ──
+  const rgb  = (arr) => arr;
+  const setF = (arr) => doc.setFillColor(...arr);
+  const setS = (arr) => doc.setDrawColor(...arr);
+  const setT = (arr) => doc.setTextColor(...arr);
+  const setFnt = (style,sz) => { doc.setFont('helvetica',style); doc.setFontSize(sz); };
+  const rect  = (x,y,w,h,mode='F') => doc.rect(x,y,w,h,mode);
+  const rRect = (x,y,w,h,r,mode='FD') => doc.roundedRect(x,y,w,h,r,r,mode);
+  const line  = (x1,y1,x2,y2) => { doc.line(x1,y1,x2,y2); };
+  const txt   = (s,x,y,opts) => doc.text(String(s),x,y,opts||{});
+  const cap   = (id) => { const el=document.getElementById(id); return el?el.toDataURL('image/png',0.95):null; };
 
-  // HEADER
-  doc.setFillColor(...accent); doc.rect(0,0,W,22,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(255,255,255);
-  doc.text('SLOPEMIND',margin,14);
-  doc.setFont('helvetica','normal'); doc.setFontSize(7);
-  doc.text('STABILITY & RISK ENGINE — MINING SLOPES',margin+48,14);
-  doc.text('v2.0',W-margin,14,{align:'right'});
+  function fsColor(fs){ if(fs<1.0)return C.red; if(fs<1.3)return C.orange; if(fs<1.5)return C.yellow; return C.green; }
+  function fsLabel(fs){ if(fs<1.0)return 'FALLA'; if(fs<1.3)return 'CRÍTICO'; if(fs<1.5)return 'MARGINAL'; return 'ESTABLE'; }
 
-  doc.setFillColor(245,242,235); doc.rect(0,22,W,10,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...negro);
-  doc.text('INFORME DE ESTABILIDAD DE TALUD',margin,29);
-  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...gris2);
-  doc.text(`Generado: ${fecha}`,W-margin,29,{align:'right'});
+  // ── DATA ──
+  const H_v   = gv('H'), beta_v=gv('beta'), c_v=gv('c'), phi_v=gv('phi');
+  const gam_v = gv('gamma'), nf_v=gv('nf'), R_v=gv('R'), cx_v=gv('cx'), cy_v=gv('cy');
+  const ndov_v= gv('ndov'), dc_v=gv('dc'), dphi_v=gv('dphi');
+  const kh_v  = seismicOn?gv('kh'):0;
+  const c_c   = c_v*(1-dc_v/100), phi_c=phi_v-dphi_v;
+  const gw    = 9.81;
+  const fs_det  = calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,nf_v,0);
+  const fs_cons = calcFS_inf(H_v,beta_v,c_c,phi_c,gam_v,nf_v,0);
+  const fs_sat  = calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,100,0);
+  const fs_seis = seismicOn?calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,nf_v,kh_v):null;
+  const bishop  = calcBishop(H_v,beta_v,c_v,phi_v,gam_v,nf_v,R_v,cx_v,cy_v,ndov_v);
+  const fs_bish = bishop.fs||0;
+  const crPhi   = findCritPhi(H_v,beta_v,c_v,gam_v,nf_v);
+  const crC     = findCritC(H_v,beta_v,phi_v,gam_v,nf_v);
+  const crBeta  = findCritBeta(H_v,c_v,phi_v,gam_v,nf_v);
+  const crNF    = findCritNF(H_v,beta_v,c_v,phi_v,gam_v);
+  const fs_min  = Math.min(fs_det,fs_cons,fs_bish,fs_sat,...(fs_seis?[fs_seis]:[]));
+  const fecha   = new Date().toLocaleDateString('es-ES',{year:'numeric',month:'long',day:'numeric'});
+  const proyNombre = (g('projectName')?.value?.trim()||'Sin nombre de proyecto');
+  const nowISO  = new Date().toISOString().slice(0,16).replace('T',' ');
 
-  // PROYECTO
-  doc.setFillColor(250,248,240); doc.rect(0,32,W,8,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(...gris2);
-  doc.text('PROYECTO:',margin,38);
-  doc.setFont('helvetica','normal'); doc.setTextColor(...negro);
-  doc.text(proyNombre,margin+20,38);
+  // ══════════════════════════════════════════════════════
+  //  PAGE 1 — COVER
+  // ══════════════════════════════════════════════════════
+  setF(C.ink); rect(0,0,W,H_PAGE);
 
-  y=46;
+  // Gold accent bar top
+  setF(C.gold); rect(0,0,W,3);
 
-  // PARÁMETROS
-  doc.setFillColor(245,242,235); doc.rect(margin,y,W-margin*2,7,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
-  doc.text('PARÁMETROS DE ENTRADA',margin+3,y+4.8); y+=10;
+  // Big title block
+  setF(C.ink2); rect(0,3,W,80);
+  // Diagonal decorative lines
+  doc.setDrawColor(60,70,85); doc.setLineWidth(0.3);
+  for(let i=0;i<12;i++){ const x=i*20; doc.line(x,3,x+80,83); }
 
-  const params=[
-    ['Altura H',`${H_v} m`,'Cohesion c',`${c_v} kPa`,'Radio R',`${R_v} m`],
-    ['Angulo beta',`${beta_v}°`,'Friccion phi',`${phi_v}°`,'Centro X',`${cx_v.toFixed(2)}xL`],
-    ['Nivel freatico',`${nf_v}%`,'Peso esp. y',`${gam_v} kN/m3`,'Centro Y',`${cy_v.toFixed(2)}xH`],
-    ['Dc incert.',`${dc_v}%`,'Dphi incert.',`${dphi_v}°`,'Dovelas',`${ndov_v}`],
-    ['c conservador',`${c_c.toFixed(1)} kPa`,'phi conservador',`${p_c.toFixed(1)}°`,'',''],
+  setFnt('bold',32); setT(C.white);
+  txt('SLOPEMIND', M, 42);
+  setFnt('normal',9); setT(C.goldL);
+  txt('STABILITY & RISK ENGINE', M, 52);
+  setFnt('normal',7); setT([160,170,180]);
+  txt('v2.0  ·  Análisis de Estabilidad de Taludes', M, 60);
+
+  // Gold divider
+  setF(C.gold); rect(M,72,80,0.8);
+
+  // Report title
+  setFnt('bold',14); setT(C.white);
+  txt('INFORME TÉCNICO DE', M, 88);
+  txt('ESTABILIDAD DE TALUD', M, 98);
+
+  // Project info card
+  setF([30,38,48]); rRect(M,110,W-M*2,55,2,'F');
+  setF(C.gold); rect(M,110,3,55,'F');
+
+  setFnt('bold',7); setT(C.goldL); txt('PROYECTO', M+7,120);
+  setFnt('bold',12); setT(C.white);
+  const plines = doc.splitTextToSize(proyNombre, W-M*2-16);
+  doc.text(plines, M+7, 129);
+
+  setFnt('normal',6.5); setT([140,155,170]);
+  txt('FECHA DE GENERACIÓN', M+7, 148);
+  setFnt('normal',7); setT(C.white); txt(fecha, M+7, 155);
+
+  txt('REF. ANÁLISIS', M+90, 148);
+  setFnt('bold',7); setT(C.goldL);
+  txt('SM-'+Date.now().toString().slice(-6), M+90, 155);
+
+  // FS SUMMARY BADGE
+  const fsCol = fsColor(fs_min);
+  setF(fsCol); rRect(M, 178, W-M*2, 36, 3, 'F');
+  setFnt('bold',7); setT(C.white); doc.text('FACTOR DE SEGURIDAD MÍNIMO OBTENIDO', W/2, 188, {align:'center'});
+  setFnt('bold',28); setT(C.white); doc.text(fs_min.toFixed(3), W/2, 206, {align:'center'});
+  setFnt('bold',9); setT(C.white); doc.text(fsLabel(fs_min), W/2, 213, {align:'center'});
+
+  // Methods note
+  setFnt('normal',6); setT([130,145,160]);
+  doc.text('Método Talud Infinito (Mohr-Coulomb)  ·  Bishop Simplificado 1955  ·  Pseudoestático (si aplica)', W/2, 235, {align:'center'});
+  doc.text('Normativa: Eurocode 7:2004 GEO ULS  ·  ISRM 1978  ·  Das Principios de Geotecnia 9ª ed.', W/2, 241, {align:'center'});
+
+  // Footer cover
+  setF(C.gold); rect(0,H_PAGE-10,W,10,'F');
+  setFnt('bold',7); setT(C.ink);
+  txt('SLOPEMIND — Herramienta de apoyo al ingeniero geotécnico colegiado.', M, H_PAGE-4);
+  doc.text(nowISO, W-M, H_PAGE-4, {align:'right'});
+
+  // ══════════════════════════════════════════════════════
+  //  PAGE 2 — PARÁMETROS + FACTORES DE SEGURIDAD
+  // ══════════════════════════════════════════════════════
+  doc.addPage();
+  setF(C.page); rect(0,0,W,H_PAGE);
+
+  // Header band
+  setF(C.ink); rect(0,0,W,14);
+  setF(C.gold); rect(0,0,3,14);
+  setFnt('bold',8); setT(C.white); txt('PARÁMETROS DE ENTRADA Y FACTORES DE SEGURIDAD', M+4, 9);
+  setFnt('normal',6); setT([160,170,180]); doc.text(proyNombre, W-M, 9, {align:'right'});
+
+  let y = 22;
+
+  // ── SECTION: PARÁMETROS ──
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('1.  PARÁMETROS DE ENTRADA', M+8, y+5); y+=10;
+
+  // Parameter grid 3 columns
+  const paramGroups = [
+    { title:'GEOMETRÍA', items:[
+      ['Altura del talud (H)', H_v.toFixed(1)+' m'],
+      ['Ángulo del talud (β)', beta_v.toFixed(1)+'°'],
+      ['Longitud estimada (L)', (H_v/Math.tan(beta_v*Math.PI/180)).toFixed(1)+' m'],
+    ]},
+    { title:'RESISTENCIA DEL SUELO', items:[
+      ["Cohesión efectiva (c')", c_v.toFixed(0)+' kPa'],
+      ["Ángulo fricción (φ')", phi_v.toFixed(1)+'°'],
+      ['Peso específico (γ)', gam_v.toFixed(1)+' kN/m³'],
+    ]},
+    { title:'CONDICIONES HIDROLÓGICAS', items:[
+      ['Nivel freático (NF)', nf_v.toFixed(0)+'%'],
+      ['Presión de poros (ru)', (gw*nf_v/100*(gam_v*H_v)/(gam_v*H_v)).toFixed(3)],
+      ['Condición', nf_v===0?'Seco':nf_v<=40?'Normal':nf_v<=80?'Lluvia intensa':'Saturado'],
+    ]},
   ];
-  doc.setFontSize(7.5);
-  params.forEach(row=>{
-    const cols=[margin,margin+42,margin+84,margin+126,margin+158,margin+178];
-    row.forEach((cell,i)=>{
-      if(i%2===0){doc.setFont('helvetica','normal'); doc.setTextColor(...gris1);}
-      else{doc.setFont('helvetica','bold'); doc.setTextColor(...negro);}
-      doc.text(cell,cols[i],y);
+  const gcW = (W-M*2-8)/3;
+  paramGroups.forEach((grp,gi)=>{
+    const gx = M + gi*(gcW+4);
+    setF(C.bg2); setS(C.line); doc.setLineWidth(0.3); rRect(gx,y,gcW,44,1.5,'FD');
+    setF(C.teal); rect(gx,y,gcW,6,'F');
+    setFnt('bold',5.5); setT(C.white); txt(grp.title, gx+3, y+4.2);
+    grp.items.forEach((item,ii)=>{
+      const iy = y+10+ii*10;
+      setFnt('normal',6); setT(C.ink3); txt(item[0], gx+3, iy);
+      setFnt('bold',7.5); setT(C.ink); txt(item[1], gx+3, iy+5.5);
     });
-    y+=6;
+  });
+  y+=50;
+
+  // Conservative parameters
+  setF(C.bg1); setS(C.line); doc.setLineWidth(0.2); rRect(M,y,W-M*2,16,1.5,'FD');
+  setFnt('bold',6); setT(C.orange); txt('PARÁMETROS CONSERVADORES (análisis de incertidumbre)', M+4, y+5);
+  setFnt('normal',6.5); setT(C.ink3);
+  txt(`Reducción c': -${dc_v}% → c'cons = ${c_c.toFixed(1)} kPa`, M+4, y+11);
+  txt(`Reducción φ': -${dphi_v}° → φ'cons = ${phi_c.toFixed(1)}°`, M+80, y+11);
+  if(seismicOn) txt(`Aceleración sísmica kh = ${kh_v.toFixed(2)}g`, M+155, y+11);
+  y+=22;
+
+  // ── SECTION: FACTORES DE SEGURIDAD ──
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('2.  FACTORES DE SEGURIDAD OBTENIDOS', M+8, y+5); y+=10;
+
+  const fsData = [
+    {label:'FS DETERMINISTA',sublabel:'Talud Infinito · Mohr-Coulomb',fs:fs_det,note:`NF=${nf_v}%, c'=${c_v}kPa, φ'=${phi_v}°`},
+    {label:'FS CONSERVADOR', sublabel:'Parámetros reducidos',          fs:fs_cons,note:`c'=${c_c.toFixed(1)}kPa, φ'=${phi_c.toFixed(1)}°`},
+    {label:'FS BISHOP SIMP.',sublabel:'Superficie circular',           fs:fs_bish,note:`R=${R_v}m, Cx=${cx_v.toFixed(2)}×L`},
+    {label:'FS SATURADO',    sublabel:'Talud Infinito · NF=100%',      fs:fs_sat, note:'Escenario peor caso'},
+  ];
+  if(fs_seis) fsData.push({label:'FS SÍSMICO',sublabel:'Análisis pseudoestático',fs:fs_seis,note:`kh=${kh_v.toFixed(2)}g`});
+
+  const cW2=(W-M*2-4*(fsData.length-1))/fsData.length;
+  fsData.forEach((fd,i)=>{
+    const fx=M+i*(cW2+4), col=fsColor(fd.fs);
+    setF(C.white); setS(C.line); doc.setLineWidth(0.3); rRect(fx,y,cW2,36,2,'FD');
+    setF(col); rect(fx,y,cW2,5,'F');
+    // FS bar background
+    setF(C.bg2); rect(fx+2,y+27,cW2-4,3,'F');
+    const bFrac=Math.min(1,fd.fs/3.0);
+    setF(col); rect(fx+2,y+27,(cW2-4)*bFrac,3,'F');
+    // FS reference lines
+    [1.0,1.3,1.5].forEach(ref=>{
+      const bx=fx+2+(ref/3.0)*(cW2-4);
+      doc.setDrawColor(...C.ink3); doc.setLineWidth(0.3); doc.line(bx,y+26,bx,y+31);
+    });
+    setFnt('normal',5.5); setT(C.white); txt(fd.label,fx+3,y+3.8);
+    setFnt('bold',13); setT(col); txt(fd.fs>90?'∞':fd.fs.toFixed(3),fx+3,y+19);
+    setFnt('bold',6); setT(col); txt(fsLabel(fd.fs),fx+3,y+24.5);
+    setFnt('normal',5); setT(C.ink3);
+    const subLines=doc.splitTextToSize(fd.sublabel,cW2-5);
+    doc.text(subLines,fx+3,y+34);
+  });
+  y+=42;
+
+  // ── EC7 QUICK ASSESSMENT ──
+  const worstFS=fs_min;
+  const col_w=fsColor(worstFS);
+  setF([...col_w.map(v=>Math.min(255,v+200))]); setS(col_w); doc.setLineWidth(0.5);
+  rRect(M,y,W-M*2,20,2,'FD');
+  setF(col_w); rect(M,y,4,20,'F');
+  setFnt('bold',7); setT(col_w); txt('EVALUACIÓN PRELIMINAR EC7 GEO ULS', M+8, y+6);
+  setFnt('normal',7); setT(C.ink);
+  const ecMsg = worstFS>=1.5?`FS mín = ${worstFS.toFixed(3)} ≥ 1.5 — El talud CUMPLE el estado límite último geotécnico (EC7 §2.4.7.4).`
+    :worstFS>=1.3?`FS mín = ${worstFS.toFixed(3)} entre 1.3-1.5 — Situación MARGINAL. Requiere monitorización activa y análisis complementario.`
+    :worstFS>=1.0?`FS mín = ${worstFS.toFixed(3)} entre 1.0-1.3 — Situación CRÍTICA. Adoptar medidas correctoras inmediatas.`
+    :`FS mín = ${worstFS.toFixed(3)} < 1.0 — FALLA INMINENTE. Evacuación y medidas de emergencia.`;
+  const ecLines=doc.splitTextToSize(ecMsg,W-M*2-14);
+  doc.text(ecLines,M+8,y+14);
+  y+=26;
+
+  // BISHOP surface params box
+  setF(C.bg1); setS(C.line); doc.setLineWidth(0.2); rRect(M,y,W-M*2,16,1.5,'FD');
+  setFnt('bold',6); setT(C.blue); txt('SUPERFICIE CRÍTICA BISHOP (parámetros de la superficie circular analizada)', M+4, y+5);
+  setFnt('normal',6.5); setT(C.ink3);
+  txt(`Radio R: ${R_v.toFixed(1)} m`, M+4, y+12);
+  txt(`Centro X: ${cx_v.toFixed(3)} × L = ${(cx_v*H_v/Math.tan(beta_v*Math.PI/180)).toFixed(1)} m`, M+40, y+12);
+  txt(`Centro Y: ${cy_v.toFixed(3)} × H = ${(cy_v*H_v).toFixed(1)} m`, M+105, y+12);
+  txt(`Dovelas: ${ndov_v}`, M+160, y+12);
+
+  // Footer
+  setF(C.ink); rect(0,H_PAGE-8,W,8,'F');
+  setFnt('normal',5.5); setT([160,170,180]);
+  txt('SLOPEMIND v2.0 · Informe generado automáticamente · Revisar con ingeniero geotécnico colegiado', M, H_PAGE-3);
+  doc.text('2 / 5', W-M, H_PAGE-3, {align:'right'});
+
+  // ══════════════════════════════════════════════════════
+  //  PAGE 3 — VISUALIZACIONES GRÁFICAS
+  // ══════════════════════════════════════════════════════
+  doc.addPage();
+  setF(C.page); rect(0,0,W,H_PAGE);
+  setF(C.ink); rect(0,0,W,14);
+  setF(C.teal); rect(0,0,3,14);
+  setFnt('bold',8); setT(C.white); txt('REPRESENTACIONES GRÁFICAS', M+4, 9);
+  setFnt('normal',6); setT([160,170,180]); doc.text(proyNombre,W-M,9,{align:'right'});
+
+  y=22;
+
+  // ── A: BISHOP CANVAS CAPTURE ──
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('3.  SUPERFICIE DE ROTURA — BISHOP SIMPLIFICADO', M+8, y+5); y+=10;
+
+  const bishopImg = cap('bishopCanvas');
+  if(bishopImg){
+    const bW=W-M*2, bH=bW*0.55;
+    setF(C.white); setS(C.line); doc.setLineWidth(0.3); rRect(M,y,bW,bH,1,'FD');
+    doc.addImage(bishopImg,'PNG',M,y,bW,bH);
+    setFnt('normal',5.5); setT(C.ink3);
+    txt(`Fig. 1 — Análisis Bishop Simplificado. Superficie circular R=${R_v.toFixed(1)}m, FS=${fs_bish.toFixed(3)}. Dovelas N=${ndov_v}.`,M,y+bH+4);
+    y+=bH+10;
+  } else {
+    // Draw Bishop schematic manually
+    const bx=M, by=y, bW=W-M*2, bH=60;
+    setF(C.white); setS(C.line); doc.setLineWidth(0.3); rRect(bx,by,bW,bH,1,'FD');
+    // Terrain silhouette
+    const beta_r=beta_v*Math.PI/180;
+    const scl=bW/(H_v/Math.tan(beta_r)*1.8);
+    const ox=bx+10, oy=by+bH-8;
+    const pts=[[0,0],[15*scl,0],[15*scl+H_v/Math.tan(beta_r)*scl,-H_v*scl],[15*scl+H_v/Math.tan(beta_r)*scl+15*scl,-H_v*scl]];
+    doc.setFillColor(210,195,170); doc.setDrawColor(...C.gold);
+    doc.setLineWidth(0.8);
+    doc.lines(pts.slice(1).map((p,i)=>[p[0]-pts[i][0],p[1]-pts[i][1]]),ox+pts[0][0],oy+pts[0][1],'FD');
+    // Bishop circle
+    const Rxp=R_v*scl*0.7;
+    const cXp=ox+pts[2][0]*0.55, cYp=oy+pts[2][1]-Rxp*0.3;
+    doc.setDrawColor(...fsColor(fs_bish)); doc.setLineWidth(1.2); doc.setLineDashPattern([2,1],0);
+    doc.ellipse(cXp,cYp,Rxp,Rxp,'S'); doc.setLineDashPattern([],0);
+    // Arrow to center
+    doc.setDrawColor(...C.ink3); doc.setLineWidth(0.4);
+    doc.line(cXp,cYp,cXp+Rxp,cYp);
+    setFnt('normal',5); setT(C.ink3); txt('R='+R_v.toFixed(1)+'m',cXp+Rxp*0.4,cYp-1.5);
+    // FS label
+    const fsc=fsColor(fs_bish);
+    setFnt('bold',9); setT(fsc);
+    doc.text('FS = '+fs_bish.toFixed(3)+' ['+fsLabel(fs_bish)+']',bx+bW/2,by+bH-4,{align:'center'});
+    setFnt('normal',5.5); setT(C.ink3);
+    txt('Fig. 1 — Diagrama esquemático superficie de rotura Bishop. Escala proporcional.',M,by+bH+4);
+    y+=bH+10;
+  }
+
+  // ── B: MOHR-COULOMB FAILURE ENVELOPE ──
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('4.  ENVOLVENTE DE ROTURA DE MOHR-COULOMB', M+8, y+5); y+=10;
+
+  (()=>{
+    const bx=M, by=y, bW=W-M*2, bH=62;
+    setF(C.white); setS(C.line); doc.setLineWidth(0.3); rRect(bx,by,bW,bH,1,'FD');
+
+    const plotL=bx+12, plotT=by+5, plotW=bW-18, plotH=bH-14;
+    const phi_r=phi_v*Math.PI/180;
+    const sigMax=gam_v*H_v*2.5;
+    const tauAtSig=(sig)=>c_v+sig*Math.tan(phi_r);
+
+    const sx=(sig)=>plotL+sig/sigMax*plotW;
+    const sy=(tau)=>plotT+plotH-(tau/(c_v+sigMax*Math.tan(phi_r))*plotH);
+
+    // Grid
+    doc.setDrawColor(...C.line); doc.setLineWidth(0.15);
+    for(let i=0;i<=5;i++){
+      const sig=sigMax*i/5;
+      doc.line(sx(sig),plotT,sx(sig),plotT+plotH);
+      const tau=(c_v+sigMax*Math.tan(phi_r))*i/5;
+      doc.line(plotL,sy(tau),plotL+plotW,sy(tau));
+    }
+    // Axes
+    doc.setDrawColor(...C.ink); doc.setLineWidth(0.6);
+    doc.line(plotL,plotT,plotL,plotT+plotH);
+    doc.line(plotL,plotT+plotH,plotL+plotW,plotT+plotH);
+
+    // Failure envelope
+    doc.setDrawColor(...C.red); doc.setLineWidth(1.0);
+    doc.line(sx(0),sy(c_v),sx(sigMax),sy(tauAtSig(sigMax)));
+
+    // Conservative envelope (dashed)
+    doc.setDrawColor(...C.orange); doc.setLineWidth(0.6); doc.setLineDashPattern([2,1],0);
+    const tauC=(sig)=>c_c+sig*Math.tan(phi_c*Math.PI/180);
+    doc.line(sx(0),sy(c_c),sx(sigMax),sy(tauC(sigMax)));
+    doc.setLineDashPattern([],0);
+
+    // Mohr circles for current state
+    const beta_r=beta_v*Math.PI/180;
+    const z=H_v; // depth = height
+    const ru=nf_v/100;
+    const sig1=gam_v*z*Math.cos(beta_r)*Math.cos(beta_r);
+    const sig3=sig1*(1-Math.sin(beta_r))/(1+Math.sin(beta_r));
+    const sigN=(sig1+sig3)/2, R_m=(sig1-sig3)/2;
+
+    if(sx(sigN+R_m)<=plotL+plotW && sy(0)>=plotT){
+      doc.setDrawColor(...C.blue); doc.setLineWidth(0.6);
+      doc.ellipse(sx(sigN),sy(R_m),Math.min(R_m/sigMax*plotW,20),Math.min(R_m/sigMax*plotW,20),'S');
+      // Tangent point
+      setF(C.blue); doc.ellipse(sx(sigN),sy(R_m),0.8,0.8,'F');
+    }
+
+    // Labels axes
+    setFnt('normal',5.5); setT(C.ink3);
+    for(let i=0;i<=5;i++){
+      const sig=sigMax*i/5;
+      doc.text((sig).toFixed(0),sx(sig)-2,plotT+plotH+4);
+      const tau=(c_v+sigMax*Math.tan(phi_r))*i/5;
+      doc.text((tau).toFixed(0),plotL-8,sy(tau)+1,{align:'right'});
+    }
+    setFnt('normal',5.5); setT(C.ink2);
+    doc.text("σ' (kPa)",plotL+plotW/2,plotT+plotH+7.5,{align:'center'});
+    doc.text('τ (kPa)',plotL-9,plotT+plotH/2,{align:'center',angle:90});
+
+    // Legend
+    doc.setDrawColor(...C.red); doc.setLineWidth(1); doc.line(plotL+plotW-55,plotT+6,plotL+plotW-40,plotT+6);
+    setFnt('normal',5); setT(C.ink2); txt(`Envolvente c'=${c_v}kPa, φ'=${phi_v}°`,plotL+plotW-38,plotT+7.5);
+    doc.setDrawColor(...C.orange); doc.setLineWidth(0.6); doc.setLineDashPattern([1.5,1],0);
+    doc.line(plotL+plotW-55,plotT+12,plotL+plotW-40,plotT+12); doc.setLineDashPattern([],0);
+    txt(`Conservador c'=${c_c.toFixed(0)}kPa, φ'=${phi_c.toFixed(0)}°`,plotL+plotW-38,plotT+13.5);
+    doc.setDrawColor(...C.blue); doc.setLineWidth(0.6); doc.ellipse(plotL+plotW-47.5,plotT+17.5,2,2,'S');
+    txt('Círculo de Mohr estado actual',plotL+plotW-38,plotT+19);
+
+    // c' and phi' annotations
+    doc.setDrawColor(...C.red); doc.setLineWidth(0.4); doc.setLineDashPattern([1,1],0);
+    doc.line(sx(0),sy(c_v),sx(0)+1,sy(c_v)); // c intercept mark
+    doc.setLineDashPattern([],0);
+    setFnt('bold',5.5); setT(C.red);
+    txt("c'="+c_v+" kPa", sx(0)+1.5, sy(c_v)-0.5);
+    // phi angle
+    const aX=sx(sigMax*0.4), aY0=sy(0), aY1=sy(tauAtSig(sigMax*0.4));
+    doc.setDrawColor(...C.red); doc.setLineWidth(0.4);
+    doc.line(aX,aY0,aX,aY1);
+    txt("φ'="+phi_v+"°",aX+1,aY1-1.5);
+
+    setFnt('normal',5.5); setT(C.ink3);
+    txt('Fig. 2 — Criterio de rotura Mohr-Coulomb. Curva roja: parámetros actuales. Naranja: conservadores. Azul: estado tensional.',bx,by+bH+3.5);
+    y=by+bH+8;
+  })();
+
+  y+=2;
+
+  // Footer p3
+  setF(C.ink); rect(0,H_PAGE-8,W,8,'F');
+  setFnt('normal',5.5); setT([160,170,180]);
+  txt('SLOPEMIND v2.0 · Los gráficos son representaciones del modelo paramétrico introducido.',M,H_PAGE-3);
+  doc.text('3 / 5',W-M,H_PAGE-3,{align:'right'});
+
+  // ══════════════════════════════════════════════════════
+  //  PAGE 4 — SENSIBILIDAD + ANÁLISIS PARAMÉTRICO
+  // ══════════════════════════════════════════════════════
+  doc.addPage();
+  setF(C.page); rect(0,0,W,H_PAGE);
+  setF(C.ink); rect(0,0,W,14);
+  setF(C.gold); rect(0,0,3,14);
+  setFnt('bold',8); setT(C.white); txt('ANÁLISIS DE SENSIBILIDAD Y VALORES CRÍTICOS',M+4,9);
+  setFnt('normal',6); setT([160,170,180]); doc.text(proyNombre,W-M,9,{align:'right'});
+  y=22;
+
+  // ── SENSITIVITY CHART CAPTURE ──
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('5.  ANÁLISIS DE SENSIBILIDAD PARAMÉTRICA',M+8,y+5); y+=10;
+
+  const sensImg = cap('sensCanvas');
+  if(sensImg){
+    const sW=(W-M*2-4)/2, sH=sW*0.65;
+    setF(C.white); setS(C.line); doc.setLineWidth(0.3); rRect(M,y,sW,sH,1,'FD');
+    doc.addImage(sensImg,'PNG',M,y,sW,sH);
+    setFnt('normal',5.5); setT(C.ink3); txt('Fig. 3a — Curvas FS vs parámetros.',M,y+sH+3.5);
+  }
+  const tornadoImg = cap('tornadoCanvas');
+  if(tornadoImg){
+    const sW=(W-M*2-4)/2, sH=sW*0.65;
+    const tx=M+(sW+4);
+    setF(C.white); setS(C.line); doc.setLineWidth(0.3); rRect(tx,y,sW,sH,1,'FD');
+    doc.addImage(tornadoImg,'PNG',tx,y,sW,sH);
+    setFnt('normal',5.5); setT(C.ink3);
+    doc.text('Fig. 3b — Tornado: influencia relativa de cada parámetro.',tx,y+(sW*0.65)+3.5);
+  }
+  if(sensImg||tornadoImg) y+=(W-M*2-4)/2*0.65+10;
+
+  // ── BUILT-IN TORNADO CHART (always present) ──
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('6.  TORNADO — SENSIBILIDAD RELATIVA DE PARÁMETROS',M+8,y+5); y+=10;
+
+  (()=>{
+    const baseFS = fs_det;
+    const params2=[
+      {name:"Ángulo β",      delta:(v)=>calcFS_inf(H_v,v,c_v,phi_v,gam_v,nf_v,0), lo:beta_v*0.8, hi:beta_v*1.2},
+      {name:"Fricción φ'",   delta:(v)=>calcFS_inf(H_v,beta_v,c_v,v,gam_v,nf_v,0), lo:phi_v*0.75, hi:phi_v*1.25},
+      {name:"Cohesión c'",   delta:(v)=>calcFS_inf(H_v,beta_v,v,phi_v,gam_v,nf_v,0), lo:Math.max(0,c_v-15), hi:c_v+15},
+      {name:"Nivel freático",delta:(v)=>calcFS_inf(H_v,beta_v,c_v,phi_v,gam_v,v,0),  lo:0, hi:100},
+      {name:"Peso esp. γ",   delta:(v)=>calcFS_inf(H_v,beta_v,c_v,phi_v,v,nf_v,0),   lo:gam_v*0.85, hi:gam_v*1.15},
+      {name:"Altura H",      delta:(v)=>calcFS_inf(v,beta_v,c_v,phi_v,gam_v,nf_v,0), lo:H_v*0.7, hi:H_v*1.3},
+    ];
+    const bars = params2.map(p=>({name:p.name, fsLo:p.delta(p.lo), fsHi:p.delta(p.hi)}))
+      .sort((a,b)=>Math.abs(b.fsHi-b.fsLo)-Math.abs(a.fsHi-a.fsLo));
+
+    const bx=M+30, tw=W-M-35, bh=8, gap=3;
+    const totalH=bars.length*(bh+gap)+6;
+    const allFS=[...bars.map(b=>b.fsLo),...bars.map(b=>b.fsHi),baseFS];
+    const fsMin2=Math.max(0,Math.min(...allFS)-0.2), fsMax2=Math.min(5,Math.max(...allFS)+0.2);
+    const toX=(fs)=>bx+(fs-fsMin2)/(fsMax2-fsMin2)*tw;
+    const baseX=toX(baseFS);
+
+    setF(C.white); setS(C.line); doc.setLineWidth(0.3); rRect(M,y,W-M*2,totalH+14,1,'FD');
+    // axis
+    doc.setDrawColor(...C.line); doc.setLineWidth(0.2);
+    [0,0.5,1,1.3,1.5,2,2.5,3].forEach(v=>{
+      if(v<fsMin2||v>fsMax2)return;
+      const vx=toX(v);
+      doc.line(vx,y+6,vx,y+6+totalH-2);
+      setFnt('normal',4.5); setT(C.ink3); doc.text(v.toFixed(1),vx,y+5,{align:'center'});
+      if(v===1.0||v===1.3||v===1.5){doc.setDrawColor(...fsColor(v));doc.line(vx,y+6,vx,y+6+totalH-2);}
+    });
+    // EC7 threshold labels
+    setFnt('normal',4); setT(C.red);   doc.text('FALLA',toX(0.8),y+totalH+9,{align:'center'});
+    setFnt('normal',4); setT(C.orange);doc.text('CRIT.',toX(1.15),y+totalH+9,{align:'center'});
+    setFnt('normal',4); setT(C.yellow);doc.text('MARG.',toX(1.4),y+totalH+9,{align:'center'});
+    setFnt('normal',4); setT(C.green); doc.text('ESTABLE',toX(1.9),y+totalH+9,{align:'center'});
+
+    bars.forEach((b,i)=>{
+      const by2=y+8+i*(bh+gap);
+      const xLo=Math.min(toX(b.fsLo),toX(b.fsHi));
+      const xHi=Math.max(toX(b.fsLo),toX(b.fsHi));
+      const barCol=fsColor(Math.min(b.fsLo,b.fsHi));
+      setF([...barCol.map(v=>Math.min(255,v+90))]); rect(xLo,by2,xHi-xLo,bh,'F');
+      setF(barCol); rect(xLo,by2,xHi-xLo,bh,'F');
+      // central dot at base FS
+      setF(C.ink); doc.ellipse(baseX,by2+bh/2,1.2,1.2,'F');
+      // param label
+      setFnt('normal',6); setT(C.ink); doc.text(b.name,bx-2,by2+bh/2+1.8,{align:'right'});
+      // values
+      setFnt('normal',4.5); setT(C.white);
+      doc.text(b.fsLo.toFixed(2),Math.min(toX(b.fsLo),toX(b.fsHi))+1,by2+bh/2+1.5);
+      doc.text(b.fsHi.toFixed(2),Math.max(toX(b.fsLo),toX(b.fsHi))-1,by2+bh/2+1.5,{align:'right'});
+    });
+    // Base FS vertical line
+    doc.setDrawColor(...C.ink); doc.setLineWidth(0.8); doc.setLineDashPattern([1,1],0);
+    doc.line(baseX,y+6,baseX,y+6+totalH-2); doc.setLineDashPattern([],0);
+    setFnt('bold',5); setT(C.ink);
+    doc.text('FS base='+baseFS.toFixed(3),baseX,y+5,{align:'center'});
+    setFnt('normal',5.5); setT(C.ink3);
+    txt('Fig. 4 — Diagrama Tornado: rango de variación del FS al perturbar ±20% cada parámetro. Barras ordenadas por influencia.',M,y+totalH+13);
+    y=y+totalH+18;
+  })();
+
+  // ── VALORES CRÍTICOS TABLE ──
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('7.  VALORES CRÍTICOS (FS = 1.0)',M+8,y+5); y+=10;
+
+  const crData=[
+    {param:"φ' crítico",val:crPhi!==null?crPhi.toFixed(1)+'°':'No alcanza',actual:phi_v.toFixed(1)+'°',margin:crPhi!==null?(phi_v-crPhi).toFixed(1)+'°':'—',note:'Reducción máxima tolerable del ángulo de rozamiento'},
+    {param:"c' crítica",val:crC.toFixed(1)+' kPa',actual:c_v.toFixed(0)+' kPa',margin:(c_v-crC).toFixed(1)+' kPa',note:'Mínima cohesión para mantener equilibrio'},
+    {param:"β crítico",val:crBeta!==null?crBeta.toFixed(1)+'°':'>80°',actual:beta_v.toFixed(1)+'°',margin:crBeta!==null?(crBeta-beta_v).toFixed(1)+'°':'—',note:'Máximo ángulo de talud antes de la rotura'},
+    {param:"NF crítico",val:crNF!==null?crNF+'%':'>100%',actual:nf_v.toFixed(0)+'%',margin:crNF!==null?(crNF-nf_v)+'%':'—',note:'Nivel freático límite para la estabilidad'},
+  ];
+  const crHdr=['PARÁMETRO','VALOR CRÍTICO','VALOR ACTUAL','MARGEN SEGURIDAD','DESCRIPCIÓN'];
+  const crW=[26,28,24,28,W-M*2-118];
+  const crX=[M,...crW.slice(0,-1).reduce((acc,w,i)=>[...acc,acc[i]+w],[M]).slice(1)];
+
+  setF(C.ink2); rect(M,y,W-M*2,6,'F');
+  crHdr.forEach((h,i)=>{setFnt('bold',5.5);setT(C.white);doc.text(h,crX[i]+1.5,y+4.2);});
+  y+=6;
+  crData.forEach((cr,ri)=>{
+    setF(ri%2===0?C.white:C.bg1); rect(M,y,W-M*2,8,'F');
+    const vals=[cr.param,cr.val,cr.actual,cr.margin,cr.note];
+    vals.forEach((v,i)=>{
+      if(i===0){setFnt('bold',6);setT(C.gold);}
+      else if(i===1){setFnt('bold',6.5);setT(C.ink);}
+      else if(i===3){setFnt('bold',6);setT(parseFloat(cr.margin)>5?C.green:C.orange);}
+      else{setFnt('normal',6);setT(C.ink2);}
+      doc.text(String(v),crX[i]+1.5,y+5.5);
+    });
+    y+=8;
   });
   y+=4;
 
-  // FS CARDS
-  doc.setFillColor(245,242,235); doc.rect(margin,y,W-margin*2,7,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
-  doc.text('FACTORES DE SEGURIDAD',margin+3,y+4.8); y+=10;
+  setF(C.ink); rect(0,H_PAGE-8,W,8,'F');
+  setFnt('normal',5.5); setT([160,170,180]);
+  txt('SLOPEMIND v2.0 · Análisis de sensibilidad: variación ±20% de parámetros individuales, Bishop 1955.',M,H_PAGE-3);
+  doc.text('4 / 5',W-M,H_PAGE-3,{align:'right'});
 
-  const fsCards=[
-    {label:'FS DETERMINISTA',fs:fs_det,method:'Talud Infinito'},
-    {label:'FS CONSERVADOR',fs:fs_cons,method:`c'*(1-${dc_v}%) phi'-${dphi_v}°`},
-    {label:'FS BISHOP SIMP.',fs:fs_bish,method:'Sup. circular'},
-    {label:'FS SATURADO',fs:fs_sat,method:'NF=100%'},
+  // ══════════════════════════════════════════════════════
+  //  PAGE 5 — RECOMENDACIONES + CLASIFICACIÓN + DISCLAIMER
+  // ══════════════════════════════════════════════════════
+  doc.addPage();
+  setF(C.page); rect(0,0,W,H_PAGE);
+  setF(C.ink); rect(0,0,W,14);
+  setF(C.green); rect(0,0,3,14);
+  setFnt('bold',8); setT(C.white); txt('CLASIFICACIÓN EC7, RECOMENDACIONES Y FICHA TÉCNICA',M+4,9);
+  setFnt('normal',6); setT([160,170,180]); doc.text(proyNombre,W-M,9,{align:'right'});
+  y=22;
+
+  // ── EC7 CLASSIFICATION TABLE ──
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('8.  CLASIFICACIÓN NORMATIVA (EC7 / ISRM)',M+8,y+5); y+=10;
+
+  const ec7=[
+    {state:'FALLA',   range:'FS < 1.0',     norm:'EC7 GEO ULS §2.4.7',action:'Evacuación inmediata. Medidas de emergencia. Estudio urgente.',col:C.red},
+    {state:'CRÍTICO', range:'1.0 ≤ FS < 1.3',norm:'ISRM / EC7',          action:'Análisis urgente. Medidas correctoras. Sin actividad de obra.',col:C.orange},
+    {state:'MARGINAL',range:'1.3 ≤ FS < 1.5',norm:'ISRM temporal',        action:'Monitorización activa. Drenaje. Verificar con ELS.',col:C.yellow},
+    {state:'ESTABLE', range:'FS ≥ 1.5',       norm:'EC7 / AusIMM',         action:'Cumple mínimo. Monitorización periódica. Mantener drenaje.',col:C.green},
   ];
-  const cardW=(W-margin*2-12)/4;
-  fsCards.forEach((card,i)=>{
-    const cx2=margin+i*(cardW+4), col=pdfFsColor(card.fs);
-    doc.setFillColor(250,249,246); doc.setDrawColor(...gris3); doc.roundedRect(cx2,y,cardW,24,2,2,'FD');
-    doc.setFillColor(...col); doc.rect(cx2,y,2,24,'F');
-    doc.setFont('helvetica','normal'); doc.setFontSize(5.5); doc.setTextColor(...gris2); doc.text(card.label,cx2+5,y+5);
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(...col); doc.text(card.fs>90?'inf':card.fs.toFixed(3),cx2+5,y+15);
-    doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...col); doc.text(pdfGetState(card.fs),cx2+5,y+20);
-    doc.setFont('helvetica','normal'); doc.setFontSize(4.5); doc.setTextColor(...gris2); doc.text(card.method,cx2+5,y+23.5);
-    // mini bar
-    doc.setFillColor(...gris3); doc.rect(cx2+2,y+25.5,cardW-4,1.5,'F');
-    const barW=Math.min(cardW-4,(Math.min(card.fs,3)/3)*(cardW-4));
-    doc.setFillColor(...col); doc.rect(cx2+2,y+25.5,barW,1.5,'F');
+  ec7.forEach((row,ri)=>{
+    const isActive=
+      (row.state==='FALLA'&&worstFS<1.0)||
+      (row.state==='CRÍTICO'&&worstFS>=1.0&&worstFS<1.3)||
+      (row.state==='MARGINAL'&&worstFS>=1.3&&worstFS<1.5)||
+      (row.state==='ESTABLE'&&worstFS>=1.5);
+    if(isActive){setF([...row.col.map(v=>Math.min(255,v+185))]);}else{setF(ri%2===0?C.white:C.bg1);}
+    rect(M,y,W-M*2,11,'F');
+    if(isActive){setF(row.col);rect(M,y,4,11,'F');doc.setDrawColor(...row.col);doc.setLineWidth(0.8);rect(M,y,W-M*2,11,'S');}
+    setFnt('bold',7); setT(row.col); txt(row.state,M+7,y+4);
+    if(isActive){setFnt('bold',5.5);setT(C.ink);txt('◄ ESTADO ACTUAL',M+30,y+4);}
+    setFnt('normal',6); setT(C.ink2); txt(row.range,M+7,y+9);
+    setFnt('normal',6); setT(C.ink3); doc.text(row.norm,M+60,y+7,{align:'left'});
+    const actLines=doc.splitTextToSize(row.action,W-M-100);
+    doc.text(actLines,M+100,y+5);
+    y+=12;
   });
-  y+=32;
+  y+=6;
 
-  // VALORES CRÍTICOS
-  doc.setFillColor(245,242,235); doc.rect(margin,y,W-margin*2,7,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
-  doc.text('VALORES CRITICOS (FS = 1.0)',margin+3,y+4.8); y+=10;
+  // ── RECOMMENDATIONS ──
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('9.  RECOMENDACIONES TÉCNICAS',M+8,y+5); y+=10;
 
-  const crits=[
-    {label:'phi CRITICO',val:crPhi!==null?`${crPhi.toFixed(1)}°`:'—',sub:'angulo min. estabilidad',margin:crPhi!==null?`margen ${(phi_v-crPhi).toFixed(1)}°`:''},
-    {label:'c CRITICA',val:`${crC.toFixed(1)} kPa`,sub:'cohesion min. FS=1',margin:`margen ${(c_v-crC).toFixed(1)} kPa`},
-    {label:'beta CRITICO',val:crBeta!==null?`${crBeta.toFixed(1)}°`:'>80°',sub:'angulo max. corte',margin:crBeta!==null?`margen ${(crBeta-beta_v).toFixed(1)}°`:''},
-    {label:'NF CRITICO',val:crNF!==null?`${crNF}%`:'>100%',sub:'nivel freatico limite',margin:crNF!==null?`margen ${crNF-nf_v}%`:'>100%'},
+  const rec_raw = (typeof getRecommendation==='function')?getRecommendation(fs_det,fs_cons,fs_bish):'';
+  const rec_clean = rec_raw.replace(/[✓△⚠⛔◎]/g,'').replace(/FS >= /g,'FS >= ').replace(/≥/g,'>=').replace(/≤/g,'<=');
+  const recSections = rec_clean.split(/\n\n+/).filter(s=>s.trim());
+
+  recSections.forEach((section)=>{
+    const lines=doc.splitTextToSize(section.trim(),W-M*2-6);
+    const boxH=lines.length*5+8;
+    setF(C.white); setS(C.line); doc.setLineWidth(0.2); rRect(M,y,W-M*2,boxH,1,'FD');
+    setF(fsColor(worstFS)); rect(M,y,3,boxH,'F');
+    setFnt('normal',6.5); setT(C.ink);
+    doc.text(lines,M+6,y+6);
+    y+=boxH+4;
+  });
+
+  // ── TECHNICAL SUMMARY TABLE ──
+  y+=2;
+  setF(C.gold); rect(M,y,4,7,'F');
+  setF(C.bg1); rect(M+4,y,W-M*2-4,7,'F');
+  setFnt('bold',8); setT(C.ink); txt('10.  FICHA TÉCNICA DEL ANÁLISIS',M+8,y+5); y+=10;
+
+  const techData=[
+    ['Método principal','Talud Infinito — Mohr-Coulomb','Normativa aplicada','Eurocode 7:2004 EN 1997-1'],
+    ['Método sup. circular','Bishop Simplificado (1955)','Referencia bibliog.','Das, Principios Geotec. 9ª ed.'],
+    ['Nº dovelas Bishop',String(ndov_v),'Convergencia iterativa','Tolerancia 5×10⁻⁵'],
+    ['Análisis sísmico',seismicOn?'Sí — Pseudoestático':'No aplicado','Coef. sísmico kh',seismicOn?kh_v.toFixed(3)+'g':'—'],
+    ['Software','SlopeMind v2.0','Generado',nowISO],
   ];
-  crits.forEach((cr,i)=>{
-    const cx2=margin+i*(cardW+4);
-    doc.setFillColor(253,248,231); doc.setDrawColor(...gris3); doc.roundedRect(cx2,y,cardW,20,2,2,'FD');
-    doc.setFont('helvetica','normal'); doc.setFontSize(5.5); doc.setTextColor(...gris2); doc.text(cr.label,cx2+4,y+5);
-    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...accent); doc.text(cr.val,cx2+4,y+13);
-    doc.setFont('helvetica','normal'); doc.setFontSize(4.5); doc.setTextColor(...gris2); doc.text(cr.sub,cx2+4,y+17);
-    if(cr.margin){doc.setFontSize(4.5); doc.setTextColor(...verde); doc.text(cr.margin,cx2+4,y+19.5);}
-  });
-  y+=26;
-
-  // TABLA EC7
-  doc.setFillColor(245,242,235); doc.rect(margin,y,W-margin*2,7,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
-  doc.text('CLASIFICACION EUROCODE 7 / ISRM',margin+3,y+4.8); y+=10;
-
-  const tabla=[
-    ['FALLA','FS < 1.0','EC7 GEO ULS','Evacuacion inmediata'],
-    ['CRITICO','1.0 <= FS < 1.3','ISRM / EC7','Analisis urgente + medidas correctoras'],
-    ['MARGINAL','1.3 <= FS < 1.5','ISRM temporal','Monitorizacion activa + drenaje'],
-    ['ESTABLE','FS >= 1.5','EC7 / AusIMM','Cumple minimo. Monitorizacion periodica'],
-  ];
-  const colores=[rojo,naranja,amarillo,verde];
-  const colW=[(W-margin*2)*0.16,(W-margin*2)*0.20,(W-margin*2)*0.20,(W-margin*2)*0.44];
-  const colX=[margin,margin+colW[0],margin+colW[0]+colW[1],margin+colW[0]+colW[1]+colW[2]];
-  ['ESTADO','INTERVALO','NORMATIVA','ACCION'].forEach((h,i)=>{
-    doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...gris2); doc.text(h,colX[i]+2,y);
-  });
-  y+=3; doc.setDrawColor(...gris3); doc.line(margin,y,W-margin,y); y+=3;
-  tabla.forEach((row,ri)=>{
-    if(ri%2===0){doc.setFillColor(250,249,246); doc.rect(margin,y-3,W-margin*2,7,'F');}
-    row.forEach((cell,ci)=>{
-      if(ci===0){doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(...colores[ri]);}
-      else{doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(...negro);}
-      doc.text(cell,colX[ci]+2,y);
-    });
+  techData.forEach((row,ri)=>{
+    setF(ri%2===0?C.bg1:C.white); rect(M,y,W-M*2,7,'F');
+    setFnt('normal',6); setT(C.ink3); txt(row[0],M+3,y+5);
+    setFnt('bold',6.5); setT(C.ink);  txt(row[1],M+45,y+5);
+    setFnt('normal',6); setT(C.ink3); txt(row[2],M+105,y+5);
+    setFnt('bold',6.5); setT(C.ink);  txt(row[3],M+140,y+5);
     y+=7;
   });
+  y+=8;
 
-  // RECOMENDACIÓN
-  doc.setFillColor(245,242,235); doc.rect(margin,y,W-margin*2,7,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
-  doc.text('RECOMENDACION AUTOMATICA (EC7 / ISRM)',margin+3,y+4.8); y+=10;
-  const rec=getRecommendation(fs_det,fs_cons,fs_bish)
-    .replace('✓','').replace('△','').replace('⚠','AVISO:').replace('⛔','FALLA:')
-    .replace(/FS >= /g,'FS >= ').replace(/≥/g,'>=').replace(/≤/g,'<=').replace(/\u2265/g,'>=').replace(/\u2264/g,'<=');
-  doc.setFillColor(250,249,246); doc.setDrawColor(...gris3); doc.roundedRect(margin,y,W-margin*2,24,2,2,'FD');
-  doc.setFillColor(...pdfFsColor(Math.min(fs_det,fs_cons,fs_bish))); doc.rect(margin,y,2.5,24,'F');
-  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...negro);
-  const recLines=doc.splitTextToSize(rec,W-margin*2-10);
-  doc.text(recLines,margin+6,y+6);
-  y+=30;
+  // ── LEGAL DISCLAIMER ──
+  setF(C.bg2); setS(C.line); doc.setLineWidth(0.3); rRect(M,y,W-M*2,28,1,'FD');
+  setFnt('bold',6.5); setT(C.orange); txt('AVISO LEGAL — ALCANCE DEL INFORME',M+4,y+6);
+  setFnt('normal',5.8); setT(C.ink2);
+  const disclaimer='Este informe ha sido generado automáticamente por SlopeMind como herramienta de apoyo al cálculo. '+
+    'Los resultados deben ser revisados e interpretados por un ingeniero geotécnico o civil colegiado con experiencia en estabilidad de taludes. '+
+    'SlopeMind no sustituye el criterio profesional ni una investigación geotécnica in situ completa. '+
+    'Los cálculos se basan en modelos simplificados (talud infinito, Bishop) que pueden no representar todas las condiciones reales del terreno. '+
+    'Para proyectos con riesgo sobre personas o infraestructuras, se requiere estudio geotécnico formal conforme a EC7.';
+  const dLines=doc.splitTextToSize(disclaimer,W-M*2-8);
+  doc.text(dLines,M+4,y+13);
 
-  // FOOTER
-  doc.setFillColor(...accent); doc.rect(0,H-14,W,14,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
-  doc.text('SLOPEMIND v2.0',margin,H-6);
-  doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
-  doc.text('Stability & Risk Engine — Mining Slopes',margin+38,H-6);
-  doc.text('Das 9a ed. · Bishop 1955 · Seed & Goodman 1964 · Eurocode 7',W-margin,H-6,{align:'right'});
+  // ── FINAL FOOTER ──
+  setF(C.ink); rect(0,H_PAGE-14,W,14,'F');
+  setF(C.gold); rect(0,H_PAGE-14,W,2,'F');
+  setFnt('bold',8); setT(C.white); txt('SLOPEMIND v2.0', M, H_PAGE-7);
+  setFnt('normal',6); setT([150,160,170]);
+  txt('Stability & Risk Engine · Herramienta de apoyo para ingenieros geotécnicos', M+42, H_PAGE-7);
+  setFnt('normal',5.5); setT([120,130,140]);
+  txt('Das 9ª ed. · Bishop 1955 · Seed & Goodman 1964 · Eurocode 7:2004 EN 1997-1 · ISRM 1978', M, H_PAGE-3);
+  doc.text('5 / 5', W-M, H_PAGE-3, {align:'right'});
 
-  doc.save(`SLOPEMIND_${proyNombre.replace(/\s+/g,'_')}_${fecha.replace(/ /g,'_')}.pdf`);
+  doc.save(`SLOPEMIND_Informe_${proyNombre.replace(/\s+/g,'_')}_${fecha.replace(/ de /g,'-').replace(/ /g,'')}.pdf`);
 }
+
 
 // ═══════════════════════════════════════════════════════
 //  EVENTS — slider ↔ input sync
@@ -3432,6 +4033,334 @@ document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{if(tab.dataset.tab==='editor')setTimeout(()=>{initEditor();drawEditor();},60);});
 });
 
+
+// ══════════════════════════════════════════════════════════
+//  SLOPEMIND AI — GEOTECHNICAL ASSISTANT ENGINE
+// ══════════════════════════════════════════════════════════
+
+const AI_SYSTEM_PROMPT = `Eres el asistente geotécnico de SlopeMind, un software profesional de análisis de estabilidad de taludes.
+
+IDENTIDAD Y PROPÓSITO:
+Ayudas a ingenieros geotécnicos y técnicos a:
+1. Extraer y validar parámetros de ensayos de laboratorio (triaxial, SPT, presiómetro, corte directo)
+2. Validar parámetros contra normativa internacional (Eurocode 7, ISRM, ASTM, UNE)
+3. Interpretar factores de seguridad y resultados de estabilidad
+4. Responder preguntas técnicas sobre mecánica de suelos y estabilidad de taludes
+5. Recomendar ensayos y metodologías apropiadas
+
+REGLAS DE HONESTIDAD (CRÍTICAS — nunca las incumplas):
+- NUNCA inventes valores numéricos. Si no sabes, di exactamente "No tengo datos suficientes para dar este valor".
+- SIEMPRE cita la fuente de cualquier rango de parámetros (ej: "EC7 Anexo A", "ISRM 1978", "Das 9ª ed. Tabla 4.2", "Ensayo triaxial del documento").
+- Si extraes datos de un PDF, cita el texto exacto del que lo obtuviste.
+- Indica SIEMPRE el nivel de confianza: ALTO (dato medido directamente), MEDIO (correlación empírica), BAJO (estimación bibliográfica).
+- Si un parámetro está fuera de rango típico para su tipo de suelo, avisa con ⚠ y explica por qué puede ser problemático.
+- El software usa el Método Bishop Simplificado (1955) e Infinito Slope (Mohr-Coulomb). Si la situación requiere otro método (Janbu, Spencer, etc.) indícalo.
+- NO recomiendes valores concretos para proyectos reales sin ensayos — solo rangos bibliográficos de referencia.
+
+RANGOS DE REFERENCIA (Eurocode 7 / Das / Bowles):
+- Arcilla blanda: c=5-25kPa, φ=0-15°, γ=14-18kN/m³
+- Arcilla media-dura: c=25-100kPa, φ=15-25°, γ=17-21kN/m³
+- Arena suelta: c=0, φ=28-32°, γ=15-18kN/m³
+- Arena densa: c=0, φ=35-42°, γ=18-21kN/m³
+- Grava: c=0, φ=35-45°, γ=19-22kN/m³
+- Roca muy alterada: c=10-50kPa, φ=20-35°, γ=20-25kN/m³
+- Roca sana: c=100-1000kPa, φ=35-65°, γ=24-28kN/m³
+
+CRITERIOS EC7 PARA FS:
+- FS < 1.0: Falla. Acción inmediata.
+- 1.0 ≤ FS < 1.3: Crítico. Análisis urgente.
+- 1.3 ≤ FS < 1.5: Marginal. Monitorización activa.
+- FS ≥ 1.5: Estable según EC7 GEO ULS.
+- Para obras críticas (presas, infraestructuras): FS ≥ 1.5-2.0 según importancia.
+
+FORMATO DE RESPUESTA:
+- Responde en español, de forma técnica pero clara.
+- Usa **negrita** para valores numéricos importantes.
+- Usa listas cuando hay varios puntos.
+- Cuando extraigas parámetros de un PDF, usa el formato estructurado de extracción.
+- Sé conciso pero completo. No rellenes con texto vacío.
+- Termina respuestas de validación siempre con una línea de conclusión clara.`;
+
+let aiMessages = []; // conversation history
+let aiIsLoading = false;
+let aiPdfBase64 = null;
+let aiPdfName = null;
+let aiExtractedParams = null; // params extracted from PDF
+
+// ── UPDATE CONTEXT PANEL ────────────────────────────────────
+function aiUpdateContext() {
+  const setVal = (id, val, unit='') => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val !== undefined && val !== null ? val + unit : '—';
+  };
+  try {
+    setVal('ai-p-H',    gv('H').toFixed(1),    ' m');
+    setVal('ai-p-beta', gv('beta').toFixed(1),  '°');
+    setVal('ai-p-c',    gv('c').toFixed(0),     ' kPa');
+    setVal('ai-p-phi',  gv('phi').toFixed(1),   '°');
+    setVal('ai-p-gamma',gv('gamma').toFixed(1), ' kN/m³');
+    setVal('ai-p-nf',   gv('nf').toFixed(0),    '%');
+    const fsEl = document.getElementById('fs-det');
+    if (fsEl) setVal('ai-p-fs', fsEl.textContent, '');
+  } catch(e) {}
+}
+
+// ── RENDER MESSAGES ─────────────────────────────────────────
+function aiRender() {
+  const container = document.getElementById('ai-messages');
+  if (!container) return;
+
+  // Keep welcome message, re-render conversation
+  const welcome = container.querySelector('.ai-msg.ai');
+  container.innerHTML = '';
+  if (welcome) container.appendChild(welcome);
+
+  aiMessages.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'ai-msg ' + (msg.role === 'user' ? 'user' : 'ai');
+    if (msg.role === 'assistant') {
+      div.innerHTML = '<div class="ai-name">⬡ SLOPEMIND AI</div>' +
+        '<div class="ai-bubble">' + aiFormatResponse(msg.content) + '</div>';
+    } else {
+      div.innerHTML = '<div class="ai-name" style="color:var(--accent)">TÚ</div>' +
+        '<div class="ai-bubble">' + escHtml(msg.content) + '</div>';
+    }
+    container.appendChild(div);
+  });
+
+  // Scroll to bottom
+  container.scrollTop = container.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function aiFormatResponse(text) {
+  // Convert markdown-ish to HTML
+  let html = escHtml(text);
+  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  html = html.replace(/^⚠(.+)$/gm, '<div class="ai-warning">⚠$1</div>');
+  html = html.replace(/^📌 FUENTE:(.+)$/gm, '<div class="ai-source">📌 FUENTE:$1</div>');
+  html = html.replace(/^🔵 CONFIANZA:(.+)$/gm, '<div class="ai-source">🔵 CONFIANZA:$1</div>');
+  // Bullet lists
+  html = html.replace(/^- (.+)$/gm, '<span style="display:block;padding:1px 0">• $1</span>');
+  return html;
+}
+
+// ── THINKING INDICATOR ──────────────────────────────────────
+function aiShowThinking() {
+  const container = document.getElementById('ai-messages');
+  const div = document.createElement('div');
+  div.className = 'ai-msg ai'; div.id = 'ai-thinking-msg';
+  div.innerHTML = '<div class="ai-name">⬡ SLOPEMIND AI</div>' +
+    '<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>' +
+    '<span style="margin-left:4px">Analizando…</span></div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+function aiHideThinking() {
+  const el = document.getElementById('ai-thinking-msg');
+  if (el) el.remove();
+}
+
+// ── BUILD CONTEXT STRING ─────────────────────────────────────
+function aiGetContextString() {
+  try {
+    return `CONTEXTO ACTUAL DEL MODELO EN SLOPEMIND:
+- Altura talud H: ${gv('H').toFixed(1)} m
+- Ángulo β: ${gv('beta').toFixed(1)}°
+- Cohesión c': ${gv('c').toFixed(0)} kPa
+- Ángulo fricción φ': ${gv('phi').toFixed(1)}°
+- Peso específico γ: ${gv('gamma').toFixed(1)} kN/m³
+- Nivel freático NF: ${gv('nf').toFixed(0)}%
+- FS Determinista (Mohr-Coulomb): ${document.getElementById('fs-det')?.textContent || '—'}
+- FS Bishop Simplificado: ${document.getElementById('fs-bish')?.textContent || '—'}
+- FS Conservador: ${document.getElementById('fs-cons')?.textContent || '—'}`;
+  } catch(e) { return 'Contexto no disponible.'; }
+}
+
+// ── SEND MESSAGE ─────────────────────────────────────────────
+async function aiSend() {
+  const input = document.getElementById('ai-input');
+  const sendBtn = document.getElementById('ai-send');
+  const text = input?.value?.trim();
+  if (!text || aiIsLoading) return;
+
+  aiIsLoading = true;
+  input.value = '';
+  input.style.height = 'auto';
+  if (sendBtn) sendBtn.disabled = true;
+
+  // Add user message
+  aiMessages.push({ role: 'user', content: text });
+  aiRender();
+  aiShowThinking();
+
+  try {
+    // Build messages for API — inject context into first user message of each turn
+    const contextNote = aiGetContextString();
+    const msgs = aiMessages.map((m, i) => {
+      if (m.role === 'user' && i === aiMessages.length - 1) {
+        // Current message: prepend context
+        const content = [];
+        if (aiPdfBase64 && i === 1) {
+          // PDF attached to first query — already sent
+        }
+        content.push({ type: 'text', text: contextNote + '\n\n---\nPREGUNTA DEL USUARIO:\n' + m.content });
+        return { role: 'user', content };
+      }
+      return { role: m.role, content: m.content };
+    });
+
+    const response = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        system: AI_SYSTEM_PROMPT,
+        messages: msgs
+      })
+    });
+
+    const data = await response.json();
+    const replyText = data.content?.map(b => b.text || '').join('') || 'Error en la respuesta de la API.';
+
+    aiHideThinking();
+    aiMessages.push({ role: 'assistant', content: replyText });
+    aiRender();
+
+  } catch(err) {
+    aiHideThinking();
+    aiMessages.push({ role: 'assistant', content: '⚠ Error de conexión con la API. Verifica tu conexión e inténtalo de nuevo.\n\nDetalle técnico: ' + err.message });
+    aiRender();
+  }
+
+  aiIsLoading = false;
+  if (sendBtn) sendBtn.disabled = false;
+  input?.focus();
+}
+
+// ── PROCESS PDF ─────────────────────────────────────────────
+async function aiProcessPDF(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('ai-pdf-status');
+  if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '⏳ Leyendo PDF…'; statusEl.style.color = 'var(--text3)'; }
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result.split(',')[1];
+    aiPdfBase64 = base64;
+    aiPdfName = file.name;
+    if (statusEl) { statusEl.textContent = '✓ ' + file.name + ' cargado. Extrayendo parámetros…'; statusEl.style.color = 'var(--accent2)'; }
+
+    // Automatically send extraction request
+    aiIsLoading = true;
+    const sendBtn = document.getElementById('ai-send');
+    if (sendBtn) sendBtn.disabled = true;
+    aiShowThinking();
+
+    const extractPrompt = `Se ha adjuntado el documento PDF: "${file.name}".
+    
+Por favor, analiza este documento geotécnico y extrae TODOS los parámetros de resistencia y clasificación que encuentres. 
+
+Para cada parámetro encontrado, indica:
+1. El valor numérico exacto y sus unidades
+2. El contexto exacto del texto donde lo encontraste (cita textual breve)
+3. El tipo de ensayo que lo determinó
+4. La profundidad o estrato al que corresponde (si se indica)
+
+Parámetros a buscar prioritariamente:
+- Cohesión c' o cu (drenada o no drenada)
+- Ángulo de rozamiento φ' o φu
+- Peso específico γ (natural, seco, saturado)
+- Nivel freático o presión de poros
+- Clasificación USCS / AASHTO
+- Límites de Atterberg (LL, LP, IP)
+- SPT (N o N60)
+- Resistencia a compresión simple qu
+- Cualquier otro parámetro relevante para estabilidad de taludes
+
+Si NO encuentras algún parámetro, indícalo explícitamente. NUNCA inventes valores.
+Al final, indica qué parámetros se podrían aplicar directamente al modelo de SlopeMind y cuáles necesitan correlaciones (con la correlación específica a usar).`;
+
+    const userMsg = { role: 'user', content: extractPrompt };
+    aiMessages.push({ role: 'user', content: `📄 He subido el informe: **${file.name}**. Por favor extrae los parámetros geotécnicos.` });
+    aiRender();
+    aiShowThinking();
+
+    try {
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1500,
+          system: AI_SYSTEM_PROMPT,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+              { type: 'text', text: extractPrompt }
+            ]
+          }]
+        })
+      });
+
+      const data = await response.json();
+      const reply = data.content?.map(b => b.text || '').join('') || 'Error procesando el PDF.';
+      aiHideThinking();
+      aiMessages.push({ role: 'assistant', content: reply });
+      aiRender();
+      if (statusEl) { statusEl.textContent = '✓ Extracción completada: ' + file.name; }
+
+    } catch(err) {
+      aiHideThinking();
+      aiMessages.push({ role: 'assistant', content: '⚠ Error al procesar el PDF: ' + err.message });
+      aiRender();
+    }
+
+    aiIsLoading = false;
+    if (sendBtn) sendBtn.disabled = false;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+// ── QUICK ACTIONS ────────────────────────────────────────────
+function aiQuick(text) {
+  const input = document.getElementById('ai-input');
+  if (input) input.value = text;
+  aiSend();
+}
+
+function aiAskContext() {
+  const ctx = aiGetContextString();
+  const input = document.getElementById('ai-input');
+  if (input) input.value = `Analiza los parámetros actuales del modelo. Indica si cada valor está dentro del rango típico para su tipo de suelo, señala cualquier combinación incoherente, y valida los factores de seguridad obtenidos contra EC7.`;
+  aiSend();
+}
+
+// ── KEYBOARD ─────────────────────────────────────────────────
+function aiKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSend(); }
+  // Auto-resize textarea
+  const ta = e.target;
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 100) + 'px';
+}
+
+// ── TAB SWITCH HOOK ──────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    if (tab.dataset.tab === 'asistente') {
+      aiUpdateContext();
+    }
+  });
+});
 </script>
 </body>
 </html>
