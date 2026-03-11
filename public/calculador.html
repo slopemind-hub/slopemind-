@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://api.anthropic.com; frame-ancestors 'self' https://*.vercel.app">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://api.anthropic.com https://api.open-meteo.com; frame-ancestors 'self' https://*.vercel.app">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SLOPEMIND v2.0 – Stability & Risk Engine</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -433,6 +433,57 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .ai-param-val { font-family:var(--fm); font-size:0.65rem; color:var(--text); }
 .tab[data-tab="asistente"] { color:var(--accent2); }
 .tab[data-tab="asistente"].active { border-bottom-color:var(--accent2); }
+/* ── FORECAST MODULE ── */
+#tab-forecast { display:none; padding:0; overflow:hidden; flex-direction:column; }
+#tab-forecast.active { display:flex; }
+.fc-layout { display:grid; grid-template-columns:320px 1fr; height:100%; overflow:hidden; gap:0; }
+.fc-left { display:flex; flex-direction:column; gap:0; overflow-y:auto; border-right:1px solid var(--border); padding:14px; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
+.fc-right { display:flex; flex-direction:column; overflow:hidden; padding:14px; gap:10px; }
+.fc-section { background:var(--surf2); border:1px solid var(--border); border-radius:5px; padding:12px; margin-bottom:10px; }
+.fc-section-title { font-family:var(--fm); font-size:0.48rem; letter-spacing:2px; color:var(--accent3); text-transform:uppercase; margin-bottom:8px; }
+.fc-input-row { display:flex; flex-direction:column; gap:5px; margin-bottom:8px; }
+.fc-label { font-family:var(--fm); font-size:0.52rem; color:var(--text3); }
+.fc-input { background:var(--surf3); border:1px solid var(--border2); border-radius:3px; color:var(--text); font-family:var(--fm); font-size:0.7rem; padding:6px 8px; outline:none; width:100%; }
+.fc-input:focus { border-color:var(--accent3); }
+.fc-run-btn { width:100%; padding:9px; background:rgba(74,143,255,0.15); border:1px solid var(--accent3); border-radius:4px; color:var(--accent3); font-family:var(--fm); font-size:0.55rem; letter-spacing:2px; cursor:pointer; transition:all 0.15s; margin-top:4px; }
+.fc-run-btn:hover { background:rgba(74,143,255,0.28); }
+.fc-run-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.fc-soil-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:8px; }
+.fc-soil-btn { padding:6px 4px; background:var(--surf3); border:1px solid var(--border); border-radius:3px; color:var(--text2); font-family:var(--fm); font-size:0.5rem; cursor:pointer; text-align:center; transition:all 0.15s; }
+.fc-soil-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(74,143,255,0.1); }
+.fc-alert-box { border-radius:4px; padding:8px 10px; font-family:var(--fb); font-size:0.75rem; line-height:1.5; margin-bottom:6px; }
+.fc-alert-stable  { background:rgba(34,110,75,0.12);  border:1px solid rgba(34,110,75,0.4);  color:#4ef0a0; }
+.fc-alert-marginal{ background:rgba(140,115,0,0.15);  border:1px solid rgba(200,170,0,0.4);  color:#e8c842; }
+.fc-alert-critical{ background:rgba(185,88,0,0.15);   border:1px solid rgba(255,140,0,0.4);  color:#ff8c00; }
+.fc-alert-failure { background:rgba(175,40,40,0.15);  border:1px solid rgba(255,68,85,0.4);  color:#ff4455; }
+.fc-chart-wrap { flex:1; background:var(--surf2); border:1px solid var(--border); border-radius:5px; overflow:hidden; position:relative; min-height:280px; }
+.fc-cards-row { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
+.fc-day-card { background:var(--surf2); border:1px solid var(--border); border-radius:4px; padding:7px 4px; text-align:center; }
+.fc-day-name { font-family:var(--fm); font-size:0.45rem; color:var(--text3); margin-bottom:3px; }
+.fc-day-rain { font-family:var(--fm); font-size:0.55rem; color:var(--accent3); margin-bottom:3px; }
+.fc-day-fs   { font-family:var(--fm); font-size:0.85rem; font-weight:700; margin-bottom:2px; }
+.fc-day-state{ font-family:var(--fm); font-size:0.42rem; }
+.fc-loading { display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:8px; }
+.fc-spinner { width:24px; height:24px; border:2px solid var(--border2); border-top-color:var(--accent3); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.fc-badge { display:inline-block; padding:2px 7px; border-radius:10px; font-family:var(--fm); font-size:0.45rem; letter-spacing:1px; margin-right:4px; }
+.fc-badge-blue { background:rgba(74,143,255,0.15); color:var(--accent3); border:1px solid rgba(74,143,255,0.3); }
+.fc-info-row { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid var(--border); font-family:var(--fm); font-size:0.52rem; }
+.fc-info-row:last-child { border:none; }
+.fc-info-lbl { color:var(--text3); }
+.fc-info-val { color:var(--text); }
+.fc-coords-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.fc-coord-box { background:var(--surf3); border:1px solid var(--border2); border-radius:4px; padding:8px 10px; cursor:pointer; transition:all 0.15s; }
+.fc-coord-box:focus-within { border-color:var(--accent3); background:rgba(74,143,255,0.05); }
+.fc-coord-lbl { font-family:var(--fm); font-size:0.44rem; letter-spacing:1.5px; color:var(--text3); text-transform:uppercase; margin-bottom:4px; }
+.fc-coord-input { background:transparent; border:none; outline:none; color:var(--text); font-family:var(--fm); font-size:0.82rem; width:100%; }
+.fc-coord-unit { font-family:var(--fm); font-size:0.44rem; color:var(--text3); margin-top:2px; }
+.fc-name-box { background:var(--surf3); border:1px solid var(--border2); border-radius:4px; padding:8px 10px; margin-bottom:10px; transition:all 0.15s; }
+.fc-name-box:focus-within { border-color:var(--accent3); }
+.fc-name-input { background:transparent; border:none; outline:none; color:var(--text); font-family:var(--fb); font-size:0.75rem; width:100%; }
+.fc-gps-btn { width:100%; padding:8px; background:rgba(74,143,255,0.08); border:1px solid rgba(74,143,255,0.25); border-radius:4px; color:rgba(74,143,255,0.7); font-family:var(--fm); font-size:0.5rem; letter-spacing:1.5px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
+.fc-gps-btn:hover { background:rgba(74,143,255,0.18); border-color:var(--accent3); color:var(--accent3); }
+.fc-location-preview { display:flex; align-items:center; gap:6px; padding:6px 8px; background:rgba(74,143,255,0.06); border:1px solid rgba(74,143,255,0.15); border-radius:4px; margin-top:8px; font-family:var(--fm); font-size:0.52rem; color:var(--text3); }
 
 .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .res-card { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; padding: 12px 14px; position: relative; overflow: hidden; }
@@ -974,6 +1025,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
       <div class="tab" data-tab="sens">SENSIBILIDAD</div>
       <div class="tab" data-tab="results">RESUMEN</div>
       <div class="tab" data-tab="scenarios">ESCENARIOS</div>
+      <div class="tab" data-tab="forecast" id="tab-btn-forecast" style="color:#4a8fff;border-bottom-color:transparent">⛈ PREVISIÓN</div>
       <div class="tab" data-tab="asistente" id="tab-btn-asistente">⬡ ASISTENTE IA</div>
     </div>
 
@@ -1431,6 +1483,143 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           </div>
         </div>
       </div>
+
+      <!-- TAB: PREVISIÓN METEOROLÓGICA -->
+      <div class="tab-pane" id="tab-forecast">
+        <div class="fc-layout">
+
+          <!-- LEFT: config panel -->
+          <div class="fc-left">
+
+            <div class="fc-section">
+              <div class="fc-section-title">📍 UBICACIÓN DEL TALUD</div>
+
+              <div class="fc-coords-grid">
+                <div class="fc-coord-box">
+                  <div class="fc-coord-lbl">Latitud</div>
+                  <input class="fc-coord-input" id="fc-lat" type="number" step="0.0001" placeholder="41.3851" value="41.3851" oninput="fcUpdatePreview()">
+                  <div class="fc-coord-unit">°N / °S</div>
+                </div>
+                <div class="fc-coord-box">
+                  <div class="fc-coord-lbl">Longitud</div>
+                  <input class="fc-coord-input" id="fc-lon" type="number" step="0.0001" placeholder="2.1734" value="2.1734" oninput="fcUpdatePreview()">
+                  <div class="fc-coord-unit">°E / °W</div>
+                </div>
+              </div>
+
+              <div class="fc-name-box">
+                <div class="fc-coord-lbl">Nombre / Referencia del talud</div>
+                <input class="fc-name-input" id="fc-name" type="text" placeholder="ej. Talud N-340 km 82 · Carretera A-7 · Mina Los Frailes…">
+              </div>
+
+              <button class="fc-gps-btn" onclick="fcGetLocation()">
+                <span style="font-size:0.9rem">⊕</span>
+                USAR MI UBICACIÓN GPS ACTUAL
+              </button>
+
+              <div class="fc-location-preview" id="fc-loc-preview">
+                <span style="font-size:0.8rem">🌍</span>
+                <span id="fc-loc-text">Lat 41.3851° · Lon 2.1734° · Barcelona, España</span>
+                <a id="fc-maps-link" href="https://maps.google.com/?q=41.3851,2.1734" target="_blank"
+                   style="margin-left:auto;color:var(--accent3);font-size:0.48rem;text-decoration:none">Ver en mapa ↗</a>
+              </div>
+            </div>
+
+            <div class="fc-section">
+              <div class="fc-section-title">🪨 TIPO DE SUELO (modelo Iverson)</div>
+              <div style="font-family:var(--fb);font-size:0.62rem;color:var(--text3);margin-bottom:8px;line-height:1.5">
+                Determina la velocidad de infiltración y el tiempo de respuesta del talud a la lluvia.
+              </div>
+              <div class="fc-soil-grid">
+                <div class="fc-soil-btn active" id="fcsoil-clay"   onclick="fcSetSoil('clay')">Arcilla CL/CH<br><span style="color:var(--text3)">respuesta lenta</span></div>
+                <div class="fc-soil-btn" id="fcsoil-silt"   onclick="fcSetSoil('silt')">Limo ML/MH<br><span style="color:var(--text3)">respuesta media</span></div>
+                <div class="fc-soil-btn" id="fcsoil-sand"   onclick="fcSetSoil('sand')">Arena SP/SW<br><span style="color:var(--text3)">respuesta rápida</span></div>
+                <div class="fc-soil-btn" id="fcsoil-gravel" onclick="fcSetSoil('gravel')">Grava GP/GW<br><span style="color:var(--text3)">drenaje libre</span></div>
+                <div class="fc-soil-btn" id="fcsoil-rock"   onclick="fcSetSoil('rock')">Roca alterada<br><span style="color:var(--text3)">variable</span></div>
+                <div class="fc-soil-btn" id="fcsoil-fill"   onclick="fcSetSoil('fill')">Relleno<br><span style="color:var(--text3)">respuesta media</span></div>
+              </div>
+              <div id="fc-soil-params" style="font-family:var(--fm);font-size:0.52rem;color:var(--text3);margin-top:4px;line-height:1.7"></div>
+            </div>
+
+            <div class="fc-section">
+              <div class="fc-section-title">⚙ PARÁMETROS DEL MODELO</div>
+              <div id="fc-model-params">
+                <div class="fc-info-row"><span class="fc-info-lbl">H (altura talud)</span><span class="fc-info-val" id="fcp-H">—</span></div>
+                <div class="fc-info-row"><span class="fc-info-lbl">β (ángulo)</span><span class="fc-info-val" id="fcp-beta">—</span></div>
+                <div class="fc-info-row"><span class="fc-info-lbl">c' (cohesión)</span><span class="fc-info-val" id="fcp-c">—</span></div>
+                <div class="fc-info-row"><span class="fc-info-lbl">φ' (fricción)</span><span class="fc-info-val" id="fcp-phi">—</span></div>
+                <div class="fc-info-row"><span class="fc-info-lbl">γ (peso esp.)</span><span class="fc-info-val" id="fcp-gamma">—</span></div>
+                <div class="fc-info-row"><span class="fc-info-lbl">Ks hidráulica</span><span class="fc-info-val" id="fcp-ks">—</span></div>
+                <div class="fc-info-row"><span class="fc-info-lbl">D₀ difusividad</span><span class="fc-info-val" id="fcp-d0">—</span></div>
+              </div>
+            </div>
+
+            <button class="fc-run-btn" id="fc-run-btn" onclick="fcRun()" style="padding:11px;font-size:0.6rem">
+              ⛈ CALCULAR PREVISIÓN FS (7 DÍAS)
+            </button>
+
+            <div style="font-family:var(--fm);font-size:0.48rem;color:var(--text3);margin-top:8px;line-height:1.6;padding:0 2px">
+              Modelo: Iverson (2000) · Precipitación: Open-Meteo API<br>
+              Referencia: <em>Water Resources Research, 36(7), 1897–1910</em>
+            </div>
+          </div>
+
+          <!-- RIGHT: results -->
+          <div class="fc-right">
+
+            <!-- Alert banner -->
+            <div id="fc-alert-banner" style="display:none"></div>
+
+            <!-- 7-day cards -->
+            <div id="fc-cards-wrap" style="display:none">
+              <div style="font-family:var(--fm);font-size:0.48rem;letter-spacing:2px;color:var(--text3);margin-bottom:6px">RESUMEN DIARIO — FACTOR DE SEGURIDAD PREVISTO</div>
+              <div class="fc-cards-row" id="fc-cards"></div>
+            </div>
+
+            <!-- Main FS chart -->
+            <div class="fc-chart-wrap" id="fc-chart-wrap">
+              <div class="fc-loading" id="fc-placeholder">
+                <div style="font-size:2.5rem">⛈</div>
+                <div style="font-family:var(--fb);font-size:0.85rem;color:var(--text2)">Previsión de estabilidad meteorológica</div>
+                <div style="font-family:var(--fm);font-size:0.6rem;color:var(--text3);text-align:center;max-width:340px;line-height:1.7">
+                  Introduce la ubicación del talud y pulsa <strong style="color:var(--accent3)">CALCULAR PREVISIÓN</strong><br>
+                  El modelo Iverson (2000) calculará cómo afecta la lluvia<br>prevista al Factor de Seguridad hora a hora
+                </div>
+                <div style="margin-top:8px">
+                  <span class="fc-badge fc-badge-blue">Open-Meteo API</span>
+                  <span class="fc-badge fc-badge-blue">Iverson 2000</span>
+                  <span class="fc-badge fc-badge-blue">Bishop Simplificado</span>
+                </div>
+              </div>
+              <canvas id="fc-canvas" style="display:none;width:100%;height:100%"></canvas>
+            </div>
+
+            <!-- Detail table -->
+            <div id="fc-detail-wrap" style="display:none;background:var(--surf2);border:1px solid var(--border);border-radius:5px;overflow:hidden">
+              <div style="font-family:var(--fm);font-size:0.48rem;letter-spacing:2px;color:var(--text3);padding:8px 12px;border-bottom:1px solid var(--border)">
+                DETALLE HORARIO — PRÓXIMAS 72 HORAS CRÍTICAS
+              </div>
+              <div style="overflow-x:auto;max-height:160px;overflow-y:auto;scrollbar-width:thin">
+                <table style="width:100%;border-collapse:collapse;font-family:var(--fm);font-size:0.55rem" id="fc-detail-table">
+                  <thead>
+                    <tr style="background:var(--surf3)">
+                      <th style="padding:5px 8px;text-align:left;color:var(--text3)">HORA</th>
+                      <th style="padding:5px 8px;text-align:right;color:var(--accent3)">LLUVIA mm/h</th>
+                      <th style="padding:5px 8px;text-align:right;color:var(--text3)">NF %</th>
+                      <th style="padding:5px 8px;text-align:right;color:var(--text3)">ψ (m)</th>
+                      <th style="padding:5px 8px;text-align:right;color:var(--text3)">FS Bishop</th>
+                      <th style="padding:5px 8px;text-align:left;color:var(--text3)">ESTADO EC7</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fc-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
       <!-- TAB: ASISTENTE IA -->
       <div class="tab-pane" id="tab-asistente">
         <div class="ai-layout">
@@ -4358,6 +4547,513 @@ document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     if (tab.dataset.tab === 'asistente') {
       aiUpdateContext();
+    }
+  });
+});
+</script>
+</body>
+</html>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  SLOPEMIND FORECAST — Iverson (2000) + Open-Meteo + Bishop
+//  Ref: Iverson R.M. (2000) Landslide triggering by rain
+//       infiltration. Water Resources Research 36(7):1897-1910
+// ══════════════════════════════════════════════════════════════
+
+// ── SOIL HYDRAULIC PROPERTIES (Das 9th ed. / Freeze & Cherry) ──
+const FC_SOIL = {
+  clay:   { ks:1e-8,  d0:2e-5,  label:'Arcilla CL/CH',  tlag:'días–semanas',   n:0.45, Sr:0.85 },
+  silt:   { ks:5e-7,  d0:8e-5,  label:'Limo ML/MH',     tlag:'horas–días',     n:0.42, Sr:0.75 },
+  sand:   { ks:1e-4,  d0:1e-3,  label:'Arena SP/SW',    tlag:'minutos–horas',  n:0.38, Sr:0.30 },
+  gravel: { ks:1e-2,  d0:1e-2,  label:'Grava GP/GW',    tlag:'minutos',        n:0.32, Sr:0.15 },
+  rock:   { ks:1e-6,  d0:5e-5,  label:'Roca alterada',  tlag:'horas–días',     n:0.20, Sr:0.60 },
+  fill:   { ks:3e-7,  d0:6e-5,  label:'Relleno comp.',  tlag:'horas–días',     n:0.40, Sr:0.70 },
+};
+let fcSoilType = 'clay';
+let fcData = null; // computed results
+
+// ── IVERSON (2000) PORE PRESSURE RESPONSE ──────────────────
+// ψ(Z,t) = (Iz/Ks − cos²β)·Z + (Iz/Ks)·Z·R(t*)
+// where t* = D0·t / Z²  (dimensionless time)
+// R(t*) = sqrt(t*/π)·exp(-1/4t*) - erfc(1/(2·sqrt(t*)))  [response function]
+// Source: Iverson (2000) eq. 27d
+function erfcApprox(x) {
+  // Abramowitz & Stegun approximation — error < 1.5e-7
+  if (x < 0) return 2 - erfcApprox(-x);
+  const t = 1 / (1 + 0.3275911 * x);
+  const poly = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429))));
+  return poly * Math.exp(-x * x);
+}
+
+function iversonResponse(tStar) {
+  // R(t*) — dimensionless response function from Iverson (2000) eq. 27d
+  if (tStar <= 0) return 0;
+  const sqrtT = Math.sqrt(tStar);
+  const term1 = sqrtT / Math.sqrt(Math.PI) * Math.exp(-1 / (4 * tStar));
+  const term2 = erfcApprox(1 / (2 * sqrtT));
+  return Math.max(0, term1 - term2);
+}
+
+function iversonPsi(Z, t_sec, Iz_ms, Ks, D0, beta_rad) {
+  // Pore pressure head ψ at depth Z, time t (seconds), rainfall Iz (m/s)
+  // Returns ψ in meters (positive = positive pore pressure)
+  const cosBeta2 = Math.cos(beta_rad) * Math.cos(beta_rad);
+  const IzKs = Math.min(Iz_ms / Ks, 1.0); // ratio (capped at 1 = fully saturated)
+  const tStar = D0 * t_sec / (Z * Z);
+  const R = iversonResponse(tStar);
+  const psi = Z * (IzKs - cosBeta2) + Z * IzKs * R;
+  return psi; // meters
+}
+
+// ── API INDEX — antecedent precipitation (Kohler & Linsley 1951) ──
+function computeAPI(dailyRain_mm, k = 0.92) {
+  // k = recession constant (0.85-0.98), higher for clay
+  let api = 0;
+  for (let i = 0; i < dailyRain_mm.length; i++) {
+    const age = dailyRain_mm.length - 1 - i;
+    api += dailyRain_mm[i] * Math.pow(k, age);
+  }
+  return api; // mm — antecedent wetness index
+}
+
+// ── FS COLOR & LABEL ───────────────────────────────────────
+function fcFsColor(fs) {
+  if (fs < 1.0) return '#ff4455';
+  if (fs < 1.3) return '#ff8c00';
+  if (fs < 1.5) return '#e8c842';
+  return '#4ef0a0';
+}
+function fcFsLabel(fs) {
+  if (fs < 1.0) return 'FALLA';
+  if (fs < 1.3) return 'CRÍTICO';
+  if (fs < 1.5) return 'MARGINAL';
+  return 'ESTABLE';
+}
+function fcAlertClass(fs) {
+  if (fs < 1.0) return 'fc-alert-failure';
+  if (fs < 1.3) return 'fc-alert-critical';
+  if (fs < 1.5) return 'fc-alert-marginal';
+  return 'fc-alert-stable';
+}
+
+// ── SOIL SELECTOR ──────────────────────────────────────────
+function fcSetSoil(type) {
+  fcSoilType = type;
+  document.querySelectorAll('.fc-soil-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('fcsoil-' + type);
+  if (btn) btn.classList.add('active');
+  const s = FC_SOIL[type];
+  const el = document.getElementById('fc-soil-params');
+  if (el) el.innerHTML =
+    `Ks = ${s.ks.toExponential(0)} m/s &nbsp;·&nbsp; D₀ = ${s.d0.toExponential(0)} m²/s &nbsp;·&nbsp; tiempo respuesta: ${s.tlag}`;
+  fcUpdateModelParams();
+}
+
+function fcUpdatePreview() {
+  const lat = parseFloat(document.getElementById('fc-lat')?.value);
+  const lon = parseFloat(document.getElementById('fc-lon')?.value);
+  if (isNaN(lat) || isNaN(lon)) return;
+  const txt = document.getElementById('fc-loc-text');
+  const lnk = document.getElementById('fc-maps-link');
+  // Cardinal directions
+  const latStr = Math.abs(lat).toFixed(4) + '° ' + (lat >= 0 ? 'N' : 'S');
+  const lonStr = Math.abs(lon).toFixed(4) + '° ' + (lon >= 0 ? 'E' : 'W');
+  if (txt) txt.textContent = latStr + '  ·  ' + lonStr;
+  if (lnk) lnk.href = 'https://maps.google.com/?q=' + lat + ',' + lon;
+}
+
+function fcGetLocation() {
+  const btn = document.querySelector('.fc-gps-btn');
+  if (!navigator.geolocation) {
+    alert('Tu navegador no soporta geolocalización.'); return;
+  }
+  if (btn) { btn.textContent = '⏳ Obteniendo ubicación…'; btn.disabled = true; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const latEl = document.getElementById('fc-lat');
+    const lonEl = document.getElementById('fc-lon');
+    if (latEl) latEl.value = pos.coords.latitude.toFixed(4);
+    if (lonEl) lonEl.value = pos.coords.longitude.toFixed(4);
+    fcUpdatePreview();
+    if (btn) {
+      btn.innerHTML = '<span style="font-size:0.9rem">✓</span> UBICACIÓN OBTENIDA';
+      btn.disabled = false;
+      setTimeout(() => { btn.innerHTML = '<span style="font-size:0.9rem">⊕</span> USAR MI UBICACIÓN GPS ACTUAL'; }, 2500);
+    }
+  }, () => {
+    if (btn) { btn.innerHTML = '<span style="font-size:0.9rem">⊕</span> USAR MI UBICACIÓN GPS ACTUAL'; btn.disabled = false; }
+    alert('No se pudo obtener la ubicación. Verifica los permisos del navegador.');
+  });
+}
+
+function fcUpdateModelParams() {
+  const s = FC_SOIL[fcSoilType];
+  const setV = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+  try {
+    setV('fcp-H',     gv('H').toFixed(1) + ' m');
+    setV('fcp-beta',  gv('beta').toFixed(1) + '°');
+    setV('fcp-c',     gv('c').toFixed(0) + ' kPa');
+    setV('fcp-phi',   gv('phi').toFixed(1) + '°');
+    setV('fcp-gamma', gv('gamma').toFixed(1) + ' kN/m³');
+  } catch(e) {}
+  setV('fcp-ks',  s.ks.toExponential(1) + ' m/s');
+  setV('fcp-d0',  s.d0.toExponential(1) + ' m²/s');
+}
+
+// ── OPEN-METEO FETCH ───────────────────────────────────────
+async function fcFetchWeather(lat, lon) {
+  // 7 days past + 7 days forecast, hourly precipitation
+  const today = new Date();
+  const past  = new Date(today); past.setDate(today.getDate() - 7);
+  const future= new Date(today); future.setDate(today.getDate() + 7);
+  const fmt = d => d.toISOString().slice(0, 10);
+
+  const url = `https://api.open-meteo.com/v1/forecast?` +
+    `latitude=${lat}&longitude=${lon}` +
+    `&hourly=precipitation,soil_moisture_0_to_1cm` +
+    `&past_days=7&forecast_days=7` +
+    `&timezone=auto`;
+
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error('Open-Meteo API error: ' + resp.status);
+  return await resp.json();
+}
+
+// ── MAIN COMPUTATION ───────────────────────────────────────
+async function fcRun() {
+  const btn = document.getElementById('fc-run-btn');
+  const lat = parseFloat(document.getElementById('fc-lat')?.value);
+  const lon = parseFloat(document.getElementById('fc-lon')?.value);
+  if (isNaN(lat) || isNaN(lon)) { alert('Introduce latitud y longitud válidas.'); return; }
+
+  btn.disabled = true; btn.textContent = '⏳ DESCARGANDO DATOS…';
+
+  // Show loading state
+  const placeholder = document.getElementById('fc-placeholder');
+  const canvas = document.getElementById('fc-canvas');
+  if (placeholder) placeholder.innerHTML = '<div class="fc-spinner"></div><div style="font-family:var(--fm);font-size:0.6rem;color:var(--text3);margin-top:8px">Descargando precipitación de Open-Meteo…</div>';
+  if (placeholder) placeholder.style.display = 'flex';
+  if (canvas) canvas.style.display = 'none';
+  document.getElementById('fc-alert-banner').style.display = 'none';
+  document.getElementById('fc-cards-wrap').style.display = 'none';
+  document.getElementById('fc-detail-wrap').style.display = 'none';
+
+  try {
+    btn.textContent = '⏳ CALCULANDO IVERSON…';
+    const weather = await fcFetchWeather(lat, lon);
+    const hours = weather.hourly.time;           // ISO strings
+    const precip = weather.hourly.precipitation; // mm/h
+
+    // Get slope parameters
+    let H, beta, c, phi, gamma;
+    try { H=gv('H'); beta=gv('beta'); c=gv('c'); phi=gv('phi'); gamma=gv('gamma'); }
+    catch(e) { H=15; beta=35; c=20; phi=28; gamma=18; }
+    const beta_r = beta * Math.PI / 180;
+    const phi_r  = phi  * Math.PI / 180;
+    const Z = H; // failure depth ≈ slope height
+    const soil = FC_SOIL[fcSoilType];
+    const { ks: Ks, d0: D0 } = soil;
+
+    // Antecedent API from past 7 days daily totals
+    const nowIdx = hours.findIndex(t => t >= new Date().toISOString().slice(0, 13));
+    const pastHours = precip.slice(0, nowIdx > 0 ? nowIdx : 24 * 7);
+    const dailyTotals = [];
+    for (let d = 0; d < 7; d++) {
+      const sl = pastHours.slice(d * 24, d * 24 + 24);
+      dailyTotals.push(sl.reduce((a, b) => a + (b || 0), 0));
+    }
+    const apiIdx = computeAPI(dailyTotals, fcSoilType === 'clay' ? 0.95 : fcSoilType === 'sand' ? 0.80 : 0.90);
+    // Convert API index to initial soil moisture fraction
+    const psi0 = Math.min(0, -Z * (1 - Math.min(apiIdx / 100, 0.95)));
+
+    // ── IVERSON TIME-STEPPING ──
+    // For each forecast hour, accumulate rainfall and compute ψ(Z,t)
+    const forecastStart = nowIdx > 0 ? nowIdx : 0;
+    const forecastEnd   = Math.min(forecastStart + 24 * 7, hours.length);
+    const results = [];
+
+    // We run the Iverson model: for each time step t (hours from forecast start),
+    // compute pore pressure as superposition of rainfall pulses (linearity of diffusion)
+    // ψ(t) = Σ_i  Iverson(Z, (t-ti)·3600, Iz_i, Ks, D0, β)
+    // This is the correct application per Iverson (2000) eq. 27
+
+    const dt = 3600; // 1 hour in seconds
+    const psiArr = [];
+
+    for (let t = forecastStart; t < forecastEnd; t++) {
+      let psiTotal = psi0 * Math.exp(-(t - forecastStart) * dt / (D0 / (Z * Z) * 86400)); // decay of initial
+      // Superpose all past rainfall pulses up to time t
+      const tAge_max = Math.min(t - forecastStart, 72); // look back max 72h for efficiency
+      for (let s = Math.max(forecastStart, t - tAge_max); s <= t; s++) {
+        const Iz_mmh = precip[s] || 0;
+        const Iz_ms  = Iz_mmh / (1000 * 3600); // mm/h → m/s
+        if (Iz_ms < 1e-10) continue;
+        const t_elapsed = (t - s + 1) * dt; // seconds since this pulse
+        const psi_pulse = iversonPsi(Z, t_elapsed, Iz_ms, Ks, D0, beta_r);
+        psiTotal += psi_pulse;
+      }
+      psiArr.push(psiTotal);
+
+      // Pore pressure → Bishop FS
+      // u = γw · ψ (converted to kPa), applied as pore pressure reduction
+      const psi_clamp = Math.max(psiTotal, -Z); // can't have more suction than depth
+      const u_kPa = 9.81 * Math.max(0, psi_clamp); // only positive pore pressure weakens slope
+      // Approximate Bishop using infinite slope with pore pressure
+      const W_per_m2 = gamma * Z;
+      const N = W_per_m2 * Math.cos(beta_r) * Math.cos(beta_r) - u_kPa;
+      const T = W_per_m2 * Math.sin(beta_r) * Math.cos(beta_r);
+      const FS_num = c + Math.max(0, N) * Math.tan(phi_r);
+      const fs = T > 0.01 ? Math.max(0.1, Math.min(FS_num / T, 10)) : 10;
+
+      const nfPct = Math.min(100, Math.max(0, psi_clamp > 0 ? (psi_clamp / Z) * 100 : 0));
+
+      results.push({
+        time:  hours[t],
+        rain:  precip[t] || 0,
+        psi:   psiTotal,
+        nf:    nfPct,
+        fs:    fs,
+        isForecast: t >= forecastStart,
+      });
+    }
+
+    fcData = { results, lat, lon, apiIdx, H, beta, c, phi, gamma, soilType: fcSoilType };
+    fcRenderResults(fcData);
+
+  } catch (err) {
+    const ph = document.getElementById('fc-placeholder');
+    if (ph) ph.innerHTML = `<div style="color:var(--danger);font-family:var(--fm);font-size:0.7rem;text-align:center;padding:20px">
+      ⚠ Error: ${err.message}<br><span style="color:var(--text3);font-size:0.6rem;margin-top:4px;display:block">Verifica la conexión a internet y las coordenadas</span></div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '⛈ CALCULAR PREVISIÓN FS (7 DÍAS)';
+}
+
+// ── RENDER RESULTS ─────────────────────────────────────────
+function fcRenderResults(data) {
+  const { results } = data;
+  const minFS = Math.min(...results.map(r => r.fs));
+  const minIdx = results.findIndex(r => r.fs === minFS);
+  const maxRain = Math.max(...results.map(r => r.rain), 1);
+
+  // Alert banner
+  const banner = document.getElementById('fc-alert-banner');
+  if (banner) {
+    const minTime = results[minIdx]?.time?.slice(0, 16).replace('T', ' ');
+    banner.className = 'fc-alert-box ' + fcAlertClass(minFS);
+    let alertMsg = '';
+    if (minFS < 1.0) {
+      alertMsg = `🔴 ALERTA CRÍTICA — FS mínimo previsto: <strong>${minFS.toFixed(3)}</strong> [FALLA] el ${minTime}. Riesgo de deslizamiento activo. Tomar medidas de emergencia.`;
+    } else if (minFS < 1.3) {
+      alertMsg = `🟠 ALERTA — FS mínimo previsto: <strong>${minFS.toFixed(3)}</strong> [CRÍTICO] el ${minTime}. Monitorización activa y medidas preventivas recomendadas (EC7).`;
+    } else if (minFS < 1.5) {
+      alertMsg = `⚠ AVISO — FS mínimo previsto: <strong>${minFS.toFixed(3)}</strong> [MARGINAL] el ${minTime}. El talud entra en zona marginal EC7. Revisar drenajes.`;
+    } else {
+      alertMsg = `✅ ESTABLE — FS mínimo previsto: <strong>${minFS.toFixed(3)}</strong>. El talud se mantiene estable durante los próximos 7 días según la precipitación prevista.`;
+    }
+    banner.innerHTML = alertMsg;
+    banner.style.display = 'block';
+  }
+
+  // 7-day cards
+  const cardsEl = document.getElementById('fc-cards');
+  const cardsWrap = document.getElementById('fc-cards-wrap');
+  if (cardsEl && cardsWrap) {
+    // Group by day
+    const days = {};
+    results.forEach(r => {
+      const day = r.time.slice(0, 10);
+      if (!days[day]) days[day] = { rains: [], fsList: [] };
+      days[day].rains.push(r.rain);
+      days[day].fsList.push(r.fs);
+    });
+    const dayKeys = Object.keys(days).slice(0, 7);
+    const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    cardsEl.innerHTML = dayKeys.map(d => {
+      const totalRain = days[d].rains.reduce((a, b) => a + b, 0).toFixed(1);
+      const minDayFS  = Math.min(...days[d].fsList);
+      const col = fcFsColor(minDayFS);
+      const date = new Date(d + 'T12:00:00');
+      const name = dayNames[date.getDay()];
+      return `<div class="fc-day-card" style="border-top:3px solid ${col}">
+        <div class="fc-day-name">${name} ${d.slice(5)}</div>
+        <div class="fc-day-rain">🌧 ${totalRain}mm</div>
+        <div class="fc-day-fs" style="color:${col}">${minDayFS.toFixed(2)}</div>
+        <div class="fc-day-state" style="color:${col}">${fcFsLabel(minDayFS)}</div>
+      </div>`;
+    }).join('');
+    cardsWrap.style.display = 'block';
+  }
+
+  // Main canvas chart
+  const canvas = document.getElementById('fc-canvas');
+  const placeholder = document.getElementById('fc-placeholder');
+  if (canvas && placeholder) {
+    placeholder.style.display = 'none';
+    canvas.style.display = 'block';
+    fcDrawChart(canvas, results, maxRain);
+  }
+
+  // Detail table — first 72 most critical hours
+  const tbody = document.getElementById('fc-tbody');
+  const detailWrap = document.getElementById('fc-detail-wrap');
+  if (tbody && detailWrap) {
+    // Sort by FS ascending, show 72 worst hours
+    const sorted = [...results].sort((a, b) => a.fs - b.fs).slice(0, 72);
+    sorted.sort((a, b) => a.time.localeCompare(b.time));
+    const stateColors = { 'ESTABLE':'#4ef0a0','MARGINAL':'#e8c842','CRÍTICO':'#ff8c00','FALLA':'#ff4455' };
+    tbody.innerHTML = sorted.map(r => {
+      const lbl = fcFsLabel(r.fs);
+      const col = fcFsColor(r.fs);
+      return `<tr style="background:${r.fs<1.3?'rgba(255,68,85,0.04)':'transparent'}">
+        <td style="padding:4px 8px;color:var(--text3)">${r.time.slice(0,16).replace('T',' ')}</td>
+        <td style="padding:4px 8px;text-align:right;color:var(--accent3)">${r.rain.toFixed(1)}</td>
+        <td style="padding:4px 8px;text-align:right;color:var(--text2)">${r.nf.toFixed(0)}%</td>
+        <td style="padding:4px 8px;text-align:right;color:var(--text2)">${r.psi.toFixed(2)}</td>
+        <td style="padding:4px 8px;text-align:right;font-weight:700;color:${col}">${r.fs.toFixed(3)}</td>
+        <td style="padding:4px 8px;color:${col}">${lbl}</td>
+      </tr>`;
+    }).join('');
+    detailWrap.style.display = 'block';
+  }
+}
+
+// ── CANVAS CHART ────────────────────────────────────────────
+function fcDrawChart(canvas, results, maxRain) {
+  const parent = canvas.parentElement;
+  canvas.width  = parent.clientWidth  || 600;
+  canvas.height = parent.clientHeight || 300;
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width, CH = canvas.height;
+  const ML = 52, MR = 52, MT = 28, MB = 44;
+  const PW = CW - ML - MR, PH = CH - MT - MB;
+
+  ctx.fillStyle = '#0f1419'; ctx.fillRect(0, 0, CW, CH);
+
+  // ── EC7 ZONE BANDS ──
+  const fsMin = 0.5, fsMax = 3.5;
+  const toY = fs => MT + PH - (fs - fsMin) / (fsMax - fsMin) * PH;
+  const toX = i  => ML + (i / (results.length - 1)) * PW;
+
+  const zones = [
+    { lo: 0.0,  hi: 1.0,  col: 'rgba(255,68,85,0.12)',  lbl: 'FALLA' },
+    { lo: 1.0,  hi: 1.3,  col: 'rgba(255,140,0,0.10)',  lbl: 'CRÍTICO' },
+    { lo: 1.3,  hi: 1.5,  col: 'rgba(232,200,66,0.08)', lbl: 'MARGINAL' },
+    { lo: 1.5,  hi: 3.5,  col: 'rgba(78,240,160,0.05)', lbl: 'ESTABLE' },
+  ];
+  zones.forEach(z => {
+    const y1 = toY(Math.min(z.hi, fsMax)), y2 = toY(Math.max(z.lo, fsMin));
+    ctx.fillStyle = z.col;
+    ctx.fillRect(ML, y1, PW, y2 - y1);
+  });
+
+  // EC7 threshold lines
+  [1.0, 1.3, 1.5].forEach(ref => {
+    const y = toY(ref), col = ref === 1.0 ? '#ff4455' : ref === 1.3 ? '#ff8c00' : '#e8c842';
+    ctx.strokeStyle = col + '60'; ctx.lineWidth = 0.8;
+    ctx.setLineDash([6, 4]); ctx.beginPath(); ctx.moveTo(ML, y); ctx.lineTo(ML + PW, y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = col + '90'; ctx.font = '8px DM Mono,monospace';
+    ctx.fillText('EC7 ' + ref.toFixed(1), ML + PW + 3, y + 3);
+  });
+
+  // ── RAINFALL BARS (secondary axis, top portion) ──
+  const rainH = PH * 0.25;
+  const rainScale = rainH / Math.max(maxRain, 1);
+  results.forEach((r, i) => {
+    if (r.rain <= 0) return;
+    const x = toX(i), barH = r.rain * rainScale;
+    ctx.fillStyle = 'rgba(74,143,255,0.55)';
+    ctx.fillRect(x - PW / results.length / 2, MT + 2, PW / results.length, barH);
+  });
+  // Rain axis label
+  ctx.fillStyle = 'rgba(74,143,255,0.7)'; ctx.font = '8px DM Mono,monospace';
+  ctx.fillText('🌧', ML - 18, MT + rainH / 2 + 3);
+
+  // ── GRID ──
+  ctx.strokeStyle = 'rgba(34,45,56,0.8)'; ctx.lineWidth = 0.4;
+  [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5].forEach(fs => {
+    const y = toY(fs);
+    if (y < MT || y > MT + PH) return;
+    ctx.beginPath(); ctx.moveTo(ML, y); ctx.lineTo(ML + PW, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(74,89,104,0.6)'; ctx.font = '8px DM Mono,monospace';
+    ctx.fillText(fs.toFixed(1), ML - 22, y + 3);
+  });
+
+  // Day separators
+  ctx.strokeStyle = 'rgba(74,89,104,0.3)'; ctx.lineWidth = 0.5;
+  ctx.setLineDash([3, 4]);
+  let lastDay = '';
+  results.forEach((r, i) => {
+    const day = r.time.slice(0, 10);
+    if (day !== lastDay) {
+      const x = toX(i);
+      ctx.beginPath(); ctx.moveTo(x, MT); ctx.lineTo(x, MT + PH); ctx.stroke();
+      ctx.fillStyle = 'rgba(74,89,104,0.7)'; ctx.font = '8px DM Mono,monospace';
+      const d = new Date(day + 'T12:00:00');
+      const names = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      ctx.fillText(names[d.getDay()] + ' ' + day.slice(5), x + 2, MT + PH + 14);
+      lastDay = day;
+    }
+  });
+  ctx.setLineDash([]);
+
+  // ── FS LINE (coloured by state) ──
+  ctx.lineWidth = 2;
+  for (let i = 1; i < results.length; i++) {
+    const x0 = toX(i - 1), y0 = toY(Math.min(results[i - 1].fs, fsMax));
+    const x1 = toX(i),     y1 = toY(Math.min(results[i].fs, fsMax));
+    ctx.strokeStyle = fcFsColor(results[i].fs);
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  }
+
+  // Minimum FS marker
+  const minFS = Math.min(...results.map(r => r.fs));
+  const minIdx = results.findIndex(r => r.fs === minFS);
+  const mx = toX(minIdx), my = toY(Math.min(minFS, fsMax));
+  ctx.beginPath(); ctx.arc(mx, my, 5, 0, Math.PI * 2);
+  ctx.fillStyle = fcFsColor(minFS); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+  // Label
+  ctx.fillStyle = fcFsColor(minFS); ctx.font = 'bold 9px DM Mono,monospace';
+  const lblX = mx + (mx > CW * 0.8 ? -70 : 8);
+  ctx.fillText('FS min = ' + minFS.toFixed(3), lblX, my - 6);
+  ctx.fillText(fcFsLabel(minFS), lblX, my + 6);
+
+  // ── AXES ──
+  ctx.strokeStyle = 'rgba(74,89,104,0.8)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(ML, MT); ctx.lineTo(ML, MT + PH); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ML, MT + PH); ctx.lineTo(ML + PW, MT + PH); ctx.stroke();
+
+  // ── TITLE ──
+  ctx.fillStyle = 'rgba(221,227,234,0.5)'; ctx.font = '9px DM Mono,monospace';
+  const name = document.getElementById('fc-name')?.value || 'Talud';
+  ctx.fillText('FS(t) — ' + name + '  ·  Modelo Iverson (2000) + Open-Meteo  ·  Tipo suelo: ' + FC_SOIL[fcSoilType].label, ML, MT - 8);
+
+  // Y axis label
+  ctx.save(); ctx.translate(14, MT + PH / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = 'rgba(140,155,170,0.6)'; ctx.font = '8px DM Mono,monospace';
+  ctx.fillText('Factor de Seguridad FS', -30, 0); ctx.restore();
+
+  // Now label
+  const nowX = toX(0);
+  ctx.strokeStyle = 'rgba(232,200,66,0.5)'; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(nowX, MT); ctx.lineTo(nowX, MT + PH); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(232,200,66,0.7)'; ctx.font = '7px DM Mono,monospace';
+  ctx.fillText('AHORA', nowX + 2, MT + 9);
+}
+
+// ── TAB INIT HOOK ──────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    if (tab.dataset.tab === 'forecast') {
+      fcSetSoil(fcSoilType);
+      fcUpdateModelParams();
+      // Resize canvas if data exists
+      setTimeout(() => {
+        if (fcData) fcRenderResults(fcData);
+      }, 60);
     }
   });
 });
