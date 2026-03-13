@@ -370,6 +370,10 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 /* TORNADO CHART */
 .tornado-card { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; padding: 14px; }
 .tornado-title { font-family: var(--fm); font-size: 0.52rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+.badge-janbu { background:rgba(74,143,255,0.12); border-color:rgba(74,143,255,0.4); color:#4a8fff; }
+.badge-crack { background:rgba(255,68,85,0.10); border-color:rgba(255,68,85,0.35); color:#ff6677; }
+#crack-row, #crack-water-row { display:none; }
+#crack-row.visible, #crack-water-row.visible { display:flex; }
 .tornado-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
 .tornado-lbl { font-family: var(--fm); font-size: 0.58rem; color: var(--text2); min-width: 70px; text-align: right; }
 .tornado-bar-wrap { flex: 1; height: 12px; background: var(--surf2); border-radius: 2px; position: relative; overflow: hidden; }
@@ -503,7 +507,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .fc-gps-btn:hover { background:rgba(74,143,255,0.18); border-color:var(--accent3); color:var(--accent3); }
 .fc-location-preview { display:flex; align-items:center; gap:6px; padding:6px 8px; background:rgba(74,143,255,0.06); border:1px solid rgba(74,143,255,0.15); border-radius:4px; margin-top:8px; font-family:var(--fm); font-size:0.52rem; color:var(--text3); }
 
-.res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.res-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
 .res-card { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; padding: 12px 14px; position: relative; overflow: hidden; }
 .res-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: currentColor; }
 .res-card-lbl { font-family: var(--fm); font-size: 0.55rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 4px; }
@@ -960,6 +964,35 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <input class="num-input" id="kh_ni" type="number" value="0.1" min="0" max="0.4" step="0.01">
       </div>
 
+      <div class="sec-hd">GRIETA DE TRACCIÓN</div>
+      <div class="seismic-toggle" onclick="toggleCrack()">
+        <div class="toggle-track" id="crack-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">ACTIVAR GRIETA DE TRACCIÓN</div>
+      </div>
+      <div class="inp-row seismic-row" id="crack-row">
+        <div class="inp-label">
+          Profundidad grieta z<sub>c</sub>
+          <div class="info-btn">i
+            <div class="tooltip">
+              <div class="tooltip-title">Grieta de tracción</div>
+              <div class="tooltip-desc">Grieta vertical en la coronación del talud. Reduce la longitud de la superficie de rotura y añade fuerza hidrostática si está llena de agua. Terzaghi (1943): zc = 2c'/γ·tan(45°+φ'/2). Típica en arcillas sobre-consolidadas.</div>
+              <div class="tooltip-range">Arcilla blanda: <span>0.5–2 m</span><br>Arcilla media: <span>2–5 m</span><br>Valor teórico Terzaghi: <span>calculado auto</span></div>
+            </div>
+          </div>
+          <em>metros</em>
+        </div>
+        <div class="slider-col"><input type="range" id="zc" min="0.1" max="10" value="2" step="0.1"></div>
+        <input class="num-input" id="zc_ni" type="number" value="2" min="0.1" max="10" step="0.1">
+      </div>
+      <div class="inp-row seismic-row" id="crack-water-row" style="margin-top:-4px">
+        <div class="inp-label" style="font-size:0.58rem;color:var(--text3)">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="checkbox" id="crack-water" onchange="update()" style="accent-color:var(--accent)">
+            Grieta llena de agua (caso más desfavorable)
+          </label>
+        </div>
+      </div>
+
       <!-- LEGEND -->
       <div class="legend">
         <div class="sec-hd" style="margin-top:0">CLASIFICACIÓN EC7 / ISRM</div>
@@ -1165,9 +1198,6 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
                   <button class="ed-import-btn" onclick="exportCSV()">↓ CSV</button>
                 </div>
               </div>
-              <div style="font-family:var(--fm);font-size:0.48rem;color:var(--text3);margin-bottom:4px">
-                Formato CSV: una línea por punto, X,Y en metros. Edita directamente en la tabla.
-              </div>
               <div class="coords-table-wrap">
                 <table class="coords-table">
                   <thead><tr><th>#</th><th>X (m)</th><th>Y (m)</th><th></th></tr></thead>
@@ -1221,7 +1251,6 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <div class="editor-side-section">
               <div class="editor-side-title">EXPORTAR</div>
               <button class="add-layer-btn" style="margin-bottom:6px" onclick="exportEditorPNG()">↓ EXPORTAR IMAGEN PNG</button>
-              <div style="font-family:var(--fm);font-size:0.48rem;color:var(--text3);line-height:1.6">Descarga el canvas actual como imagen de alta resolución para incluir en informes.</div>
             </div>
             <div class="editor-side-section">
               <div class="editor-side-title">INSTRUCCIONES RÁPIDAS</div>
@@ -1351,6 +1380,87 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <div class="tornado-title">ANÁLISIS DE SENSIBILIDAD — IMPACTO EN FS (±10% de parámetro)</div>
           <div id="tornado-rows"></div>
         </div>
+
+        <!-- MONTE CARLO -->
+        <div class="mc-card" style="margin-top:12px">
+          <div class="mc-header">
+            <div>
+              <div class="mc-title">🎲 ANÁLISIS PROBABILÍSTICO — MONTE CARLO</div>
+              <div class="mc-subtitle">Distribución estadística del Factor de Seguridad · Probabilidad de fallo P(FS&lt;1.0)</div>
+            </div>
+            <div class="mc-controls">
+              <div class="mc-ctrl-group">
+                <label class="mc-lbl">N simulaciones</label>
+                <select class="mc-select" id="mc-n">
+                  <option value="500">500 — rápido</option>
+                  <option value="2000" selected>2 000 — estándar</option>
+                  <option value="10000">10 000 — preciso</option>
+                </select>
+              </div>
+              <div class="mc-ctrl-group">
+                <label class="mc-lbl">Distribución</label>
+                <select class="mc-select" id="mc-dist">
+                  <option value="normal" selected>Normal</option>
+                  <option value="lognormal">Log-Normal</option>
+                </select>
+              </div>
+              <div class="mc-ctrl-group">
+                <label class="mc-lbl">COV parámetros</label>
+                <select class="mc-select" id="mc-cov">
+                  <option value="0.10">10% — baja variabilidad</option>
+                  <option value="0.20" selected>20% — típico campo</option>
+                  <option value="0.30">30% — alta variabilidad</option>
+                </select>
+              </div>
+              <button class="mc-run-btn" id="mc-run-btn" onclick="mcRun()">▶ EJECUTAR</button>
+            </div>
+          </div>
+
+          <div class="mc-body" id="mc-body">
+            <div class="mc-placeholder" id="mc-placeholder">
+              <div style="font-size:2rem;margin-bottom:8px;opacity:0.3">🎲</div>
+              <div style="font-family:var(--fm);font-size:0.6rem;color:var(--text3)">Configura los parámetros y ejecuta el análisis</div>
+            </div>
+            <div id="mc-results" style="display:none">
+              <div class="mc-stats-row">
+                <div class="mc-stat-box" id="mc-stat-pf">
+                  <div class="mc-stat-lbl">P(FS &lt; 1.0)</div>
+                  <div class="mc-stat-val" id="mc-pf">—</div>
+                  <div class="mc-stat-sub">Probabilidad de fallo</div>
+                </div>
+                <div class="mc-stat-box" id="mc-stat-pmarg">
+                  <div class="mc-stat-lbl">P(FS &lt; 1.3)</div>
+                  <div class="mc-stat-val" id="mc-pmarg">—</div>
+                  <div class="mc-stat-sub">Prob. estado crítico</div>
+                </div>
+                <div class="mc-stat-box">
+                  <div class="mc-stat-lbl">FS medio (μ)</div>
+                  <div class="mc-stat-val" id="mc-mean">—</div>
+                  <div class="mc-stat-sub">Media de simulaciones</div>
+                </div>
+                <div class="mc-stat-box">
+                  <div class="mc-stat-lbl">Desv. típica (σ)</div>
+                  <div class="mc-stat-val" id="mc-std">—</div>
+                  <div class="mc-stat-sub">Dispersión del FS</div>
+                </div>
+                <div class="mc-stat-box">
+                  <div class="mc-stat-lbl">FS percentil 5%</div>
+                  <div class="mc-stat-val" id="mc-p5">—</div>
+                  <div class="mc-stat-sub">Valor característico EC7</div>
+                </div>
+                <div class="mc-stat-box">
+                  <div class="mc-stat-lbl">Índice confiabilidad β</div>
+                  <div class="mc-stat-val" id="mc-beta">—</div>
+                  <div class="mc-stat-sub">Hasofer-Lind (EC7)</div>
+                </div>
+              </div>
+              <div class="mc-chart-row">
+                <canvas id="mc-canvas" width="900" height="200"></canvas>
+              </div>
+              <div class="mc-footer" id="mc-footer"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- TAB: RESULTS -->
@@ -1411,6 +1521,32 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
               </div>
             </div>
           </div>
+          <div class="res-card" id="rcard-jan">
+            <div class="res-card-lbl">FS JANBU SIMPLIFICADO</div>
+            <div class="res-card-val" id="rv-jan">—</div>
+            <div class="res-card-state" id="rs-jan">—</div>
+            <div class="res-card-method">Sup. no circular · f₀ correg. · Janbu (1973)</div>
+            <div class="safety-bar-wrap">
+              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-track">
+                <div class="safety-bar-fill" id="sbar-jan"></div>
+                <div class="safety-bar-target" style="left:50%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="res-card" id="rcard-crack" style="display:none">
+            <div class="res-card-lbl">FS CON GRIETA DE TRACCIÓN</div>
+            <div class="res-card-val" id="rv-crack">—</div>
+            <div class="res-card-state" id="rs-crack">—</div>
+            <div class="res-card-method" id="crack-method-lbl">Terzaghi (1943) · zc=— · sin agua</div>
+            <div class="safety-bar-wrap">
+              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-track">
+                <div class="safety-bar-fill" id="sbar-crack"></div>
+                <div class="safety-bar-target" style="left:50%"></div>
+              </div>
+            </div>
+          </div>
           <div class="res-card" id="rcard-sat">
             <div class="res-card-lbl">FS SATURADO (peor caso)</div>
             <div class="res-card-val" id="rv-sat">—</div>
@@ -1461,7 +1597,6 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <!-- STABILIZATION ANALYSIS -->
         <div class="stab-box">
           <div class="stab-title">⚙ ANÁLISIS DE ESTABILIZACIÓN — ¿Qué cambiar para alcanzar FS ≥ 1.5?</div>
-          <div class="stab-subtitle">El software calcula automáticamente las medidas mínimas necesarias para llevar el talud a un estado ESTABLE según EC7.</div>
           <div class="stab-grid" id="stab-grid">—</div>
         </div>
       </div>
@@ -1545,9 +1680,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 
             <div class="fc-section">
               <div class="fc-section-title">🪨 TIPO DE SUELO (modelo Iverson)</div>
-              <div style="font-family:var(--fb);font-size:0.62rem;color:var(--text3);margin-bottom:8px;line-height:1.5">
-                Determina la velocidad de infiltración y el tiempo de respuesta del talud a la lluvia.
-              </div>
+              <div style="font-family:var(--fb);font-size:0.62rem;color:var(--text3);margin-bottom:8px;line-height:1.5"></div>
               <div class="fc-soil-grid">
                 <div class="fc-soil-btn active" id="fcsoil-clay"   onclick="fcSetSoil('clay')">Arcilla CL/CH<br><span style="color:var(--text3)">respuesta lenta</span></div>
                 <div class="fc-soil-btn" id="fcsoil-silt"   onclick="fcSetSoil('silt')">Limo ML/MH<br><span style="color:var(--text3)">respuesta media</span></div>
@@ -1576,10 +1709,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
               ⛈ CALCULAR PREVISIÓN FS (7 DÍAS)
             </button>
 
-            <div style="font-family:var(--fm);font-size:0.48rem;color:var(--text3);margin-top:8px;line-height:1.6;padding:0 2px">
-              Modelo: Iverson (2000) · Precipitación: Open-Meteo API<br>
-              Referencia: <em>Water Resources Research, 36(7), 1897–1910</em>
-            </div>
+
           </div>
 
           <!-- RIGHT: results -->
@@ -1723,6 +1853,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 // ═══════════════════════════════════════════════════════
 const gw = 9.81;
 let seismicOn = false;
+let crackOn   = false;
 let activeMethod = 'infinite';
 
 // ═══════════════════════════════════════════════════════
@@ -2282,8 +2413,8 @@ function findCritNF(H,beta,c,phi,gamma){
 // ═══════════════════════════════════════════════════════
 //  RECOMMENDATION
 // ═══════════════════════════════════════════════════════
-function getRecommendation(fs_det, fs_cons, fs_bish) {
-  const fs_min=Math.min(fs_det,fs_cons,fs_bish||999);
+function getRecommendation(fs_det, fs_cons, fs_bish, fs_jan) {
+  const fs_min=Math.min(fs_det,fs_cons,fs_bish||999,fs_jan||999);
   if(fs_min>=1.5) return `✓ ESTABLE — El talud cumple FS ≥ 1.5 en todos los métodos. Condición conforme a Eurocode 7 / ISRM. Recomendación: monitorización piezométrica periódica y revisión de parámetros ante eventos sísmicos o lluvias intensas.`;
   if(fs_min>=1.3) return `△ MARGINAL — FS mínimo = ${fs_min.toFixed(2)} (entre 1.3 y 1.5). Margen de seguridad reducido. Acciones: (1) instrumentar con piezómetros, (2) analizar superficies críticas adicionales con Bishop, (3) evaluar bermas de contención y sistemas de drenaje superficial.`;
   if(fs_min>=1.0) return `⚠ CRÍTICO — FS = ${fs_min.toFixed(2)} < 1.3. Riesgo real de inestabilidad progresiva. Acciones urgentes: inspección in situ inmediata, análisis Bishop completo, instalación de drenajes, restricción de acceso al área. Considerar reducción del ángulo o bermas de contención.`;
@@ -2512,12 +2643,13 @@ function renderScenarios() {
     return `<tr><td>${f.lbl}</td>${cells}</tr>`;
   }).join('');
 }
-function updateSummaryTable(fs_det, fs_cons, fs_bish, fs_sat, c, phi, dc, dphi) {
+function updateSummaryTable(fs_det, fs_cons, fs_bish, fs_sat, c, phi, dc, dphi, fs_janbu) {
   const tbody = g('summary-tbody'); if (!tbody) return;
   const rows = [
     { method:'Talud Infinito Determinista', params:`c=${c}kPa, φ=${phi}°`, fs:fs_det },
     { method:'Talud Infinito Conservador',  params:`c'=${(c*(1-dc/100)).toFixed(1)}kPa, φ'=${(phi-dphi).toFixed(1)}°`, fs:fs_cons },
-    { method:'Bishop Simplificado',         params:`Sup. circular, iterativo`, fs:fs_bish },
+    { method:'Bishop Simplificado',         params:`Sup. circular · iterativo`, fs:fs_bish },
+    { method:'Janbu Simplificado',          params:`Sup. no circular · f₀ correg.`, fs:fs_janbu||0 },
     { method:'Talud Saturado (peor caso)',  params:`NF=100%, c=${c}kPa, φ=${phi}°`, fs:fs_sat },
   ];
   tbody.innerHTML = rows.map(r=>{
@@ -2573,7 +2705,7 @@ function updateForcesTable(slices, phi_deg, fs_bish) {
 // ═══════════════════════════════════════════════════════
 //  SLIDER IDS
 // ═══════════════════════════════════════════════════════
-const sliderIds = ['H','beta','c','phi','gamma','nf','R','cx','cy','ndov','dc','dphi','kh'];
+const sliderIds = ['H','beta','c','phi','gamma','nf','R','cx','cy','ndov','dc','dphi','kh','zc'];
 
 // ═══════════════════════════════════════════════════════
 //  MAIN UPDATE
@@ -2674,13 +2806,31 @@ function update() {
   const cm_nf=g('cm-nf');
   if(cm_nf){if(crNF!==null){const diff=crNF-nf; cm_nf.textContent=`Margen: ${diff}%`; cm_nf.style.color=diff>40?'#4ef0c0':diff>20?'#f5c400':'#ff8c00';} else {cm_nf.textContent='Margen: >100%'; cm_nf.style.color='#4ef0c0';}}
 
+  // ── JANBU SIMPLIFICADO ──
+  const janbu     = calcJanbu(H, beta, c, phi, gamma, nf);
+  const fs_janbu  = janbu.fs;
+  setResCard('rv-jan','rs-jan','rcard-jan','sbar-jan', fs_janbu);
+
+  // ── GRIETA DE TRACCIÓN ──
+  if (crackOn) {
+    const zc       = gv('zc');
+    const wFilled  = g('crack-water')?.checked || false;
+    const crack    = calcCrack(H, beta, c, phi, gamma, nf, zc, wFilled);
+    if (crack.fs !== null) {
+      setResCard('rv-crack','rs-crack','rcard-crack','sbar-crack', crack.fs);
+      const zcT = crack.zc_theor?.toFixed(1) || '—';
+      const lbl = g('crack-method-lbl');
+      if (lbl) lbl.textContent = `Terzaghi (1943) · zc=${zc}m (teórico ${zcT}m) · ${wFilled?'con agua':'sin agua'}`;
+    }
+  }
+
   // Results tab
   setResCard('rv-det','rs-det','rcard-det','sbar-det',fs_det);
   setResCard('rv-cons','rs-cons','rcard-cons','sbar-cons',fs_cons);
   setResCard('rv-bish','rs-bish','rcard-bish','sbar-bish',fs_bish);
   setResCard('rv-sat','rs-sat','rcard-sat','sbar-sat',fs_sat);
 
-  updateSummaryTable(fs_det,fs_cons,fs_bish,fs_sat,c,phi,dc,dphi);
+  updateSummaryTable(fs_det,fs_cons,fs_bish,fs_sat,c,phi,dc,dphi,fs_janbu);
   updateStabilization(H,beta,c,phi,gamma,nf,fs_det);
 
   // Recommendation
@@ -2724,6 +2874,16 @@ function toggleSeismic(){
   const strip=g('fs-strip'); strip.className='fs-strip '+(seismicOn?'cols-4':'cols-3');
   update();
 }
+function toggleCrack() {
+  crackOn = !crackOn;
+  const track = g('crack-track');
+  track.classList.toggle('on', crackOn);
+  g('crack-row').classList.toggle('visible', crackOn);
+  g('crack-water-row').classList.toggle('visible', crackOn);
+  g('rcard-crack').style.display = crackOn ? '' : 'none';
+  update();
+}
+
 
 // ═══════════════════════════════════════════════════════
 //  EXPORT PDF
@@ -4575,6 +4735,84 @@ document.querySelectorAll('.tab').forEach(tab => {
     }
   });
 });
+
+// ══════════════════════════════════════════════════════════════
+//  JANBU SIMPLIFIED  — Janbu (1973) with f₀ correction
+//  Valid for: non-circular, composite, translational slides
+//  Ref: Janbu N. (1973) Slope stability computations.
+//       Embankment Dam Eng., Casagrande Volume, 47-86
+// ══════════════════════════════════════════════════════════════
+function calcJanbu(H, beta_deg, c, phi_deg, gamma, nf_pct) {
+  // Janbu simplified — slope-parallel failure plane + f₀ correction
+  // Ref: Janbu N. (1973) Embankment Dam Eng., Casagrande Volume, 47-86
+  const beta    = beta_deg * Math.PI / 180;
+  const phi     = phi_deg  * Math.PI / 180;
+  const L       = H / Math.tan(beta);
+  const n_sl    = 30;
+  const dx      = L / n_sl;
+  const hw      = H * nf_pct / 100;
+  const alpha_j = beta; // failure plane parallel to slope surface
+
+  let num = 0, den = 0;
+  for (let i = 0; i < n_sl; i++) {
+    const xm     = (i + 0.5) * dx;
+    const h_perp = (xm / L) * H * Math.cos(beta);
+    if (h_perp < 0.01) continue;
+    const h_sat  = Math.max(0, Math.min(h_perp, hw * Math.cos(beta)));
+    const u_j    = gw * h_sat;
+    const W_j    = gamma * (h_perp / Math.cos(beta)) * dx;
+    const N_eff  = Math.max(0, W_j * Math.cos(alpha_j) - u_j * dx);
+    num += (c * dx / Math.cos(alpha_j)) + N_eff * Math.tan(phi);
+    den += W_j * Math.sin(alpha_j);
+  }
+
+  // f₀ correction factor — Janbu (1973) Table 1
+  const d_L = (H * 0.5) / L;
+  const b1  = c > 0 ? 0.69 : 0.31;
+  const b2  = 0.50;
+  const f0  = 1 + b1 * (d_L - b2 * d_L * d_L);
+
+  const fs_raw = den > 0.01 ? num / den : 9.99;
+  const fs     = Math.max(0.01, Math.min(fs_raw * f0, 9.99));
+  return { fs, f0: f0.toFixed(3) };
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TENSION CRACK  — Terzaghi (1943) / Tension crack with water
+//  Ref: Terzaghi K. (1943) Theoretical Soil Mechanics, pp.151
+//       Cruden & Varnes (1996) Landslide types and processes
+//       EC7 EN1997-1:2004 §11.5
+// ══════════════════════════════════════════════════════════════
+function calcCrack(H, beta_deg, c, phi_deg, gamma, nf_pct, zc, waterFilled) {
+  const beta  = beta_deg * Math.PI / 180;
+  const phi   = phi_deg  * Math.PI / 180;
+
+  // Theoretical crack depth (Terzaghi 1943)
+  const zc_theor = (2 * c / gamma) * Math.tan(Math.PI / 4 + phi / 2);
+  const zc_use   = Math.min(zc, H * 0.5, zc_theor * 1.5); // cap at 50% H
+
+  // Effective slope height reduced by crack
+  const H_eff  = H - zc_use;
+  if (H_eff <= 0.1) return { fs: null, zc_theor };
+
+  // Hydrostatic force in crack (if water-filled)
+  // Vw = 0.5 · γw · zc²  per unit width
+  const Vw = waterFilled ? 0.5 * gw * zc_use ** 2 : 0;
+
+  // Infinite slope on reduced height + crack force
+  const ru     = nf_pct / 100 * 0.45;
+  const sigma_n = gamma * H_eff * Math.cos(beta) ** 2;
+  const u_base  = ru * gamma * H_eff;
+  const T_drive = gamma * H_eff * Math.sin(beta) * Math.cos(beta)
+                 + Vw / (H_eff / Math.sin(beta)); // Vw distributed over failure length
+  const N_eff   = Math.max(0, sigma_n - u_base);
+
+  if (T_drive < 0.01) return { fs: 9.99, zc_theor };
+  const fs = Math.max(0.01, Math.min((c + N_eff * Math.tan(phi)) / T_drive, 9.99));
+  return { fs, zc_theor, zc_use, Vw };
+}
+
+// ── CRACK TOGGLE ──
 </script>
 </body>
 </html>
@@ -5162,6 +5400,240 @@ document.querySelectorAll('.tab').forEach(tab=>{
     }
   });
 });
+
+
+// ══════════════════════════════════════════════════════════════
+//  MONTE CARLO PROBABILISTIC ANALYSIS
+//  Method: random sampling of c', φ', γ, H, NF with COV
+//  Output: P(FS<1.0), P(FS<1.3), μ, σ, p5, β index
+//  Ref: Phoon & Kulhawy (1999) Géotechnique 49(5)
+//       EC7 EN1997-1 §2.4.3 — characteristic values
+// ══════════════════════════════════════════════════════════════
+
+function mcSampleNormal(mu, sigma) {
+  // Box-Muller transform
+  const u1 = Math.random(), u2 = Math.random();
+  return mu + sigma * Math.sqrt(-2*Math.log(u1)) * Math.cos(2*Math.PI*u2);
+}
+
+function mcSampleLogNormal(mu, sigma) {
+  const lnSigma = Math.sqrt(Math.log(1 + (sigma/mu)**2));
+  const lnMu    = Math.log(mu) - 0.5*lnSigma**2;
+  return Math.exp(mcSampleNormal(lnMu, lnSigma));
+}
+
+function mcBishopFS(c, phi_deg, gamma, H, nf_frac, beta_deg) {
+  // Infinite slope Bishop with water table
+  const phi_r  = phi_deg * Math.PI/180;
+  const beta_r = beta_deg * Math.PI/180;
+  const nf     = Math.max(0, Math.min(1, nf_frac));
+  const Z      = Math.max(0.5, H);
+  const ru     = nf * 0.45; // approximate ru from NF fraction
+  const sigma_n = gamma * Z * Math.cos(beta_r)**2;
+  const u       = ru * gamma * Z;
+  const N_eff   = Math.max(0, sigma_n - u);
+  const T_drv   = gamma * Z * Math.sin(beta_r) * Math.cos(beta_r);
+  if (T_drv < 0.01) return 9.99;
+  return Math.max(0.01, Math.min((c + N_eff*Math.tan(phi_r))/T_drv, 9.99));
+}
+
+async function mcRun() {
+  const btn = document.getElementById('mc-run-btn');
+  btn.disabled = true; btn.textContent = '⏳ CALCULANDO…';
+
+  const N    = parseInt(document.getElementById('mc-n').value);
+  const dist = document.getElementById('mc-dist').value;
+  const COV  = parseFloat(document.getElementById('mc-cov').value);
+
+  // Get current parameters
+  let c=20, phi=28, gamma=18, H=15, nf=0.5, beta=35;
+  try { c=gv('c'); phi=gv('phi'); gamma=gv('gamma'); H=gv('H'); nf=gv('nf')/100; beta=gv('beta'); } catch(e){}
+
+  const sample = dist === 'lognormal' ? mcSampleLogNormal : mcSampleNormal;
+
+  // Yield to UI before heavy loop
+  await new Promise(r => setTimeout(r, 20));
+
+  const fsArr = new Float32Array(N);
+  const sigC   = c     * COV;
+  const sigPhi = phi   * COV;
+  const sigG   = gamma * COV * 0.5; // unit weight less variable
+  const sigH   = H     * COV * 0.3;
+  const sigNF  = nf    * COV;
+
+  for (let i = 0; i < N; i++) {
+    const ci  = Math.max(0,   sample(c,     sigC));
+    const phi_i = Math.max(1, sample(phi,   sigPhi));
+    const gi  = Math.max(10,  sample(gamma, sigG));
+    const hi  = Math.max(1,   sample(H,     sigH));
+    const nfi = Math.max(0,   Math.min(1, sample(nf, sigNF)));
+    fsArr[i]  = mcBishopFS(ci, phi_i, gi, hi, nfi, beta);
+  }
+
+  // Sort for percentiles
+  fsArr.sort();
+
+  // Stats
+  let sum=0, sum2=0;
+  for (let i=0;i<N;i++){ sum+=fsArr[i]; sum2+=fsArr[i]*fsArr[i]; }
+  const mean  = sum/N;
+  const std   = Math.sqrt(sum2/N - mean*mean);
+  const pf    = fsArr.filter(v=>v<1.0).length/N;
+  const pmarg = fsArr.filter(v=>v<1.3).length/N;
+  const p5    = fsArr[Math.floor(N*0.05)];
+  const betaHL = std > 0 ? (mean-1.0)/std : 99; // Hasofer-Lind reliability index
+
+  // Show results
+  document.getElementById('mc-placeholder').style.display = 'none';
+  document.getElementById('mc-results').style.display = 'block';
+
+  const pfPct = (pf*100).toFixed(pf<0.001?3:pf<0.01?2:1)+'%';
+  const pmPct = (pmarg*100).toFixed(pmarg<0.01?2:1)+'%';
+  const pfBox = document.getElementById('mc-stat-pf');
+  const pmBox = document.getElementById('mc-stat-pmarg');
+
+  document.getElementById('mc-pf').textContent    = pfPct;
+  document.getElementById('mc-pmarg').textContent  = pmPct;
+  document.getElementById('mc-mean').textContent   = mean.toFixed(3);
+  document.getElementById('mc-std').textContent    = std.toFixed(3);
+  document.getElementById('mc-p5').textContent     = p5.toFixed(3);
+  document.getElementById('mc-beta').textContent   = betaHL.toFixed(2);
+
+  // Color probability boxes
+  pfBox.style.borderColor   = pf>0.05?'#ff4455':pf>0.01?'#ff8c00':'#4ef0a0';
+  pfBox.querySelector('.mc-stat-val').style.color = pf>0.05?'#ff4455':pf>0.01?'#ff8c00':'#4ef0a0';
+  pmBox.style.borderColor   = pmarg>0.15?'#ff8c00':pmarg>0.05?'#e8c842':'#4ef0a0';
+  pmBox.querySelector('.mc-stat-val').style.color = pmarg>0.15?'#ff8c00':pmarg>0.05?'#e8c842':'#4ef0a0';
+
+  // Draw histogram
+  mcDrawHistogram(fsArr, mean, std, pf, pmarg, N);
+
+  // Footer interpretation
+  const betaClass = betaHL>3.8?'Alta (β>3.8)':betaHL>3.0?'Media-alta':betaHL>2.0?'Media':'Baja (β<2.0)';
+  const ecClass   = p5>=1.5?'✅ EC7 ESTABLE':p5>=1.3?'⚠ EC7 MARGINAL':'🔴 EC7 CRÍTICO';
+  document.getElementById('mc-footer').innerHTML =
+    `<strong>Interpretación:</strong> Con ${N.toLocaleString()} simulaciones (COV=${(COV*100).toFixed(0)}%, dist. ${dist}), `+
+    `el FS medio es <strong>${mean.toFixed(3)}</strong> con σ=<strong>${std.toFixed(3)}</strong>. `+
+    `Probabilidad de fallo P(FS&lt;1.0)=<strong>${pfPct}</strong> · `+
+    `P(FS&lt;1.3)=<strong>${pmPct}</strong>. `+
+    `Índice de confiabilidad de Hasofer-Lind β=<strong>${betaHL.toFixed(2)}</strong> → fiabilidad <strong>${betaClass}</strong>. `+
+    `Valor característico p5%=<strong>${p5.toFixed(3)}</strong> → ${ecClass}. `+
+    `<span style="color:var(--text3)">Ref: Phoon &amp; Kulhawy (1999) · EC7 EN1997-1 §2.4.3</span>`;
+
+  btn.disabled = false; btn.textContent = '▶ EJECUTAR';
+}
+
+function mcDrawHistogram(fsArr, mean, std, pf, pmarg, N) {
+  const canvas = document.getElementById('mc-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.parentElement.clientWidth - 8;
+  const cssH = 200;
+  canvas.width  = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  canvas.style.width  = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const ML=48, MR=20, MT=18, MB=36;
+  const PW=cssW-ML-MR, PH=cssH-MT-MB;
+
+  ctx.fillStyle='#0b0f13'; ctx.fillRect(0,0,cssW,cssH);
+  ctx.fillStyle='#080b0d'; ctx.fillRect(ML,MT,PW,PH);
+
+  // Bins
+  const BINS = Math.min(80, Math.max(30, Math.round(Math.sqrt(N))));
+  const fsMin2 = Math.max(0, fsArr[0]-0.05);
+  const fsMax2 = Math.min(9, fsArr[N-1]+0.05);
+  const binW = (fsMax2-fsMin2)/BINS;
+  const bins = new Array(BINS).fill(0);
+  for (let i=0;i<N;i++){
+    const bi = Math.min(BINS-1, Math.floor((fsArr[i]-fsMin2)/binW));
+    bins[bi]++;
+  }
+  const maxBin = Math.max(...bins);
+  const toX = fs => ML + (fs-fsMin2)/(fsMax2-fsMin2)*PW;
+  const toY = count => MT + PH - (count/maxBin)*PH;
+  const bpx = PW/BINS;
+
+  // Background EC7 zones
+  const zones=[
+    {lo:0,   hi:1.0, col:'rgba(255,68,85,0.10)'},
+    {lo:1.0, hi:1.3, col:'rgba(255,140,0,0.08)'},
+    {lo:1.3, hi:1.5, col:'rgba(232,200,66,0.07)'},
+    {lo:1.5, hi:99,  col:'rgba(78,240,160,0.04)'},
+  ];
+  zones.forEach(z=>{
+    const x1=Math.max(ML,toX(z.lo)), x2=Math.min(ML+PW,toX(z.hi));
+    if(x2>x1){ ctx.fillStyle=z.col; ctx.fillRect(x1,MT,x2-x1,PH); }
+  });
+
+  // Bars — coloured by EC7 zone
+  bins.forEach((count,bi)=>{
+    if(count===0) return;
+    const fsMid = fsMin2 + (bi+0.5)*binW;
+    const col = fsMid<1.0?'rgba(255,68,85,0.75)':fsMid<1.3?'rgba(255,140,0,0.75)':fsMid<1.5?'rgba(232,200,66,0.75)':'rgba(78,240,160,0.65)';
+    const x = ML + bi*bpx;
+    const h = (count/maxBin)*PH;
+    const g = ctx.createLinearGradient(0,toY(count),0,MT+PH);
+    g.addColorStop(0,col); g.addColorStop(1,col.replace('0.75','0.2').replace('0.65','0.15'));
+    ctx.fillStyle=g; ctx.fillRect(x+0.5,toY(count),bpx-1,MT+PH-toY(count));
+  });
+
+  // Normal curve overlay
+  const gaussY = fs => N * binW * (1/(std*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*((fs-mean)/std)**2);
+  ctx.beginPath(); ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
+  for(let px=0;px<=PW;px++){
+    const fs=fsMin2+px/PW*(fsMax2-fsMin2);
+    const gy=gaussY(fs);
+    const cy=MT+PH-(gy/maxBin)*PH;
+    px===0?ctx.moveTo(ML+px,cy):ctx.lineTo(ML+px,cy);
+  }
+  ctx.stroke();
+
+  // EC7 threshold lines
+  [{v:1.0,c:'#ff4455'},{v:1.3,c:'#ff8c00'},{v:1.5,c:'#e8c842'}].forEach(({v,c})=>{
+    if(v<fsMin2||v>fsMax2) return;
+    const x=toX(v);
+    ctx.strokeStyle=c+'aa'; ctx.lineWidth=1.2; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(x,MT); ctx.lineTo(x,MT+PH); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=c; ctx.font='bold 9px DM Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(v.toFixed(1),x,MT+PH+12);
+  });
+
+  // Mean line
+  const mx=toX(mean);
+  ctx.strokeStyle='rgba(255,255,255,0.7)'; ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(mx,MT); ctx.lineTo(mx,MT+PH); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,0.8)'; ctx.font='bold 9px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('μ='+mean.toFixed(3),mx,MT-4);
+
+  // Axes
+  ctx.strokeStyle='#2a3540'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(ML,MT); ctx.lineTo(ML,MT+PH+1); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ML-1,MT+PH); ctx.lineTo(ML+PW,MT+PH); ctx.stroke();
+
+  // Y axis ticks
+  [0.25,0.5,0.75,1.0].forEach(f=>{
+    const y=MT+PH-f*PH;
+    ctx.fillStyle='#5a6a7a'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='right';
+    ctx.fillText((f*100).toFixed(0)+'%',ML-4,y+3);
+    ctx.strokeStyle='rgba(255,255,255,0.03)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(ML,y); ctx.lineTo(ML+PW,y); ctx.stroke();
+  });
+
+  ctx.fillStyle='#4a5968'; ctx.font='9px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('Factor de Seguridad FS',ML+PW/2,MT+PH+28);
+
+  // P(fail) shaded area label
+  if(pf>0.001){
+    ctx.fillStyle='rgba(255,68,85,0.6)'; ctx.font='bold 9px DM Mono,monospace'; ctx.textAlign='left';
+    ctx.fillText('P(fallo)='+(pf*100).toFixed(2)+'%',ML+4,MT+12);
+  }
+}
+
+
+
 
 </script>
 </body>
