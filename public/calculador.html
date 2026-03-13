@@ -1,33 +1,27 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://api.anthropic.com https://api.open-meteo.com; frame-ancestors 'self' https://*.vercel.app">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SLOPEMIND v2.0 – Stability & Risk Engine</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
-  --bg:       #080b0d;
-  --surf1:    #0f1419;
-  --surf2:    #141c24;
-  --surf3:    #1a2430;
-  --border:   #222d38;
-  --border2:  #2e3d4e;
-  --accent:   #e8c842;
-  --accent2:  #4ef0c0;
-  --accent3:  #4a8fff;
-  --danger:   #ff4455;
-  --warn:     #ff8c00;
+  /* ── NEW PALETTE: Navy Precision ── */
+  --bg:       #050912;
+  --surf1:    #080e1f;
+  --surf2:    #0d1528;
+  --surf3:    #111e35;
+  --border:   #1c2d4a;
+  --border2:  #263d5e;
+  --accent:   #4d8cff;
+  --accent2:  #00e5a0;
+  --accent3:  #a78bfa;
+  --danger:   #ff3347;
+  --warn:     #ff9500;
   --marg:     #f5c400;
-  --safe:     #4ef0c0;
-  --text:     #dde3ea;
-  --text2:    #8a97a6;
-  --text3:    #4a5968;
+  --safe:     #00e5a0;
+  --text:     #e2ecff;
+  --text2:    #6b88b8;
+  --text3:    #2e4a72;
+  --glow:     rgba(77,140,255,0.15);
+  --glow2:    rgba(0,229,160,0.12);
   --fd: 'Bebas Neue', sans-serif;
-  --fm: 'DM Mono', monospace;
-  --fb: 'DM Sans', sans-serif;
+  --fm: 'Space Mono', monospace;
+  --fb: 'Outfit', sans-serif;
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -41,17 +35,33 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  height: 58px;
+  height: 56px;
   background: var(--surf1);
   border-bottom: 1px solid var(--border);
   z-index: 200;
   gap: 16px;
+  position: relative;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent) 0%, transparent 60%);
+  opacity: 0.5;
 }
 
-.logo-wrap { display:flex; align-items:baseline; gap:10px; flex-shrink:0; }
-.logo-name { font-family: var(--fd); font-size: 1.6rem; letter-spacing: 4px; color: var(--accent); line-height: 1; }
-.logo-ver  { font-family: var(--fm); font-size: 0.55rem; color: var(--text3); letter-spacing: 2px; }
-.logo-tag  { font-family: var(--fm); font-size: 0.48rem; color: var(--text3); letter-spacing: 1px; margin-top: 2px; }
+.logo-wrap { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.logo-name {
+  font-family: var(--fd);
+  font-size: 1.5rem;
+  letter-spacing: 6px;
+  color: var(--text);
+  line-height: 1;
+}
+.logo-name span { color: var(--accent); }
+.logo-ver  { font-family: var(--fm); font-size: 0.52rem; color: var(--text2); letter-spacing: 3px; }
+.logo-tag  { font-family: var(--fm); font-size: 0.48rem; color: var(--text2); letter-spacing: 1.5px; margin-top: 2px; }
 
 /* PROJECT NAME INPUT */
 .project-input-wrap {
@@ -86,11 +96,11 @@ header {
 .header-right { display:flex; align-items:center; gap:14px; flex-shrink:0; }
 .method-badge { display: flex; gap: 5px; }
 .mbadge {
-  font-family: var(--fm); font-size: 0.52rem; letter-spacing: 1.5px;
+  font-family: var(--fm); font-size: 0.54rem; letter-spacing: 1.5px;
   padding: 3px 8px; border-radius: 2px; border: 1px solid var(--border2);
-  color: var(--text2); cursor: pointer; transition: all 0.15s; text-transform: uppercase;
+  color: var(--text); cursor: pointer; transition: all 0.15s; text-transform: uppercase;
 }
-.mbadge.active { border-color: var(--accent); color: var(--accent); background: rgba(232,200,66,0.08); }
+.mbadge.active { border-color: var(--accent); color: var(--accent); background: rgba(77,140,255,0.08); }
 .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: pulse 2.2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
 
@@ -133,20 +143,39 @@ header {
 
 .sec-hd {
   font-family: var(--fm); font-size: 0.52rem; letter-spacing: 3px;
-  color: var(--accent); text-transform: uppercase;
-  padding: 10px 0 7px; border-bottom: 1px solid var(--border);
-  margin-bottom: 10px; margin-top: 14px;
+  color: var(--text2); text-transform: uppercase;
+  padding: 11px 0 8px; margin-bottom: 12px; margin-top: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
 }
-.sec-hd:first-child { margin-top: 2px; }
+.sec-hd::before {
+  content: '';
+  display: inline-block; width: 14px; height: 1px;
+  background: var(--accent); flex-shrink: 0;
+}
+.sec-hd:first-child { margin-top: 4px; }
 
 .inp-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
 .inp-label { font-size: 0.73rem; color: var(--text); flex: 1; min-width: 0; display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
-.inp-label em { display: block; font-style: normal; font-family: var(--fm); font-size: 0.52rem; color: var(--text2); margin-top: 1px; width: 100%; }
+.inp-label em { display: block; font-style: normal; font-family: var(--fm); font-size: 0.56rem; color: var(--text2); margin-top: 1px; width: 100%; }
 .slider-col { flex: 1.1; min-width: 0; }
 
-input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 2px; background: var(--border2); border-radius: 1px; outline: none; cursor: pointer; }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; }
-input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shadow: 0 0 8px rgba(232,200,66,0.5); }
+input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 2px;
+  background: var(--border2); border-radius: 1px; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.35); box-shadow: 0 0 12px rgba(77,140,255,0.6), 0 0 0 1px var(--accent);
+}
 
 .sval { font-family: var(--fm); font-size: 0.62rem; color: var(--accent); text-align: right; min-width: 50px; }
 
@@ -155,18 +184,18 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shado
   font-family: var(--fm);
   font-size: 0.65rem;
   color: var(--accent);
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border2);
-  width: 52px;
+  background: rgba(77,140,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  width: 54px;
   text-align: right;
   outline: none;
-  padding: 1px 2px;
-  transition: border-color 0.2s;
+  padding: 3px 6px;
+  transition: border-color 0.2s, background 0.2s;
 }
 .num-input:focus {
-  border-bottom-color: var(--accent);
-  background: rgba(232,200,66,0.05);
+  border-color: var(--accent);
+  background: rgba(77,140,255,0.08);
 }
 
 /* DERIVED VALUES BOX */
@@ -174,7 +203,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shado
   background: var(--surf2); border: 1px solid var(--border);
   border-radius: 3px; padding: 9px 11px; margin-top: 4px; margin-bottom: 4px;
 }
-.derived-title { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 7px; }
+.derived-title { font-family: var(--fm); font-size: 0.52rem; letter-spacing: 2px; color: var(--text2); text-transform: uppercase; margin-bottom: 7px; }
 .derived-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
 .derived-lbl { font-size: 0.68rem; color: var(--text2); }
 .derived-val { font-family: var(--fm); font-size: 0.65rem; color: var(--warn); }
@@ -193,40 +222,52 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shado
 .legend { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
 .leg-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.leg-text { font-family: var(--fm); font-size: 0.58rem; color: var(--text2); }
-.leg-fs { font-family: var(--fm); font-size: 0.52rem; color: var(--text3); margin-left: auto; }
+.leg-text { font-family: var(--fm); font-size: 0.62rem; color: var(--text); }
+.leg-fs { font-family: var(--fm); font-size: 0.55rem; color: var(--text2); margin-left: auto; }
 
 /* ── RIGHT PANEL ── */
 .right-panel { display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
 
 /* ── FS STRIP ── */
-.fs-strip { flex-shrink: 0; display: grid; border-bottom: 1px solid var(--border); background: var(--surf1); }
+.fs-strip { flex-shrink: 0; display: grid; border-bottom: 1px solid var(--border); background: var(--surf1); position: relative; }
 .fs-strip.cols-4 { grid-template-columns: repeat(4,1fr); }
 .fs-strip.cols-3 { grid-template-columns: repeat(3,1fr); }
 
 .fs-card {
-  padding: 12px 18px 10px;
+  padding: 14px 20px 12px;
   border-right: 1px solid var(--border);
   transition: background 0.35s;
   position: relative; overflow: hidden;
 }
 .fs-card:last-child { border-right: none; }
+.fs-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.fs-card:hover::before { opacity: 0.5; }
 
-.fsc-label { font-family: var(--fm); font-size: 0.62rem; letter-spacing: 2px; color: var(--text2); text-transform: uppercase; margin-bottom: 4px; }
-.fsc-val { font-family: var(--fd); font-size: 2.4rem; letter-spacing: 2px; line-height: 1; transition: color 0.3s; }
-.fsc-state { font-family: var(--fm); font-size: 0.55rem; letter-spacing: 2px; margin-top: 2px; transition: color 0.3s; }
+.fsc-label {
+  font-family: var(--fm); font-size: 0.52rem; letter-spacing: 2.5px;
+  color: var(--text2); text-transform: uppercase; margin-bottom: 6px;
+}
+.fsc-val {
+  font-family: var(--fd); font-size: 2.8rem; letter-spacing: 2px;
+  line-height: 1; transition: color 0.3s, text-shadow 0.3s;
+}
+.fsc-state {
+  font-family: var(--fm); font-size: 0.52rem; letter-spacing: 2px;
+  margin-top: 3px; transition: color 0.3s; text-transform: uppercase;
+}
 .fsc-method {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 6px;
-  font-family: var(--fm);
-  font-size: 0.58rem;
-  letter-spacing: 1px;
-  color: var(--text);
-  background: rgba(46,61,78,0.7);
-  border: 1px solid var(--border2);
-  padding: 3px 9px;
-  border-radius: 2px;
+  display: inline-flex; align-items: center; margin-top: 8px;
+  font-family: var(--fm); font-size: 0.5rem; letter-spacing: 2px;
+  color: var(--text); background: rgba(28,45,74,0.5);
+  border: 1px solid var(--border); padding: 3px 9px; border-radius: 3px;
 }
 
 /* FS GAUGE BAR */
@@ -243,12 +284,128 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shado
 
 /* ── TABS ── */
 .tab-bar { flex-shrink: 0; display: flex; border-bottom: 1px solid var(--border); background: var(--surf1); padding: 0 18px; }
+
+/* ── STEPPER ── */
+.stepper-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  background: var(--surf1);
+  border-bottom: 1px solid var(--border);
+  padding: 0 18px;
+  gap: 0;
+  height: 52px;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  height: 100%;
+  cursor: pointer;
+  opacity: 0.35;
+  transition: opacity 0.2s;
+  user-select: none;
+  border-bottom: 2px solid transparent;
+}
+.step:hover { opacity: 0.65; }
+.step.active { opacity: 1; border-bottom-color: var(--accent); }
+.step.done   { opacity: 0.7; }
+.step.done .step-num { background: rgba(78,240,192,0.15); color: var(--accent2); border-color: rgba(78,240,192,0.4); }
+.step-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  color: var(--accent);
+  font-family: var(--fm);
+  font-size: 0.6rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step.active .step-num { background: rgba(77,140,255,0.15); border-color: var(--accent); }
+.step-info { display: flex; flex-direction: column; gap: 1px; }
+.step-title { font-family: var(--fm); font-size: 0.58rem; letter-spacing: 1.5px; color: var(--text); }
+.step-sub   { font-family: var(--fm); font-size: 0.5rem; letter-spacing: 0.8px; color: var(--text2); }
+.step-arrow { color: var(--text3); font-size: 1rem; padding: 0 2px; flex-shrink: 0; user-select: none; }
+.expert-tabs { display: flex; align-items: center; gap: 6px; margin-left: auto; padding-left: 12px; }
+.expert-sep  { width: 1px; height: 24px; background: var(--border); margin-right: 6px; }
+.inf-item { font-family:var(--fm); font-size:0.62rem; color:var(--text); letter-spacing:0.5px; padding:6px 10px; background:rgba(255,255,255,0.03); border-radius:2px; }
+.etab {
+  width: 28px; height: 28px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.etab:hover  { color: var(--text); border-color: var(--text3); }
+.etab.active { color: var(--accent); border-color: var(--accent); background: rgba(77,140,255,0.1); box-shadow: 0 0 8px rgba(77,140,255,0.2); }
+
+/* ── SUB-TABS (within step screens) ── */
+.sub-tab-bar {
+  flex-shrink: 0;
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--surf2);
+  padding: 0 18px;
+}
+.sub-tab {
+  font-family: var(--fm);
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  color: var(--text2);
+  padding: 9px 14px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.sub-tab:hover  { color: var(--text2); }
+.sub-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+
+/* ── STEP SCREENS ── */
+/* step-screen fills tab-content absolutely */
+.step-screen { position: absolute; inset: 0; display: none; flex-direction: column; }
+.step-screen.active { display: flex; }
+/* screen-body: positioning context for tab-panes, sits between sub-tab-bar and step-footer */
+.screen-body { flex: 1; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+
+/* ── NEXT BUTTON bar ── */
+.step-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--surf1);
+  gap: 12px;
+}
+.step-footer-info { font-family: var(--fm); font-size: 0.55rem; color: var(--text2); letter-spacing: 1px; }
+.btn-next {
+  font-family: var(--fm); font-size: 0.52rem; letter-spacing: 1.5px;
+  padding: 6px 18px; border-radius: 2px;
+  border: 1px solid var(--accent); color: var(--accent);
+  background: rgba(77,140,255,0.08); cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-next:hover { background: rgba(77,140,255,0.18); }
+.btn-prev {
+  font-family: var(--fm); font-size: 0.52rem; letter-spacing: 1.5px;
+  padding: 6px 14px; border-radius: 2px;
+  border: 1px solid var(--border); color: var(--text3);
+  background: transparent; cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-prev:hover { color: var(--text2); border-color: var(--text3); }
 .tab { font-family: var(--fm); font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); padding: 9px 12px; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
 .tab:hover { color: var(--text2); }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
 /* ── TAB CONTENT ── */
-.tab-content { flex:1; overflow: hidden; position: relative; }
+.tab-content { flex:1; overflow: hidden; position: relative; display: flex; flex-direction: column; }
 .tab-pane { position: absolute; inset: 0; display: none; overflow: hidden; }
 .tab-pane.active { display: flex; }
 
@@ -257,13 +414,13 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); box-shado
 #tab-visual.active { display: flex; }
 .visual-main { flex: 1; display: grid; grid-template-columns: 1fr 250px; overflow: hidden; }
 .canvas-wrap { padding: 14px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
-.canvas-label { font-family: var(--fm); font-size: 0.5rem; letter-spacing: 3px; color: var(--text3); text-transform: uppercase; }
+.canvas-label { font-family: var(--fm); font-size: 0.56rem; letter-spacing: 2px; color: var(--text2); text-transform: uppercase; }
 #slopeCanvas { flex: 1; width: 100%; border-radius: 4px; background: #090d12; border: 1px solid var(--border); min-height: 0; }
-.canvas-info { display: flex; gap: 12px; flex-wrap: wrap; font-family: var(--fm); font-size: 0.52rem; color: var(--text3); }
+.canvas-info { display: flex; gap: 12px; flex-wrap: wrap; font-family: var(--fm); font-size: 0.6rem; color: var(--text2); }
 .canvas-info span { color: var(--accent); }
 
 .sens-panel { border-left: 1px solid var(--border); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: var(--surf1); scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
-.sens-lbl { font-family: var(--fm); font-size: 0.5rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 4px; }
+.sens-lbl { font-family: var(--fm); font-size: 0.55rem; letter-spacing: 2px; color: var(--text2); text-transform: uppercase; margin-bottom: 4px; }
 canvas.sc { width: 100%; border-radius: 3px; border: 1px solid var(--border); background: #090d12; display: block; }
 
 /* TAB: BISHOP */
@@ -273,7 +430,7 @@ canvas.sc { width: 100%; border-radius: 3px; border: 1px solid var(--border); ba
 .bishop-main { padding: 14px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
 .bishop-canvas-wrap { flex: 1; position: relative; min-height: 0; }
 #bishopCanvas { width: 100%; height: 100%; border-radius: 4px; background: #090d12; border: 1px solid var(--border); }
-.bishop-info { display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--fm); font-size: 0.52rem; color: var(--text3); }
+.bishop-info { display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--fm); font-size: 0.58rem; color: var(--text2); }
 .bishop-info span { color: var(--accent); }
 
 .bishop-side { border-left: 1px solid var(--border); overflow-y: auto; background: var(--surf1); scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
@@ -282,19 +439,19 @@ canvas.sc { width: 100%; border-radius: 3px; border: 1px solid var(--border); ba
 .forces-table-wrap { padding: 0 14px 14px; }
 .forces-table { width: 100%; border-collapse: collapse; font-family: var(--fm); font-size: 0.52rem; }
 .forces-table th {
-  padding: 5px 4px; text-align: right; color: var(--text3);
-  font-size: 0.44rem; letter-spacing: 1px; text-transform: uppercase;
+  padding: 5px 6px; text-align: right; color: var(--text2);
+  font-size: 0.52rem; letter-spacing: 1px; text-transform: uppercase;
   border-bottom: 1px solid var(--border); font-weight: 400;
 }
 .forces-table th:first-child { text-align: left; }
 .forces-table td { padding: 4px 4px; text-align: right; color: var(--text2); border-bottom: 1px solid rgba(34,45,56,0.5); }
 .forces-table td:first-child { text-align: left; color: var(--accent); }
-.forces-table tr:hover td { background: rgba(232,200,66,0.03); }
+.forces-table tr:hover td { background: rgba(77,140,255,0.03); }
 
 .conv-box { margin: 14px 14px 0; padding: 10px 12px; background: var(--surf2); border: 1px solid var(--border); border-radius: 3px; }
-.conv-title { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
+.conv-title { font-family: var(--fm); font-size: 0.52rem; letter-spacing: 2px; color: var(--text2); text-transform: uppercase; margin-bottom: 8px; }
 .conv-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-.conv-lbl { font-family: var(--fm); font-size: 0.58rem; color: var(--text2); }
+.conv-lbl { font-family: var(--fm); font-size: 0.62rem; color: var(--text); }
 .conv-val { font-family: var(--fm); font-size: 0.62rem; color: var(--accent2); }
 
 /* CRITICAL SEARCH */
@@ -302,7 +459,7 @@ canvas.sc { width: 100%; border-radius: 3px; border: 1px solid var(--border); ba
   margin: 12px 14px 0;
   width: calc(100% - 28px);
   padding: 10px;
-  background: rgba(232,200,66,0.08);
+  background: rgba(77,140,255,0.08);
   border: 1px solid var(--accent);
   border-radius: 3px;
   color: var(--accent);
@@ -317,7 +474,7 @@ canvas.sc { width: 100%; border-radius: 3px; border: 1px solid var(--border); ba
   justify-content: center;
   gap: 8px;
 }
-.search-btn:hover { background: rgba(232,200,66,0.16); }
+.search-btn:hover { background: rgba(77,140,255,0.16); }
 .search-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .search-btn.running { border-color: var(--accent2); color: var(--accent2); background: rgba(78,240,192,0.06); }
 
@@ -328,7 +485,7 @@ canvas.sc { width: 100%; border-radius: 3px; border: 1px solid var(--border); ba
 .search-progress.visible { display: block; }
 .progress-bar-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
 .progress-bar-fill { height: 100%; background: var(--accent2); border-radius: 2px; transition: width 0.1s; width: 0%; }
-.progress-label { font-family: var(--fm); font-size: 0.5rem; color: var(--text3); }
+.progress-label { font-family: var(--fm); font-size: 0.55rem; color: var(--text2); }
 
 .search-result {
   margin: 10px 14px 0;
@@ -341,7 +498,7 @@ canvas.sc { width: 100%; border-radius: 3px; border: 1px solid var(--border); ba
 .search-result.visible { display: block; }
 .sr-title { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--accent2); text-transform: uppercase; margin-bottom: 8px; }
 .sr-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-.sr-lbl { font-family: var(--fm); font-size: 0.58rem; color: var(--text2); }
+.sr-lbl { font-family: var(--fm); font-size: 0.62rem; color: var(--text); }
 .sr-val { font-family: var(--fm); font-size: 0.65rem; color: var(--accent); }
 .sr-fs { font-family: var(--fd); font-size: 1.6rem; line-height: 1; margin: 6px 0 2px; }
 .sr-apply-btn {
@@ -375,10 +532,10 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 #crack-row, #crack-water-row, #load-row, #load-width-row { display:none; }
 #crack-row.visible, #crack-water-row.visible, #load-row.visible, #load-width-row.visible { display:flex; }
 .tornado-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
-.tornado-lbl { font-family: var(--fm); font-size: 0.58rem; color: var(--text2); min-width: 70px; text-align: right; }
+.tornado-lbl { font-family: var(--fm); font-size: 0.62rem; color: var(--text); min-width: 70px; text-align: right; }
 .tornado-bar-wrap { flex: 1; height: 12px; background: var(--surf2); border-radius: 2px; position: relative; overflow: hidden; }
 .tornado-bar { height: 100%; border-radius: 2px; transition: width 0.5s; }
-.tornado-pct { font-family: var(--fm); font-size: 0.55rem; color: var(--text3); min-width: 35px; }
+.tornado-pct { font-family: var(--fm); font-size: 0.58rem; color: var(--text2); min-width: 35px; }
 
 /* TAB: RESULTS */
 #tab-results { display: none; padding: 14px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
@@ -396,21 +553,21 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .ai-msg.user { align-self:flex-end; align-items:flex-end; }
 .ai-msg.ai   { align-self:flex-start; align-items:flex-start; }
 .ai-bubble { padding:10px 13px; border-radius:10px; font-family:var(--fb); font-size:0.8rem; line-height:1.65; }
-.ai-msg.user .ai-bubble { background:rgba(232,200,66,0.12); border:1px solid rgba(232,200,66,0.25); color:var(--text); border-radius:10px 10px 2px 10px; }
+.ai-msg.user .ai-bubble { background:rgba(77,140,255,0.12); border:1px solid rgba(77,140,255,0.25); color:var(--text); border-radius:10px 10px 2px 10px; }
 .ai-msg.ai   .ai-bubble { background:var(--surf2); border:1px solid var(--border2); color:var(--text); border-radius:10px 10px 10px 2px; }
 .ai-bubble b { color:var(--accent); }
 .ai-bubble code { font-family:var(--fm); font-size:0.75rem; background:rgba(255,255,255,0.06); padding:1px 5px; border-radius:3px; color:var(--accent2); }
-.ai-bubble .ai-source { font-family:var(--fm); font-size:0.55rem; color:var(--text3); margin-top:6px; border-top:1px solid var(--border); padding-top:5px; letter-spacing:0.5px; }
+.ai-bubble .ai-source { font-family:var(--fm); font-size:0.58rem; color:var(--text2); margin-top:6px; border-top:1px solid var(--border); padding-top:5px; letter-spacing:0.5px; }
 .ai-bubble .ai-warning { background:rgba(255,140,0,0.08); border:1px solid rgba(255,140,0,0.25); border-radius:4px; padding:5px 8px; margin-top:6px; font-size:0.72rem; color:var(--warn); }
 .ai-bubble .ai-extract { background:rgba(78,240,192,0.06); border:1px solid rgba(78,240,192,0.2); border-radius:4px; padding:6px 10px; margin-top:6px; font-size:0.75rem; }
 .ai-bubble .ai-extract-row { display:flex; justify-content:space-between; align-items:center; padding:2px 0; border-bottom:1px solid rgba(78,240,192,0.1); }
 .ai-bubble .ai-extract-row:last-child { border:none; }
-.ai-bubble .ai-extract-key { color:var(--text3); font-size:0.68rem; }
+.ai-bubble .ai-extract-key { color:var(--text2); font-size:0.7rem; }
 .ai-bubble .ai-extract-val { color:var(--accent2); font-family:var(--fm); font-size:0.72rem; font-weight:600; }
 .ai-bubble .ai-apply-btn { margin-top:8px; padding:5px 12px; background:rgba(78,240,192,0.12); border:1px solid var(--accent2); border-radius:3px; color:var(--accent2); font-family:var(--fm); font-size:0.55rem; letter-spacing:1.5px; cursor:pointer; }
 .ai-bubble .ai-apply-btn:hover { background:rgba(78,240,192,0.22); }
-.ai-name { font-family:var(--fm); font-size:0.48rem; letter-spacing:1.5px; color:var(--text3); margin-bottom:2px; }
-.ai-thinking { display:flex; align-items:center; gap:6px; padding:8px 12px; background:var(--surf2); border:1px solid var(--border2); border-radius:8px; font-family:var(--fm); font-size:0.6rem; color:var(--text3); }
+.ai-name { font-family:var(--fm); font-size:0.52rem; letter-spacing:1.5px; color:var(--text2); margin-bottom:2px; }
+.ai-thinking { display:flex; align-items:center; gap:6px; padding:8px 12px; background:var(--surf2); border:1px solid var(--border2); border-radius:8px; font-family:var(--fm); font-size:0.62rem; color:var(--text2); }
 .ai-dot { width:5px; height:5px; border-radius:50%; background:var(--accent2); animation:aidot 1.2s infinite; }
 .ai-dot:nth-child(2){animation-delay:0.2s;} .ai-dot:nth-child(3){animation-delay:0.4s;}
 @keyframes aidot{0%,80%,100%{opacity:0.2;transform:scale(0.8);}40%{opacity:1;transform:scale(1.1);}}
@@ -422,19 +579,19 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .ai-send-btn:disabled { opacity:0.4; cursor:not-allowed; }
 .ai-right-col { display:flex; flex-direction:column; overflow-y:auto; padding:14px; gap:12px; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
 .ai-right-section { background:var(--surf2); border:1px solid var(--border); border-radius:6px; padding:12px; }
-.ai-right-title { font-family:var(--fm); font-size:0.48rem; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:8px; }
+.ai-right-title { font-family:var(--fm); font-size:0.54rem; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:8px; }
 .ai-upload-zone { border:1.5px dashed var(--border2); border-radius:5px; padding:14px 10px; text-align:center; cursor:pointer; transition:all 0.15s; }
 .ai-upload-zone:hover { border-color:var(--accent2); background:rgba(78,240,192,0.04); }
 .ai-upload-icon { font-size:1.4rem; margin-bottom:5px; }
 .ai-upload-text { font-family:var(--fb); font-size:0.72rem; color:var(--text2); }
-.ai-upload-sub { font-family:var(--fm); font-size:0.52rem; color:var(--text3); margin-top:3px; }
+.ai-upload-sub { font-family:var(--fm); font-size:0.56rem; color:var(--text2); margin-top:3px; }
 .ai-quick-btn { width:100%; text-align:left; padding:7px 10px; background:var(--surf3); border:1px solid var(--border); border-radius:4px; color:var(--text2); font-family:var(--fb); font-size:0.72rem; cursor:pointer; margin-bottom:5px; transition:all 0.15s; line-height:1.4; }
 .ai-quick-btn:hover { border-color:var(--accent2); color:var(--text); background:rgba(78,240,192,0.05); }
-.ai-context-badge { display:inline-block; padding:2px 7px; background:rgba(232,200,66,0.1); border:1px solid rgba(232,200,66,0.25); border-radius:10px; font-family:var(--fm); font-size:0.48rem; color:var(--accent); letter-spacing:1px; margin-bottom:6px; }
+.ai-context-badge { display:inline-block; padding:2px 7px; background:rgba(77,140,255,0.1); border:1px solid rgba(77,140,255,0.25); border-radius:10px; font-family:var(--fm); font-size:0.52rem; color:var(--accent); letter-spacing:1px; margin-bottom:6px; }
 .ai-param-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border); }
 .ai-param-row:last-child { border:none; }
-.ai-param-lbl { font-family:var(--fm); font-size:0.55rem; color:var(--text3); }
-.ai-param-val { font-family:var(--fm); font-size:0.65rem; color:var(--text); }
+.ai-param-lbl { font-family:var(--fm); font-size:0.6rem; color:var(--text2); }
+.ai-param-val { font-family:var(--fm); font-size:0.7rem; color:var(--text); }
 .tab[data-tab="asistente"] { color:var(--accent2); }
 .tab[data-tab="asistente"].active { border-bottom-color:var(--accent2); }
 /* ── FORECAST MODULE ── */
@@ -446,7 +603,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .fc-section { background:var(--surf2); border:1px solid var(--border); border-radius:5px; padding:12px; margin-bottom:10px; }
 .fc-section-title { font-family:var(--fm); font-size:0.48rem; letter-spacing:2px; color:var(--accent3); text-transform:uppercase; margin-bottom:8px; }
 .fc-input-row { display:flex; flex-direction:column; gap:5px; margin-bottom:8px; }
-.fc-label { font-family:var(--fm); font-size:0.52rem; color:var(--text3); }
+.fc-label { font-family:var(--fm); font-size:0.58rem; color:var(--text2); }
 .fc-input { background:var(--surf3); border:1px solid var(--border2); border-radius:3px; color:var(--text); font-family:var(--fm); font-size:0.7rem; padding:6px 8px; outline:none; width:100%; }
 .fc-input:focus { border-color:var(--accent3); }
 .fc-run-btn { width:100%; padding:9px; background:rgba(74,143,255,0.15); border:1px solid var(--accent3); border-radius:4px; color:var(--accent3); font-family:var(--fm); font-size:0.55rem; letter-spacing:2px; cursor:pointer; transition:all 0.15s; margin-top:4px; }
@@ -463,7 +620,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .fc-chart-wrap { flex:1; background:var(--surf2); border:1px solid var(--border); border-radius:5px; overflow:hidden; position:relative; min-height:280px; }
 .fc-cards-row { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
 .fc-day-card { background:var(--surf2); border:1px solid var(--border); border-radius:4px; padding:7px 4px; text-align:center; }
-.fc-day-name { font-family:var(--fm); font-size:0.45rem; color:var(--text3); margin-bottom:3px; }
+.fc-day-name { font-family:var(--fm); font-size:0.52rem; color:var(--text2); margin-bottom:3px; }
 .fc-day-rain { font-family:var(--fm); font-size:0.55rem; color:var(--accent3); margin-bottom:3px; }
 .fc-day-fs   { font-family:var(--fm); font-size:0.85rem; font-weight:700; margin-bottom:2px; }
 .fc-day-state{ font-family:var(--fm); font-size:0.42rem; }
@@ -478,8 +635,8 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .fc-meteo-val { font-family:var(--fm); font-size:0.85rem; font-weight:700; color:var(--text); }
 .fc-meteo-unit { font-size:0.5rem; color:var(--text3); margin-left:1px; }
 .fc-meteo-lbl { font-family:var(--fm); font-size:0.42rem; color:var(--text3); margin-top:2px; }
-.fc-disclaimer { background:rgba(232,200,66,0.06); border:1px solid rgba(232,200,66,0.2); border-radius:4px; padding:8px 12px; font-family:var(--fm); font-size:0.48rem; color:rgba(232,200,66,0.7); line-height:1.7; margin-bottom:8px; }
-.fc-disclaimer strong { color:rgba(232,200,66,0.9); }
+.fc-disclaimer { background:rgba(77,140,255,0.08); border:1px solid rgba(77,140,255,0.18); border-radius:4px; padding:8px 12px; font-family:var(--fm); font-size:0.48rem; color:rgba(77,140,255,0.7); line-height:1.7; margin-bottom:8px; }
+.fc-disclaimer strong { color:rgba(77,140,255,0.9); }
 .fc-tooltip { position:absolute; background:rgba(8,11,13,0.95); border:1px solid var(--border2); border-radius:4px; padding:7px 10px; font-family:var(--fm); font-size:0.58rem; pointer-events:none; display:none; z-index:10; min-width:155px; }
 .fc-tooltip-time { color:var(--text3); font-size:0.5rem; margin-bottom:4px; }
 .fc-tooltip-fs   { font-size:0.85rem; font-weight:700; margin-bottom:2px; }
@@ -508,7 +665,8 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .fc-location-preview { display:flex; align-items:center; gap:6px; padding:6px 8px; background:rgba(74,143,255,0.06); border:1px solid rgba(74,143,255,0.15); border-radius:4px; margin-top:8px; font-family:var(--fm); font-size:0.52rem; color:var(--text3); }
 
 .res-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
-.res-card { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; padding: 12px 14px; position: relative; overflow: hidden; }
+.res-card { background: linear-gradient(145deg, var(--surf2) 0%, var(--surf1) 100%); border: 1px solid var(--border); border-radius: 6px; padding: 13px 15px; position: relative; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
+.res-card:hover { border-color: var(--border2); box-shadow: 0 0 16px rgba(77,140,255,0.06); }
 .res-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: currentColor; }
 .res-card-lbl { font-family: var(--fm); font-size: 0.55rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 4px; }
 .res-card-val { font-family: var(--fd); font-size: 2.2rem; letter-spacing: 1px; line-height: 1; }
@@ -517,10 +675,10 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 
 /* SAFETY MARGIN BAR */
 .safety-bar-wrap { margin-top: 7px; }
-.safety-bar-label { display: flex; justify-content: space-between; font-family: var(--fm); font-size: 0.48rem; color: var(--text3); margin-bottom: 3px; }
+.safety-bar-label { display: flex; justify-content: space-between; font-family: var(--fm); font-size: 0.54rem; color: var(--text2); margin-bottom: 3px; }
 .safety-bar-track { height: 4px; background: var(--border); border-radius: 2px; position: relative; overflow: hidden; }
 .safety-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s cubic-bezier(.4,0,.2,1), background 0.4s; }
-.safety-bar-target { position: absolute; top: -2px; height: 8px; width: 1px; background: rgba(232,200,66,0.5); }
+.safety-bar-target { position: absolute; top: -2px; height: 8px; width: 1px; background: rgba(77,140,255,0.5); }
 
 .crit-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 12px; }
 .crit-card { background: var(--surf2); border: 1px solid var(--border); border-radius: 4px; padding: 10px 12px; }
@@ -532,11 +690,12 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 /* SUMMARY TABLE */
 .summary-table-wrap { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 12px; overflow: hidden; }
 .summary-table { width: 100%; border-collapse: collapse; font-family: var(--fm); font-size: 0.68rem; }
-.summary-table th { padding: 9px 12px; text-align: left; background: var(--surf2); color: var(--text3); font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; border-bottom: 1px solid var(--border); }
-.summary-table td { padding: 9px 12px; color: var(--text2); border-bottom: 1px solid rgba(34,45,56,0.5); }
+.summary-table th { padding: 8px 14px; text-align: left; background: var(--surf2); color: var(--text2); font-size: 0.52rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 400; border-bottom: 1px solid var(--border); }
+.summary-table td { padding: 10px 14px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
 .summary-table tr:last-child td { border-bottom: none; }
-.summary-table td.fs-val { font-size: 0.82rem; font-weight: 500; }
-.summary-table td.state-cell { font-size: 0.6rem; letter-spacing: 1px; }
+.summary-table tr:hover td { background: rgba(77,140,255,0.03); }
+.summary-table td.fs-val { font-family: var(--fd); font-size: 1.2rem; letter-spacing: 1px; }
+.summary-table td.state-cell { font-family: var(--fm); font-size: 0.5rem; letter-spacing: 2px; }
 
 .rec-box { background: var(--surf1); border: 1px solid var(--border); border-radius: 4px; padding: 12px 14px; }
 .rec-box-lbl { font-family: var(--fm); font-size: 0.48rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 7px; }
@@ -555,7 +714,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .coords-table { width:100%; border-collapse:collapse; font-family:var(--fm); font-size:0.6rem; }
 .coords-table th { background:var(--surf2); color:var(--text3); font-size:0.48rem; letter-spacing:1.5px; padding:5px 6px; text-align:left; border-bottom:1px solid var(--border); position:sticky; top:0; }
 .coords-table td { padding:3px 4px; border-bottom:1px solid rgba(34,45,56,0.4); color:var(--text2); }
-.coords-table tr:hover td { background:rgba(232,200,66,0.04); }
+.coords-table tr:hover td { background:rgba(77,140,255,0.04); }
 .coord-input { width:56px; background:var(--surf3); border:1px solid var(--border); border-radius:2px; color:var(--text); font-family:var(--fm); font-size:0.6rem; padding:3px 5px; outline:none; text-align:right; }
 .coord-input:focus { border-color:var(--accent); }
 .coord-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:0.75rem; padding:2px 4px; }
@@ -572,7 +731,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .cond-btn.active { border-color:var(--accent3); background:rgba(74,143,255,0.08); }
 .cond-icon { font-size:1.2rem; margin-bottom:3px; }
 .cond-name { font-family:var(--fm); font-size:0.52rem; letter-spacing:1.5px; color:var(--text); margin-bottom:2px; }
-.cond-desc { font-family:var(--fm); font-size:0.48rem; color:var(--text3); }
+.cond-desc { font-family:var(--fm); font-size:0.54rem; color:var(--text2); }
 .cond-seismic { padding:4px 0; }
 
 /* ── WATER POINTS ── */
@@ -593,14 +752,14 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
   letter-spacing:1px; cursor:pointer; transition:all 0.15s; white-space:nowrap;
 }
 .editor-tool-btn:hover { border-color:var(--accent); color:var(--accent); }
-.editor-tool-btn.active { background:rgba(232,200,66,0.12); border-color:var(--accent); color:var(--accent); }
+.editor-tool-btn.active { background:rgba(77,140,255,0.12); border-color:var(--accent); color:var(--accent); }
 .editor-tool-btn.water { border-color:var(--accent3); color:var(--accent3); }
 .editor-tool-btn.water.active { background:rgba(74,143,255,0.12); }
 .editor-tool-btn.danger { border-color:var(--danger); color:var(--danger); }
 .editor-tool-btn.danger:hover { background:rgba(255,68,85,0.1); }
 .tool-sep { width:1px; height:18px; background:var(--border); margin:0 3px; }
 .editor-hint {
-  font-family:var(--fm); font-size:0.52rem; color:var(--text3); margin-left:auto;
+  font-family:var(--fm); font-size:0.56rem; color:var(--text2); margin-left:auto;
 }
 
 #editorCanvas {
@@ -613,7 +772,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
   overflow-y:auto; display:flex; flex-direction:column; scrollbar-width:thin; scrollbar-color:var(--border2) transparent;
 }
 .editor-side-section { padding:12px 14px; border-bottom:1px solid var(--border); }
-.editor-side-title { font-family:var(--fm); font-size:0.52rem; letter-spacing:2px; color:var(--text3); text-transform:uppercase; margin-bottom:10px; }
+.editor-side-title { font-family:var(--fm); font-size:0.56rem; letter-spacing:2px; color:var(--text2); text-transform:uppercase; margin-bottom:10px; }
 
 /* Layer list */
 .layer-list { display:flex; flex-direction:column; gap:6px; }
@@ -622,20 +781,20 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
   padding:8px 10px; cursor:pointer; transition:all 0.15s; position:relative;
 }
 .layer-item:hover { border-color:var(--border2); }
-.layer-item.selected { border-color:var(--accent); background:rgba(232,200,66,0.05); }
+.layer-item.selected { border-color:var(--accent); background:rgba(77,140,255,0.06); }
 .layer-item-header { display:flex; align-items:center; gap:7px; margin-bottom:5px; }
 .layer-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 .layer-name { font-family:var(--fb); font-size:0.78rem; color:var(--text); font-weight:500; flex:1; }
-.layer-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:0.8rem; padding:0 3px; }
+.layer-del { background:none; border:none; color:var(--text2); cursor:pointer; font-size:0.9rem; padding:0 3px; }
 .layer-del:hover { color:var(--danger); }
 .layer-props { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; }
 .layer-prop { text-align:center; }
 .layer-prop-val { font-family:var(--fm); font-size:0.65rem; color:var(--accent2); }
-.layer-prop-lbl { font-family:var(--fm); font-size:0.42rem; color:var(--text3); letter-spacing:1px; }
+.layer-prop-lbl { font-family:var(--fm); font-size:0.52rem; color:var(--text2); letter-spacing:1px; }
 
 .add-layer-btn {
   width:100%; padding:7px; background:transparent; border:1px dashed var(--border2);
-  border-radius:2px; color:var(--text3); font-family:var(--fm); font-size:0.55rem;
+  border-radius:2px; color:var(--text2); font-family:var(--fm); font-size:0.58rem;
   letter-spacing:1px; cursor:pointer; transition:all 0.2s; margin-top:6px;
 }
 .add-layer-btn:hover { border-color:var(--accent); color:var(--accent); }
@@ -681,8 +840,8 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .scen-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
 .scen-title { font-family:var(--fm); font-size:0.62rem; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:4px; }
 .scen-subtitle { font-family:var(--fb); font-size:0.75rem; color:var(--text3); line-height:1.55; max-width:520px; }
-.scen-save-btn { flex-shrink:0; padding:12px 20px; background:rgba(232,200,66,0.1); border:1px solid var(--accent); border-radius:3px; color:var(--accent); font-family:var(--fm); font-size:0.62rem; letter-spacing:1.5px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
-.scen-save-btn:hover { background:rgba(232,200,66,0.2); }
+.scen-save-btn { flex-shrink:0; padding:12px 20px; background:rgba(77,140,255,0.1); border:1px solid var(--accent); border-radius:3px; color:var(--accent); font-family:var(--fm); font-size:0.62rem; letter-spacing:1.5px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+.scen-save-btn:hover { background:rgba(77,140,255,0.18); }
 .scen-slots { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
 .scen-empty { grid-column:1/-1; text-align:center; padding:50px 30px; font-family:var(--fb); font-size:0.9rem; color:var(--text3); line-height:2; border:1px dashed var(--border2); border-radius:4px; }
 .scen-slot { background:var(--surf2); border:1px solid var(--border2); border-radius:4px; padding:16px; position:relative; }
@@ -712,6 +871,17 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .bg-crit { background: rgba(255,140,0,0.05); }
 .bg-marg { background: rgba(245,196,0,0.05); }
 .bg-safe { background: rgba(78,240,192,0.05); }
+
+/* ── MONTE CARLO STATS ── */
+.mc-title { font-family:var(--fm); font-size:0.65rem; letter-spacing:2px; color:var(--text); text-transform:uppercase; }
+.mc-subtitle { font-family:var(--fm); font-size:0.55rem; color:var(--text2); margin-top:3px; }
+.mc-stat-box { background:var(--surf2); border:1px solid var(--border); border-radius:5px; padding:10px 12px; text-align:center; }
+.mc-stat-lbl { font-family:var(--fm); font-size:0.52rem; letter-spacing:1.5px; color:var(--text2); text-transform:uppercase; margin-bottom:4px; }
+.mc-stat-val { font-family:var(--fd); font-size:1.6rem; line-height:1; margin-bottom:2px; }
+.mc-stat-sub { font-family:var(--fm); font-size:0.52rem; color:var(--text2); }
+.mc-lbl { font-family:var(--fm); font-size:0.55rem; color:var(--text2); letter-spacing:1px; }
+.mc-select { background:var(--surf2); border:1px solid var(--border2); border-radius:3px; color:var(--text); font-family:var(--fm); font-size:0.58rem; padding:4px 8px; outline:none; cursor:pointer; }
+.mc-footer { font-family:var(--fm); font-size:0.55rem; color:var(--text2); margin-top:8px; padding-top:8px; border-top:1px solid var(--border); }
 </style>
 </head>
 <body>
@@ -720,7 +890,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 <header>
   <div class="logo-wrap">
     <div>
-      <div class="logo-name">SLOPEMIND</div>
+      <div class="logo-name">SLOPE<span>MIND</span></div>
       <div class="logo-tag">STABILITY &amp; RISK ENGINE — MINING SLOPES</div>
     </div>
     <div class="logo-ver">v2.0</div>
@@ -736,7 +906,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
       <div class="mbadge active" id="btn-infinite" onclick="setMethod('infinite')">Talud Infinito</div>
       <div class="mbadge" id="btn-bishop" onclick="setMethod('bishop')">Bishop</div>
     </div>
-    <button onclick="exportPDF()" style="font-family:var(--fm);font-size:0.52rem;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:2px;border:1px solid var(--accent);color:var(--accent);background:rgba(232,200,66,0.08);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(232,200,66,0.18)'" onmouseout="this.style.background='rgba(232,200,66,0.08)'">⬇ Exportar PDF</button>
+    <button onclick="exportPDF()" style="font-family:var(--fm);font-size:0.52rem;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:2px;border:1px solid var(--accent);color:var(--accent);background:rgba(77,140,255,0.08);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(77,140,255,0.18)'" onmouseout="this.style.background='rgba(77,140,255,0.08)'">⬇ Exportar PDF</button>
     <div style="display:flex;align-items:center;gap:6px;">
       <div class="pulse-dot"></div>
       <span style="font-family:var(--fm);font-size:0.5rem;color:var(--text3);">ORIOL DEVESA · 2026</span>
@@ -900,7 +1070,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <div class="info-btn">i
             <div class="tooltip">
               <div class="tooltip-title">Incertidumbre en cohesión</div>
-              <div class="tooltip-desc">Reducción porcentual de c' para calcular el FS conservador. Refleja la variabilidad natural del suelo y posibles errores de ensayo. EC7 recomienda aplicar factores parciales.</div>
+              <div class="tooltip-desc">Reducción porcentual de la cohesión para el escenario conservador. Refleja la variabilidad del suelo.</div>
               <div class="tooltip-range">Ensayo de calidad: <span>10–15%</span><br>Ensayo estándar: <span>20–30%</span><br>Datos escasos: <span>30–50%</span></div>
             </div>
           </div>
@@ -975,7 +1145,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <div class="info-btn">i
             <div class="tooltip">
               <div class="tooltip-title">Carga exterior distribuida</div>
-              <div class="tooltip-desc">Carga vertical distribuida sobre la coronación del talud: edificio, terraplén, maquinaria pesada, almacenamiento. Se añade como incremento de tensión normal en la superficie de rotura. EC7 §6.5.3 — cargas de uso.</div>
+              <div class="tooltip-desc">Carga vertical distribuida sobre la coronación: edificio, terraplén, maquinaria o almacenamiento.</div>
               <div class="tooltip-range">Edificio residencial: <span>10–30 kN/m²</span><br>Edificio industrial: <span>30–80 kN/m²</span><br>Maquinaria / tren: <span>50–150 kN/m²</span></div>
             </div>
           </div>
@@ -1011,7 +1181,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <div class="info-btn">i
             <div class="tooltip">
               <div class="tooltip-title">Grieta de tracción</div>
-              <div class="tooltip-desc">Grieta vertical en la coronación del talud. Reduce la longitud de la superficie de rotura y añade fuerza hidrostática si está llena de agua. Terzaghi (1943): zc = 2c'/γ·tan(45°+φ'/2). Típica en arcillas sobre-consolidadas.</div>
+              <div class="tooltip-desc">Grieta vertical en la coronación. Reduce la superficie de rotura y añade presión hidrostática si hay agua.</div>
               <div class="tooltip-range">Arcilla blanda: <span>0.5–2 m</span><br>Arcilla media: <span>2–5 m</span><br>Valor teórico Terzaghi: <span>calculado auto</span></div>
             </div>
           </div>
@@ -1031,11 +1201,11 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 
       <!-- LEGEND -->
       <div class="legend">
-        <div class="sec-hd" style="margin-top:0">CLASIFICACIÓN EC7 / ISRM</div>
+        <div class="sec-hd" style="margin-top:0">CLASIFICACIÓN</div>
         <div class="leg-row"><div class="leg-dot" style="background:var(--danger)"></div><div class="leg-text">FALLA</div><div class="leg-fs">FS &lt; 1.0</div></div>
         <div class="leg-row"><div class="leg-dot" style="background:var(--warn)"></div><div class="leg-text">CRÍTICO</div><div class="leg-fs">1.0 – 1.3</div></div>
         <div class="leg-row"><div class="leg-dot" style="background:var(--marg)"></div><div class="leg-text">MARGINAL</div><div class="leg-fs">1.3 – 1.5</div></div>
-        <div class="leg-row"><div class="leg-dot" style="background:var(--safe)"></div><div class="leg-text">ESTABLE (EC7)</div><div class="leg-fs">&gt; 1.5</div></div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--safe)"></div><div class="leg-text">ESTABLE</div><div class="leg-fs">&gt; 1.5</div></div>
       </div>
 
     </div>
@@ -1050,7 +1220,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <div class="fsc-label">FS DETERMINISTA</div>
         <div class="fsc-val" id="fs-det">—</div>
         <div class="fsc-state" id="st-det">—</div>
-        <div class="fsc-method">⟁ MOHR-COULOMB</div>
+        <div class="fsc-method">TALUD INFINITO</div>
         <div class="fs-gauge-wrap">
           <div class="fs-gauge-markers">
             <div class="fs-gauge-marker m10"></div>
@@ -1064,7 +1234,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <div class="fsc-label">FS CONSERVADOR</div>
         <div class="fsc-val" id="fs-cons">—</div>
         <div class="fsc-state" id="st-cons">—</div>
-        <div class="fsc-method">◈ PARÁMETROS REDUCIDOS</div>
+        <div class="fsc-method">CONSERVADOR</div>
         <div class="fs-gauge-wrap">
           <div class="fs-gauge-markers">
             <div class="fs-gauge-marker m10"></div>
@@ -1078,7 +1248,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <div class="fsc-label">FS BISHOP SIMPLIFICADO</div>
         <div class="fsc-val" id="fs-bish">—</div>
         <div class="fsc-state" id="st-bish">—</div>
-        <div class="fsc-method">◎ SUP. CIRCULAR</div>
+        <div class="fsc-method">BISHOP</div>
         <div class="fs-gauge-wrap">
           <div class="fs-gauge-markers">
             <div class="fs-gauge-marker m10"></div>
@@ -1092,7 +1262,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <div class="fsc-label">FS SÍSMICO</div>
         <div class="fsc-val" id="fs-seis">—</div>
         <div class="fsc-state" id="st-seis">—</div>
-        <div class="fsc-method">≋ PSEUDOESTÁTICO</div>
+        <div class="fsc-method">SÍSMICO</div>
         <div class="fs-gauge-wrap">
           <div class="fs-gauge-markers">
             <div class="fs-gauge-marker m10"></div>
@@ -1104,23 +1274,65 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
       </div>
     </div>
 
-    <!-- TABS -->
-    <div class="tab-bar">
-      <div class="tab" data-tab="editor">✏ EDITOR 2D</div>
-      <div class="tab active" data-tab="visual">VISUALIZACIÓN</div>
-      <div class="tab" data-tab="bishop">BISHOP — DOVELAS</div>
-      <div class="tab" data-tab="sens">SENSIBILIDAD</div>
-      <div class="tab" data-tab="results">RESUMEN</div>
-      <div class="tab" data-tab="scenarios">ESCENARIOS</div>
-      <div class="tab" data-tab="forecast" id="tab-btn-forecast" style="color:#4a8fff;border-bottom-color:transparent">⛈ PREVISIÓN</div>
-      <div class="tab" data-tab="asistente" id="tab-btn-asistente">⬡ ASISTENTE IA</div>
+    <!-- STEPPER NAV -->
+    <div class="stepper-bar">
+      <div class="step active" id="step-1" onclick="goStep(1)">
+        <div class="step-num">1</div>
+        <div class="step-info">
+          <div class="step-title">GEOMETRÍA</div>
+          <div class="step-sub">Perfil · Suelo · Capas</div>
+        </div>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="step" id="step-2" onclick="goStep(2)">
+        <div class="step-num">2</div>
+        <div class="step-info">
+          <div class="step-title">CONDICIONES</div>
+          <div class="step-sub">Agua · Sismo · Cargas</div>
+        </div>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="step" id="step-3" onclick="goStep(3)">
+        <div class="step-num">3</div>
+        <div class="step-info">
+          <div class="step-title">ANÁLISIS</div>
+          <div class="step-sub">FS · Bishop · Monte Carlo</div>
+        </div>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="step" id="step-4" onclick="goStep(4)">
+        <div class="step-num">4</div>
+        <div class="step-info">
+          <div class="step-title">INFORME</div>
+          <div class="step-sub">PDF · Escenarios</div>
+        </div>
+      </div>
+      <!-- expert tabs collapsed -->
+      <div class="expert-tabs" id="expert-tabs">
+        <div class="expert-sep"></div>
+        <div class="etab" id="etab-bishop" onclick="showExpertTab('bishop')" title="Bishop — Dovelas">⊙</div>
+        <div class="etab" id="etab-sens"   onclick="showExpertTab('sens')"   title="Sensibilidad">∿</div>
+        <div class="etab" id="etab-forecast" onclick="showExpertTab('forecast')" title="Previsión">⛈</div>
+        <div class="etab" id="etab-asistente" onclick="showExpertTab('asistente')" title="Asistente IA">⬡</div>
+      </div>
     </div>
 
     <!-- TAB CONTENT -->
     <div class="tab-content">
 
+      <!-- ══════════════════════════════════════
+           SCREEN 1 — GEOMETRÍA
+           Sub-tabs: Editor 2D · Visualización
+      ══════════════════════════════════════ -->
+      <div class="step-screen active" id="screen-1">
+        <div class="sub-tab-bar">
+          <div class="sub-tab active" id="stab-editor"  onclick="showSubTab(1,'editor')">✏ EDITOR 2D</div>
+          <div class="sub-tab"        id="stab-visual"  onclick="showSubTab(1,'visual')">VISUALIZACIÓN</div>
+        </div>
+        <div class="screen-body">
+
       <!-- TAB: EDITOR 2D -->
-      <div class="tab-pane" id="tab-editor">
+      <div class="tab-pane active" id="tab-editor">
         <div class="editor-canvas-area">
           <!-- Toolbar -->
           <div class="editor-toolbar">
@@ -1144,18 +1356,18 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <div class="editor-fs-bar">
             <div class="editor-fs-cell">
               <div class="editor-fs-lbl">FS DETERMINISTA</div>
-              <div class="editor-fs-val" id="efs-det" style="color:var(--text3)">—</div>
-              <div class="editor-fs-state" id="est-det" style="color:var(--text3)">—</div>
+              <div class="editor-fs-val" id="efs-det">—</div>
+              <div class="editor-fs-state" id="est-det">—</div>
             </div>
             <div class="editor-fs-cell">
               <div class="editor-fs-lbl">FS BISHOP</div>
-              <div class="editor-fs-val" id="efs-bish" style="color:var(--text3)">—</div>
-              <div class="editor-fs-state" id="est-bish" style="color:var(--text3)">—</div>
+              <div class="editor-fs-val" id="efs-bish">—</div>
+              <div class="editor-fs-state" id="est-bish">—</div>
             </div>
             <div class="editor-fs-cell">
               <div class="editor-fs-lbl">FS CONSERVADOR</div>
-              <div class="editor-fs-val" id="efs-cons" style="color:var(--text3)">—</div>
-              <div class="editor-fs-state" id="est-cons" style="color:var(--text3)">—</div>
+              <div class="editor-fs-val" id="efs-cons">—</div>
+              <div class="editor-fs-state" id="est-cons">—</div>
             </div>
           </div>
           <!-- Main canvas -->
@@ -1276,7 +1488,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
               <div class="cond-seismic">
                 <label style="display:flex;align-items:center;gap:8px;font-family:var(--fb);font-size:0.78rem;color:var(--text2);cursor:pointer">
                   <input type="checkbox" id="ed-seismic" onchange="calcEditorFS();drawEditor()" style="accent-color:var(--accent)">
-                  Análisis pseudoestático
+                  Pseudoestático
                 </label>
                 <div class="layer-edit-row" style="margin-top:8px">
                   <div class="layer-edit-lbl">kh (coef. sísmico)</div>
@@ -1305,10 +1517,10 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
       </div>
 
       <!-- TAB: VISUAL -->
-      <div class="tab-pane active" id="tab-visual">
+      <div class="tab-pane" id="tab-visual">
         <div class="visual-main">
           <div class="canvas-wrap">
-            <div class="canvas-label">SECCIÓN TRANSVERSAL — TALUD INFINITO</div>
+            <div class="canvas-label">SECCIÓN TRANSVERSAL</div>
             <canvas id="slopeCanvas"></canvas>
             <div class="canvas-info">
               H=<span id="i-H">20</span>m &nbsp;
@@ -1328,13 +1540,30 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         </div>
       </div>
 
+        </div><!-- end screen-1 inner -->
+        <div class="step-footer">
+          <span class="step-footer-info">PASO 1 DE 4 — Define el perfil y los parámetros del suelo</span>
+          <button class="btn-next" onclick="goStep(2)">CONDICIONES →</button>
+        </div>
+      </div><!-- end screen-1 -->
+
+      <!-- ══════════════════════════════════════
+           SCREEN 2 — CONDICIONES
+           Shows slope + conditions in left panel
+      ══════════════════════════════════════ -->
+      <div class="step-screen" id="screen-2">
+        <div class="sub-tab-bar">
+          <div class="sub-tab active" id="stab-cond-bishop">SUPERFICIE CIRCULAR — BISHOP</div>
+        </div>
+        <div class="screen-body">
+
       <!-- TAB: BISHOP -->
       <div class="tab-pane" id="tab-bishop">
         <div class="bishop-layout">
           <div class="bishop-main">
-            <div class="canvas-label">BISHOP SIMPLIFICADO — SUPERFICIE CIRCULAR</div>
+            <div class="canvas-label">BISHOP — SUPERFICIE CIRCULAR</div>
             <div style="margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-              <div style="padding:8px 10px;background:rgba(232,200,66,0.06);border:1px solid rgba(232,200,66,0.2);border-radius:3px;">
+              <div style="padding:8px 10px;background:rgba(77,140,255,0.08);border:1px solid rgba(77,140,255,0.18);border-radius:3px;">
                 <div style="font-family:var(--fm);font-size:0.58rem;color:var(--accent);letter-spacing:1.5px;margin-bottom:4px;">⊙ BUSCAR SUPERFICIE CRÍTICA</div>
                 <div style="font-family:var(--fb);font-size:0.7rem;color:var(--text2);line-height:1.55;">Analiza cientos de superficies circulares automáticamente y encuentra la que tiene el <span style="color:var(--text);font-weight:600">factor de seguridad más bajo</span> — la rotura más probable del talud.</div>
               </div>
@@ -1404,6 +1633,28 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         </div>
       </div>
 
+        </div><!-- end screen-2 inner -->
+        <div class="step-footer">
+          <button class="btn-prev" onclick="goStep(1)">← GEOMETRÍA</button>
+          <span class="step-footer-info">PASO 2 DE 4 — Define agua, sismo y cargas en el panel izquierdo</span>
+          <button class="btn-next" onclick="goStep(3)">ANÁLISIS →</button>
+        </div>
+      </div><!-- end screen-2 -->
+
+      <!-- ══════════════════════════════════════
+           SCREEN 3 — ANÁLISIS
+           Sub-tabs: Sensibilidad · Resumen · Escenarios · Previsión · IA
+      ══════════════════════════════════════ -->
+      <div class="step-screen" id="screen-3">
+        <div class="sub-tab-bar">
+          <div class="sub-tab active" id="stab-results"    onclick="showSubTab(3,'results')">RESUMEN</div>
+          <div class="sub-tab"       id="stab-sens"       onclick="showSubTab(3,'sens')">SENSIBILIDAD</div>
+          <div class="sub-tab"       id="stab-scenarios"  onclick="showSubTab(3,'scenarios')">ESCENARIOS</div>
+          <div class="sub-tab"       id="stab-forecast"   onclick="showSubTab(3,'forecast')" style="color:var(--accent3)">⛈ PREVISIÓN</div>
+          <div class="sub-tab"       id="stab-asistente"  onclick="showSubTab(3,'asistente')" style="color:var(--accent2)">⬡ IA</div>
+        </div>
+        <div class="screen-body">
+
       <!-- TAB: SENSITIVITY -->
       <div class="tab-pane" id="tab-sens">
         <div class="sens-grid">
@@ -1422,7 +1673,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <div class="mc-header">
             <div>
               <div class="mc-title">🎲 ANÁLISIS PROBABILÍSTICO — MONTE CARLO</div>
-              <div class="mc-subtitle">Distribución estadística del Factor de Seguridad · Probabilidad de fallo P(FS&lt;1.0)</div>
+              <div class="mc-subtitle">Distribución estadística del FS · Probabilidad de fallo</div>
             </div>
             <div class="mc-controls">
               <div class="mc-ctrl-group">
@@ -1482,12 +1733,12 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
                 <div class="mc-stat-box">
                   <div class="mc-stat-lbl">FS percentil 5%</div>
                   <div class="mc-stat-val" id="mc-p5">—</div>
-                  <div class="mc-stat-sub">Valor característico EC7</div>
+                  <div class="mc-stat-sub">Valor característico</div>
                 </div>
                 <div class="mc-stat-box">
                   <div class="mc-stat-lbl">Índice confiabilidad β</div>
                   <div class="mc-stat-val" id="mc-beta">—</div>
-                  <div class="mc-stat-sub">Hasofer-Lind (EC7)</div>
+                  <div class="mc-stat-sub">Índice de fiabilidad</div>
                 </div>
               </div>
               <div class="mc-chart-row">
@@ -1507,7 +1758,6 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <thead>
               <tr>
                 <th>MÉTODO</th>
-                <th>PARÁMETROS</th>
                 <th>FS</th>
                 <th>ESTADO</th>
                 <th>MARGEN HASTA FS=1.5</th>
@@ -1522,9 +1772,9 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <div class="res-card-lbl">FS DETERMINISTA</div>
             <div class="res-card-val" id="rv-det">—</div>
             <div class="res-card-state" id="rs-det">—</div>
-            <div class="res-card-method">Talud Infinito · Mohr-Coulomb</div>
+            
             <div class="safety-bar-wrap">
-              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-label"><span>0</span><span>1.0</span><span>1.5</span><span>3.0</span></div>
               <div class="safety-bar-track">
                 <div class="safety-bar-fill" id="sbar-det"></div>
                 <div class="safety-bar-target" style="left:50%"></div>
@@ -1535,9 +1785,9 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <div class="res-card-lbl">FS CONSERVADOR</div>
             <div class="res-card-val" id="rv-cons">—</div>
             <div class="res-card-state" id="rs-cons">—</div>
-            <div class="res-card-method">c'·(1–Δc) · φ'–Δφ</div>
+            
             <div class="safety-bar-wrap">
-              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-label"><span>0</span><span>1.0</span><span>1.5</span><span>3.0</span></div>
               <div class="safety-bar-track">
                 <div class="safety-bar-fill" id="sbar-cons"></div>
                 <div class="safety-bar-target" style="left:50%"></div>
@@ -1548,9 +1798,9 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <div class="res-card-lbl">FS BISHOP SIMPLIFICADO</div>
             <div class="res-card-val" id="rv-bish">—</div>
             <div class="res-card-state" id="rs-bish">—</div>
-            <div class="res-card-method">Sup. circular · iteración convergente</div>
+            
             <div class="safety-bar-wrap">
-              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-label"><span>0</span><span>1.0</span><span>1.5</span><span>3.0</span></div>
               <div class="safety-bar-track">
                 <div class="safety-bar-fill" id="sbar-bish"></div>
                 <div class="safety-bar-target" style="left:50%"></div>
@@ -1561,9 +1811,9 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <div class="res-card-lbl">FS JANBU SIMPLIFICADO</div>
             <div class="res-card-val" id="rv-jan">—</div>
             <div class="res-card-state" id="rs-jan">—</div>
-            <div class="res-card-method">Sup. no circular · f₀ correg. · Janbu (1973)</div>
+            
             <div class="safety-bar-wrap">
-              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-label"><span>0</span><span>1.0</span><span>1.5</span><span>3.0</span></div>
               <div class="safety-bar-track">
                 <div class="safety-bar-fill" id="sbar-jan"></div>
                 <div class="safety-bar-target" style="left:50%"></div>
@@ -1574,9 +1824,9 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <div class="res-card-lbl">FS CON GRIETA DE TRACCIÓN</div>
             <div class="res-card-val" id="rv-crack">—</div>
             <div class="res-card-state" id="rs-crack">—</div>
-            <div class="res-card-method" id="crack-method-lbl">Terzaghi (1943) · zc=— · sin agua</div>
+            
             <div class="safety-bar-wrap">
-              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-label"><span>0</span><span>1.0</span><span>1.5</span><span>3.0</span></div>
               <div class="safety-bar-track">
                 <div class="safety-bar-fill" id="sbar-crack"></div>
                 <div class="safety-bar-target" style="left:50%"></div>
@@ -1587,9 +1837,9 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <div class="res-card-lbl">FS CON CARGA EXTERIOR</div>
             <div class="res-card-val" id="rv-load">—</div>
             <div class="res-card-state" id="rs-load">—</div>
-            <div class="res-card-method" id="load-method-lbl">EC7 §6.5.3 · q=— kN/m²</div>
+            <div class="res-card-method" id="load-method-lbl" style="display:none"></div>
             <div class="safety-bar-wrap">
-              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-label"><span>0</span><span>1.0</span><span>1.5</span><span>3.0</span></div>
               <div class="safety-bar-track">
                 <div class="safety-bar-fill" id="sbar-load"></div>
                 <div class="safety-bar-target" style="left:50%"></div>
@@ -1600,9 +1850,9 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <div class="res-card-lbl">FS SATURADO (peor caso)</div>
             <div class="res-card-val" id="rv-sat">—</div>
             <div class="res-card-state" id="rs-sat">—</div>
-            <div class="res-card-method">NF = 100% · Talud Infinito</div>
+            
             <div class="safety-bar-wrap">
-              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-label"><span>0</span><span>1.0</span><span>1.5</span><span>3.0</span></div>
               <div class="safety-bar-track">
                 <div class="safety-bar-fill" id="sbar-sat"></div>
                 <div class="safety-bar-target" style="left:50%"></div>
@@ -1615,31 +1865,31 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
           <div class="crit-card">
             <div class="crit-card-lbl">φ CRÍTICO</div>
             <div class="crit-card-val" id="cv-phi">—</div>
-            <div class="crit-card-sub">ángulo mínimo para FS=1.0</div>
-            <div class="crit-card-margin" id="cm-phi" style="color:var(--text3)">Margen: —</div>
+            <div class="crit-card-sub">ángulo mínimo</div>
+            <div class="crit-card-margin" id="cm-phi">—</div>
           </div>
           <div class="crit-card">
             <div class="crit-card-lbl">c CRÍTICA</div>
             <div class="crit-card-val" id="cv-c">—</div>
-            <div class="crit-card-sub">cohesión mínima para FS=1.0</div>
-            <div class="crit-card-margin" id="cm-c" style="color:var(--text3)">Margen: —</div>
+            <div class="crit-card-sub">cohesión mínima</div>
+            <div class="crit-card-margin" id="cm-c">—</div>
           </div>
           <div class="crit-card">
             <div class="crit-card-lbl">β CRÍTICO</div>
             <div class="crit-card-val" id="cv-beta">—</div>
-            <div class="crit-card-sub">ángulo máximo de corte</div>
-            <div class="crit-card-margin" id="cm-beta" style="color:var(--text3)">Margen: —</div>
+            <div class="crit-card-sub">ángulo máximo</div>
+            <div class="crit-card-margin" id="cm-beta">—</div>
           </div>
           <div class="crit-card">
             <div class="crit-card-lbl">NF CRÍTICO</div>
             <div class="crit-card-val" id="cv-nf">—</div>
-            <div class="crit-card-sub">nivel freático límite</div>
+            <div class="crit-card-sub">nivel freático máx.</div>
             <div class="crit-card-margin" id="cm-nf" style="color:var(--text3)">Margen: —</div>
           </div>
         </div>
 
         <div class="rec-box">
-          <div class="rec-box-lbl">RECOMENDACIÓN AUTOMÁTICA (EC7 / ISRM)</div>
+          <div class="rec-box-lbl">RECOMENDACIÓN</div>
           <div class="rec-box-text" id="rec-text">—</div>
         </div>
 
@@ -1812,7 +2062,7 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
                       <th style="padding:5px 8px;text-align:right;color:var(--text3)">NF %</th>
                       <th style="padding:5px 8px;text-align:right;color:var(--text3)">ψ (m)</th>
                       <th style="padding:5px 8px;text-align:right;color:var(--text3)">FS Bishop</th>
-                      <th style="padding:5px 8px;text-align:left;color:var(--text3)">ESTADO EC7</th>
+                      <th style="padding:5px 8px;text-align:left;color:var(--text3)">ESTADO</th>
                     </tr>
                   </thead>
                   <tbody id="fc-tbody"></tbody>
@@ -1881,16 +2131,80 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
             <!-- Quick questions -->
             <div class="ai-right-section">
               <div class="ai-right-title">CONSULTAS RÁPIDAS</div>
-              <button class="ai-quick-btn" onclick="aiQuick('¿Son coherentes los parámetros actuales con suelo típico? Valida contra rangos EC7.')">✓ Validar parámetros vs EC7</button>
+              <button class="ai-quick-btn" onclick="aiQuick('¿Son coherentes estos parámetros con el tipo de suelo?')">✓ Validar parámetros</button>
               <button class="ai-quick-btn" onclick="aiQuick('Interpreta el factor de seguridad obtenido y qué significa para la seguridad del talud.')">📊 Interpretar FS obtenido</button>
               <button class="ai-quick-btn" onclick="aiQuick('¿Qué ensayos de laboratorio necesito para determinar c y phi con fiabilidad en este tipo de suelo?')">🔬 ¿Qué ensayos necesito?</button>
-              <button class="ai-quick-btn" onclick="aiQuick('¿Qué medidas de estabilización recomienda EC7 para un talud con este factor de seguridad?')">🔧 Medidas de estabilización</button>
-              <button class="ai-quick-btn" onclick="aiQuick('Explica el método Bishop Simplificado: hipótesis, limitaciones y cuándo usarlo.')">📖 Explicar método Bishop</button>
+              <button class="ai-quick-btn" onclick="aiQuick('¿Qué medidas de estabilización recomiendas con este FS?')">🔧 Medidas de estabilización</button>
+              <button class="ai-quick-btn" onclick="aiQuick('¿Cuándo usar Bishop frente a Janbu?')">📖 Explicar método Bishop</button>
             </div>
 
           </div>
         </div>
       </div>
+
+        </div><!-- end screen-3 inner -->
+        <div class="step-footer">
+          <button class="btn-prev" onclick="goStep(2)">← CONDICIONES</button>
+          <span class="step-footer-info">PASO 3 DE 4 — Revisa los resultados y análisis</span>
+          <button class="btn-next" onclick="goStep(4)">INFORME →</button>
+        </div>
+      </div><!-- end screen-3 -->
+
+      <!-- ══════════════════════════════════════
+           SCREEN 4 — INFORME
+      ══════════════════════════════════════ -->
+      <div class="step-screen" id="screen-4">
+        <div style="flex:1;overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:20px;">
+
+          <div style="font-family:var(--fm);font-size:0.55rem;letter-spacing:2px;color:var(--accent);margin-bottom:4px;">PASO 4 — INFORME TÉCNICO</div>
+
+          <!-- Report summary cards -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div style="background:var(--surf2);border:1px solid var(--border);border-radius:4px;padding:16px;">
+              <div style="font-family:var(--fm);font-size:0.48rem;letter-spacing:1.5px;color:var(--text3);margin-bottom:8px;">PROYECTO</div>
+              <div style="font-family:var(--fb);font-size:0.85rem;color:var(--text)" id="inf-project">—</div>
+            </div>
+            <div style="background:var(--surf2);border:1px solid var(--border);border-radius:4px;padding:16px;">
+              <div style="font-family:var(--fm);font-size:0.48rem;letter-spacing:1.5px;color:var(--text3);margin-bottom:8px;">FS DETERMINISTA</div>
+              <div style="font-family:var(--fd);font-size:1.8rem;color:var(--accent)" id="inf-fs-det">—</div>
+            </div>
+            <div style="background:var(--surf2);border:1px solid var(--border);border-radius:4px;padding:16px;">
+              <div style="font-family:var(--fm);font-size:0.48rem;letter-spacing:1.5px;color:var(--text3);margin-bottom:8px;">FS BISHOP</div>
+              <div style="font-family:var(--fd);font-size:1.8rem;color:var(--accent2)" id="inf-fs-bish">—</div>
+            </div>
+          </div>
+
+          <!-- What will be in the PDF -->
+          <div style="background:var(--surf2);border:1px solid var(--border);border-radius:4px;padding:20px;">
+            <div style="font-family:var(--fm);font-size:0.5rem;letter-spacing:2px;color:var(--text3);margin-bottom:14px;">CONTENIDO DEL INFORME PDF</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div class="inf-item">✓ Geometría del talud y parámetros geotécnicos</div>
+              <div class="inf-item">✓ FS Talud Infinito — Determinista y Conservador</div>
+              <div class="inf-item">✓ FS Bishop Simplificado — Superficie circular</div>
+              <div class="inf-item">✓ FS Janbu Simplificado — Superficie no circular</div>
+              <div class="inf-item" id="inf-row-seis" style="opacity:0.3">◌ Análisis sísmico pseudoestático</div>
+              <div class="inf-item" id="inf-row-crack" style="opacity:0.3">◌ Grieta de tracción</div>
+              <div class="inf-item" id="inf-row-load" style="opacity:0.3">◌ Carga exterior en coronación</div>
+              <div class="inf-item">✓ Análisis de sensibilidad — Parámetros críticos</div>
+              <div class="inf-item">✓ Clasificación e interpretación automática</div>
+              <div class="inf-item">✓ Perfil gráfico del talud</div>
+            </div>
+          </div>
+
+          <!-- Export button -->
+          <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+            <button onclick="exportPDF()" style="font-family:var(--fm);font-size:0.58rem;letter-spacing:2px;padding:12px 32px;border-radius:3px;border:1px solid var(--accent);color:var(--accent);background:rgba(77,140,255,0.08);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(77,140,255,0.18)'" onmouseout="this.style.background='rgba(77,140,255,0.08)'">⬇ EXPORTAR INFORME PDF</button>
+            <span style="font-family:var(--fm);font-size:0.45rem;color:var(--text3);">PDF generado con todos los cálculos activos</span>
+          </div>
+
+        </div>
+        <div class="step-footer">
+          <button class="btn-prev" onclick="goStep(3)">← ANÁLISIS</button>
+          <span class="step-footer-info">PASO 4 DE 4 — Exporta el informe técnico completo</span>
+        </div>
+      </div><!-- end screen-4 -->
+
+    </div><!-- end tab-content -->
 
   </div><!-- end right panel -->
 
@@ -2120,8 +2434,7 @@ function debouncedUpdate() {
   _updateTimer = setTimeout(update, 60); // 60ms debounce
 }
 function activeTab() {
-  const t = document.querySelector('.tab.active');
-  return t ? t.dataset.tab : 'results';
+  return currentPane || 'editor';
 }
 
 function setFSCard(valId, stId, cardId, gaugeId, fs, methodText) {
@@ -2163,8 +2476,10 @@ function setResCard(valId, stId, cardId, sbarId, fs) {
 // ═══════════════════════════════════════════════════════
 function drawSlope(H, beta_deg, nf_pct, fs) {
   const canvas = g('slopeCanvas');
-  const W = canvas.parentElement.clientWidth - 28;
+  if (!canvas) return;
+  const W  = canvas.parentElement.clientWidth  - 28;
   const Ht = canvas.parentElement.clientHeight - 60;
+  if (W <= 0 || Ht <= 0) return; // pane hidden — skip
   canvas.width  = Math.max(300, W);
   canvas.height = Math.max(180, Ht);
   const ctx = canvas.getContext('2d');
@@ -2253,6 +2568,8 @@ function drawSlope(H, beta_deg, nf_pct, fs) {
 // ═══════════════════════════════════════════════════════
 function drawBishop(H, beta_deg, nf_pct, R, cx_f, cy_f, slices, fs, explored) {
   const canvas = g('bishopCanvas');
+  if (!canvas) return;
+  if (canvas.parentElement.clientWidth <= 0) return; // pane hidden — skip
   const pw = canvas.parentElement.clientWidth;
   const ph = canvas.parentElement.clientHeight;
   canvas.width  = Math.max(300, pw);
@@ -2709,12 +3026,12 @@ function renderScenarios() {
 function updateSummaryTable(fs_det, fs_cons, fs_bish, fs_sat, c, phi, dc, dphi, fs_janbu, fs_load) {
   const tbody = g('summary-tbody'); if (!tbody) return;
   const rows = [
-    { method:'Talud Infinito Determinista', params:`c=${c}kPa, φ=${phi}°`, fs:fs_det },
-    { method:'Talud Infinito Conservador',  params:`c'=${(c*(1-dc/100)).toFixed(1)}kPa, φ'=${(phi-dphi).toFixed(1)}°`, fs:fs_cons },
-    { method:'Bishop Simplificado',         params:`Sup. circular · iterativo`, fs:fs_bish },
-    { method:'Janbu Simplificado',          params:`Sup. no circular · f₀ correg.`, fs:fs_janbu||0 },
-    { method:'Talud Saturado (peor caso)',  params:`NF=100%, c=${c}kPa, φ=${phi}°`, fs:fs_sat },
-    ...(fs_load ? [{ method:'Con Carga Exterior', params:`q=${loadOn?gv('q_load'):0} kN/m² · EC7 §6.5.3`, fs:fs_load }] : []),
+    { method:'Talud Infinito', params:`c=${c} · φ=${phi}°`, fs:fs_det },
+    { method:'Talud Inf. Conservador', params:'', fs:fs_cons },
+    { method:'Bishop Simplificado', params:`Sup. circular`, fs:fs_bish },
+    { method:'Janbu Simplificado', params:`Sup. no circular`, fs:fs_janbu||0 },
+    { method:'Saturado (peor caso)', params:`NF = 100%`, fs:fs_sat },
+    ...(fs_load ? [{ method:'Con Carga Exterior', params:`q = ${loadOn?gv('q_load'):0} kN/m²`, fs:fs_load }] : []),
   ];
   tbody.innerHTML = rows.map(r=>{
     const st = getState(r.fs);
@@ -2722,9 +3039,8 @@ function updateSummaryTable(fs_det, fs_cons, fs_bish, fs_sat, c, phi, dc, dphi, 
     const marginColor = r.fs >= 1.5 ? '#4ef0c0' : r.fs >= 1.0 ? '#ff8c00' : '#ff4455';
     const barW = Math.min(100, (Math.min(r.fs,3)/3*100)).toFixed(1);
     return `<tr>
-      <td>${r.method}</td>
-      <td style="color:var(--text3);font-size:0.52rem">${r.params}</td>
-      <td class="fs-val ${st.cls}">${r.fs>90?'∞':r.fs.toFixed(3)}</td>
+      <td style="font-size:0.62rem">${r.method}</td>
+      <td class="fs-val ${st.cls}" style="font-size:0.9rem">${r.fs>90?'∞':r.fs.toFixed(3)}</td>
       <td class="state-cell ${st.cls}">${st.lbl}</td>
       <td>
         <div style="display:flex;align-items:center;gap:6px">
@@ -2919,18 +3235,105 @@ function update() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  TABS
+//  NAVIGATION — 4-DOOR STEPPER
 // ═══════════════════════════════════════════════════════
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-    tab.classList.add('active');
-    const target=g('tab-'+tab.dataset.tab);
-    if(target) target.classList.add('active');
-    setTimeout(update,50);
+
+// Map: step → which tab-panes are shown as sub-tabs
+const STEP_MAP = {
+  1: { panes: ['editor','visual'],    default: 'editor',   stabs: ['stab-editor','stab-visual'] },
+  2: { panes: ['bishop'],             default: 'bishop',   stabs: ['stab-cond-bishop'] },
+  3: { panes: ['results','sens','scenarios','forecast','asistente'], default: 'results', stabs: ['stab-results','stab-sens','stab-scenarios','stab-forecast','stab-asistente'] },
+  4: { panes: [],                     default: null,       stabs: [] },
+};
+
+let currentStep = 1;
+let currentPane = 'editor';
+
+function showPane(paneId) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  const target = g('tab-' + paneId);
+  if (target) target.classList.add('active');
+  currentPane = paneId;
+  onPaneVisible(paneId);
+}
+
+function showSubTab(step, paneId) {
+  // Update sub-tab active state
+  const map = STEP_MAP[step];
+  map.stabs.forEach(sid => { const el = g(sid); if (el) el.classList.remove('active'); });
+  // Find which stab corresponds to this pane
+  const paneIdx = map.panes.indexOf(paneId);
+  if (paneIdx >= 0 && map.stabs[paneIdx]) {
+    const el = g(map.stabs[paneIdx]);
+    if (el) el.classList.add('active');
+  }
+  showPane(paneId);
+}
+
+function goStep(n) {
+  // Mark steps done/active
+  [1,2,3,4].forEach(i => {
+    const el = g('step-'+i);
+    if (!el) return;
+    el.classList.remove('active','done');
+    if (i < n) el.classList.add('done');
+    if (i === n) el.classList.add('active');
   });
-});
+
+  // Show/hide screens
+  [1,2,3,4].forEach(i => {
+    const sc = g('screen-'+i);
+    if (sc) sc.classList.toggle('active', i === n);
+  });
+
+  currentStep = n;
+
+  // Show default pane for this step
+  const map = STEP_MAP[n];
+  if (map.default) {
+    showPane(map.default);
+    // Activate the first sub-tab
+    map.stabs.forEach((sid,i) => {
+      const el = g(sid);
+      if (el) el.classList.toggle('active', i === 0);
+    });
+  }
+
+  // Update informe screen summary
+  if (n === 4) updateInforme();
+
+  setTimeout(update, 50);
+}
+
+function showExpertTab(paneId) {
+  // Expert tabs (bishop, sens, forecast, asistente) jump to step 3
+  // deactivate all etabs
+  ['bishop','sens','forecast','asistente'].forEach(id => {
+    const el = g('etab-'+id); if (el) el.classList.remove('active');
+  });
+  const el = g('etab-'+paneId); if (el) el.classList.add('active');
+
+  goStep(3);
+  showPane(paneId);
+  // Activate correct stab in step 3
+  const map = STEP_MAP[3];
+  map.stabs.forEach((sid,i) => {
+    const sel = g(sid);
+    if (sel) sel.classList.toggle('active', map.panes[i] === paneId);
+  });
+}
+
+function updateInforme() {
+  const fsDetEl = g('fs-det'); const fsBishEl = g('fs-bish');
+  const projEl  = g('projectName');
+  if (g('inf-project')) g('inf-project').textContent = projEl?.value?.trim() || 'Sin nombre';
+  if (g('inf-fs-det'))  g('inf-fs-det').textContent  = fsDetEl?.textContent  || '—';
+  if (g('inf-fs-bish')) g('inf-fs-bish').textContent = fsBishEl?.textContent || '—';
+  // Toggle active rows
+  if (g('inf-row-seis'))  { g('inf-row-seis').style.opacity  = seismicOn ? '1' : '0.3'; g('inf-row-seis').textContent  = seismicOn  ? '✓ Análisis sísmico pseudoestático' : '◌ Análisis sísmico pseudoestático'; }
+  if (g('inf-row-crack')) { g('inf-row-crack').style.opacity = crackOn  ? '1' : '0.3'; g('inf-row-crack').textContent = crackOn   ? '✓ Grieta de tracción'  : '◌ Grieta de tracción'; }
+  if (g('inf-row-load'))  { g('inf-row-load').style.opacity  = loadOn   ? '1' : '0.3'; g('inf-row-load').textContent  = loadOn    ? '✓ Carga exterior en coronación'   : '◌ Carga exterior en coronación'; }
+}
 
 // ═══════════════════════════════════════════════════════
 //  METHOD TOGGLE
@@ -2939,8 +3342,8 @@ function setMethod(m){
   activeMethod=m;
   g('btn-infinite').classList.toggle('active',m==='infinite');
   g('btn-bishop').classList.toggle('active',m==='bishop');
-  if(m==='bishop'){ document.querySelectorAll('.tab').forEach(t=>{if(t.dataset.tab==='bishop')t.click();}); }
-  else { document.querySelectorAll('.tab').forEach(t=>{if(t.dataset.tab==='visual')t.click();}); }
+  if(m==='bishop'){ showExpertTab('bishop'); }
+  else { showPane('visual'); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3199,7 +3602,7 @@ function exportPDF(){
     {label:'FS BISHOP SIMP.',sublabel:'Superficie circular',           fs:fs_bish,note:`R=${R_v}m, Cx=${cx_v.toFixed(2)}×L`},
     {label:'FS SATURADO',    sublabel:'Talud Infinito · NF=100%',      fs:fs_sat, note:'Escenario peor caso'},
   ];
-  if(fs_seis) fsData.push({label:'FS SÍSMICO',sublabel:'Análisis pseudoestático',fs:fs_seis,note:`kh=${kh_v.toFixed(2)}g`});
+  if(fs_seis) fsData.push({label:'FS SÍSMICO',sublabel:'Pseudoestático',fs:fs_seis,note:`kh=${kh_v.toFixed(2)}g`});
 
   const cW2=(W-M*2-4*(fsData.length-1))/fsData.length;
   fsData.forEach((fd,i)=>{
@@ -3680,7 +4083,8 @@ sliderIds.forEach(id => {
 });
 
 window.addEventListener('resize', () => { update(); drawEditor(); });
-update();
+// Init the default pane (editor) on load
+setTimeout(() => { initEditor(); drawEditor(); update(); }, 80);
 
 // ═══════════════════════════════════════════════════════
 //  EDITOR 2D — INTERACTIVE GEOMETRY ENGINE
@@ -4197,6 +4601,7 @@ function bishopOnProfile(R,Xc,Yc,n){
 function drawEditor(){
   const canvas=edCanvas();if(!canvas)return;
   const parent=canvas.parentElement;
+  if(parent.clientWidth<=0)return; // pane hidden
   canvas.width=Math.max(400,parent.clientWidth-26);canvas.height=Math.max(280,parent.clientHeight-116);
   const ctx=canvas.getContext('2d'),CW=canvas.width,CH=canvas.height;
   ctx.clearRect(0,0,CW,CH);
@@ -4516,10 +4921,17 @@ function clearLayerBoundary(){
   saveState();editorLayers[selectedLayerIdx].boundaryPts=[];afterEdit();
 }
 
-// ── INIT ON TAB OPEN ──────────────────────────────────────────
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{if(tab.dataset.tab==='editor')setTimeout(()=>{initEditor();drawEditor();},60);});
-});
+// ── INIT ON PANE OPEN — called by showPane() ──────────────────
+function onPaneVisible(paneId) {
+  if (paneId === 'editor') {
+    setTimeout(() => { initEditor(); drawEditor(); }, 60);
+  } else if (paneId === 'bishop') {
+    // Force full redraw — currentPane is already 'bishop' so drawBishop will run
+    setTimeout(() => { update(); }, 80);
+  } else {
+    setTimeout(() => { update(); }, 60);
+  }
+}
 
 
 // ══════════════════════════════════════════════════════════
