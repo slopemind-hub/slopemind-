@@ -372,8 +372,8 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 .tornado-title { font-family: var(--fm); font-size: 0.52rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
 .badge-janbu { background:rgba(74,143,255,0.12); border-color:rgba(74,143,255,0.4); color:#4a8fff; }
 .badge-crack { background:rgba(255,68,85,0.10); border-color:rgba(255,68,85,0.35); color:#ff6677; }
-#crack-row, #crack-water-row { display:none; }
-#crack-row.visible, #crack-water-row.visible { display:flex; }
+#crack-row, #crack-water-row, #load-row, #load-width-row { display:none; }
+#crack-row.visible, #crack-water-row.visible, #load-row.visible, #load-width-row.visible { display:flex; }
 .tornado-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
 .tornado-lbl { font-family: var(--fm); font-size: 0.58rem; color: var(--text2); min-width: 70px; text-align: right; }
 .tornado-bar-wrap { flex: 1; height: 12px; background: var(--surf2); border-radius: 2px; position: relative; overflow: hidden; }
@@ -964,6 +964,42 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
         <input class="num-input" id="kh_ni" type="number" value="0.1" min="0" max="0.4" step="0.01">
       </div>
 
+      <div class="sec-hd">CARGA EXTERIOR</div>
+      <div class="seismic-toggle" onclick="toggleLoad()">
+        <div class="toggle-track" id="load-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">ACTIVAR CARGA SOBRE CORONACIÓN</div>
+      </div>
+      <div class="inp-row seismic-row" id="load-row">
+        <div class="inp-label">
+          Sobrecarga q
+          <div class="info-btn">i
+            <div class="tooltip">
+              <div class="tooltip-title">Carga exterior distribuida</div>
+              <div class="tooltip-desc">Carga vertical distribuida sobre la coronación del talud: edificio, terraplén, maquinaria pesada, almacenamiento. Se añade como incremento de tensión normal en la superficie de rotura. EC7 §6.5.3 — cargas de uso.</div>
+              <div class="tooltip-range">Edificio residencial: <span>10–30 kN/m²</span><br>Edificio industrial: <span>30–80 kN/m²</span><br>Maquinaria / tren: <span>50–150 kN/m²</span></div>
+            </div>
+          </div>
+          <em>kN/m²</em>
+        </div>
+        <div class="slider-col"><input type="range" id="q_load" min="0" max="200" value="20" step="5"></div>
+        <input class="num-input" id="q_load_ni" type="number" value="20" min="0" max="200" step="5">
+      </div>
+      <div class="inp-row seismic-row" id="load-width-row">
+        <div class="inp-label">
+          Ancho carga b<sub>q</sub>
+          <div class="info-btn">i
+            <div class="tooltip">
+              <div class="tooltip-title">Ancho de la carga</div>
+              <div class="tooltip-desc">Extensión horizontal de la carga desde la coronación. Afecta qué dovelas de Bishop reciben la sobrecarga. Para cargas continuas (terraplén) usar ancho = longitud del talud.</div>
+              <div class="tooltip-range">Zapata corrida: <span>1–3 m</span><br>Forjado planta: <span>5–15 m</span><br>Terraplén continuo: <span>>20 m</span></div>
+            </div>
+          </div>
+          <em>metros</em>
+        </div>
+        <div class="slider-col"><input type="range" id="bq" min="1" max="50" value="10" step="1"></div>
+        <input class="num-input" id="bq_ni" type="number" value="10" min="1" max="50" step="1">
+      </div>
+
       <div class="sec-hd">GRIETA DE TRACCIÓN</div>
       <div class="seismic-toggle" onclick="toggleCrack()">
         <div class="toggle-track" id="crack-track"><div class="toggle-thumb"></div></div>
@@ -1547,6 +1583,19 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
               </div>
             </div>
           </div>
+          <div class="res-card" id="rcard-load" style="display:none">
+            <div class="res-card-lbl">FS CON CARGA EXTERIOR</div>
+            <div class="res-card-val" id="rv-load">—</div>
+            <div class="res-card-state" id="rs-load">—</div>
+            <div class="res-card-method" id="load-method-lbl">EC7 §6.5.3 · q=— kN/m²</div>
+            <div class="safety-bar-wrap">
+              <div class="safety-bar-label"><span>0</span><span>FS=1.0</span><span>FS=1.5</span><span>3.0</span></div>
+              <div class="safety-bar-track">
+                <div class="safety-bar-fill" id="sbar-load"></div>
+                <div class="safety-bar-target" style="left:50%"></div>
+              </div>
+            </div>
+          </div>
           <div class="res-card" id="rcard-sat">
             <div class="res-card-lbl">FS SATURADO (peor caso)</div>
             <div class="res-card-val" id="rv-sat">—</div>
@@ -1848,12 +1897,14 @@ canvas.sens-big { width: 100%; border-radius: 3px; background: #090d12; border: 
 </div><!-- end app-body -->
 
 <script>
+
 // ═══════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════
 const gw = 9.81;
 let seismicOn = false;
 let crackOn   = false;
+let loadOn    = false;
 let activeMethod = 'infinite';
 
 // ═══════════════════════════════════════════════════════
@@ -2060,6 +2111,18 @@ function fsColor(fs) {
 }
 function g(id)  { return document.getElementById(id); }
 function gv(id) { return parseFloat(g(id).value); }
+
+// ── PERFORMANCE: debounce heavy recalc, RAF for canvas ──
+let _updateTimer = null;
+let _activeTab   = 'results';
+function debouncedUpdate() {
+  clearTimeout(_updateTimer);
+  _updateTimer = setTimeout(update, 60); // 60ms debounce
+}
+function activeTab() {
+  const t = document.querySelector('.tab.active');
+  return t ? t.dataset.tab : 'results';
+}
 
 function setFSCard(valId, stId, cardId, gaugeId, fs, methodText) {
   const st = getState(fs);
@@ -2643,7 +2706,7 @@ function renderScenarios() {
     return `<tr><td>${f.lbl}</td>${cells}</tr>`;
   }).join('');
 }
-function updateSummaryTable(fs_det, fs_cons, fs_bish, fs_sat, c, phi, dc, dphi, fs_janbu) {
+function updateSummaryTable(fs_det, fs_cons, fs_bish, fs_sat, c, phi, dc, dphi, fs_janbu, fs_load) {
   const tbody = g('summary-tbody'); if (!tbody) return;
   const rows = [
     { method:'Talud Infinito Determinista', params:`c=${c}kPa, φ=${phi}°`, fs:fs_det },
@@ -2651,6 +2714,7 @@ function updateSummaryTable(fs_det, fs_cons, fs_bish, fs_sat, c, phi, dc, dphi, 
     { method:'Bishop Simplificado',         params:`Sup. circular · iterativo`, fs:fs_bish },
     { method:'Janbu Simplificado',          params:`Sup. no circular · f₀ correg.`, fs:fs_janbu||0 },
     { method:'Talud Saturado (peor caso)',  params:`NF=100%, c=${c}kPa, φ=${phi}°`, fs:fs_sat },
+    ...(fs_load ? [{ method:'Con Carga Exterior', params:`q=${loadOn?gv('q_load'):0} kN/m² · EC7 §6.5.3`, fs:fs_load }] : []),
   ];
   tbody.innerHTML = rows.map(r=>{
     const st = getState(r.fs);
@@ -2705,12 +2769,13 @@ function updateForcesTable(slices, phi_deg, fs_bish) {
 // ═══════════════════════════════════════════════════════
 //  SLIDER IDS
 // ═══════════════════════════════════════════════════════
-const sliderIds = ['H','beta','c','phi','gamma','nf','R','cx','cy','ndov','dc','dphi','kh','zc'];
+const sliderIds = ['H','beta','c','phi','gamma','nf','R','cx','cy','ndov','dc','dphi','kh','zc','q_load','bq'];
 
 // ═══════════════════════════════════════════════════════
 //  MAIN UPDATE
 // ═══════════════════════════════════════════════════════
 function update() {
+  const tab = activeTab();
   const H=gv('H'), beta=gv('beta'), c=gv('c'), phi=gv('phi');
   const gamma=gv('gamma'), nf=gv('nf'), R=gv('R'), cx_f=gv('cx'), cy_f=gv('cy');
   const ndov=gv('ndov'), dc=gv('dc'), dphi=gv('dphi');
@@ -2762,9 +2827,11 @@ function update() {
 
   // Draw canvases
   drawSlope(H,beta,nf,fs_det);
-  drawBishop(H,beta,nf,R,cx_f,cy_f,bishop.slices,fs_bish, exploredSurfaces);
+  if (tab === 'bishop' || tab === 'visualizacion') {
+    drawBishop(H,beta,nf,R,cx_f,cy_f,bishop.slices,fs_bish, exploredSurfaces);
+  }
 
-  // Sensitivity charts
+  // Sensitivity charts — only compute when tab is visible
   const betas=[15,20,25,30,35,40,45,50,55,60,65,70,75];
   const phis=[10,15,20,25,30,35,40,45];
   const nfs=[0,10,20,30,40,50,60,70,80,90,100];
@@ -2773,17 +2840,19 @@ function update() {
   const fsPhis=phis.map(p=>calcFS_inf(H,beta,c_c,p,gamma,nf));
   const fsNFs=nfs.map(n=>calcFS_inf(H,beta,c_c,p_c,gamma,n));
   const fsCs=cs.map(cv=>calcFS_inf(H,beta,cv,p_c,gamma,nf));
+  // Always draw the small charts in the visualization tab
   drawChart('ch-beta',betas,fsBetas,beta,'β');
   drawChart('ch-phi',phis,fsPhis,p_c,'φ');
   drawChart('ch-nf',nfs,fsNFs,nf,'NF');
   drawChart('ch-c',cs,fsCs,c_c,'c');
-  drawChart('sg-beta',betas,fsBetas,beta,'β');
-  drawChart('sg-phi',phis,fsPhis,p_c,'φ');
-  drawChart('sg-nf',nfs,fsNFs,nf,'NF');
-  drawChart('sg-c',cs,fsCs,c_c,'c');
-
-  // Tornado
-  updateTornado(H,beta,c,phi,gamma,nf,fs_det);
+  // Only draw big sensitivity charts if that tab is active
+  if (tab === 'sens') {
+    drawChart('sg-beta',betas,fsBetas,beta,'β');
+    drawChart('sg-phi',phis,fsPhis,p_c,'φ');
+    drawChart('sg-nf',nfs,fsNFs,nf,'NF');
+    drawChart('sg-c',cs,fsCs,c_c,'c');
+    updateTornado(H,beta,c,phi,gamma,nf,fs_det);
+  }
 
   // Critical values
   const crPhi=findCritPhi(H,beta,c,gamma,nf);
@@ -2824,13 +2893,24 @@ function update() {
     }
   }
 
+  // ── CARGA EXTERIOR ──
+  if (loadOn) {
+    const q_val  = gv('q_load');
+    const bq_val = gv('bq');
+    const loadRes = calcFSLoad(H, beta, c, phi, gamma, nf, q_val, bq_val);
+    setResCard('rv-load','rs-load','rcard-load','sbar-load', loadRes.fs);
+    const llbl = g('load-method-lbl');
+    if (llbl) llbl.textContent = `EC7 §6.5.3 · q=${q_val} kN/m² · bq=${bq_val}m`;
+  }
+
   // Results tab
   setResCard('rv-det','rs-det','rcard-det','sbar-det',fs_det);
   setResCard('rv-cons','rs-cons','rcard-cons','sbar-cons',fs_cons);
   setResCard('rv-bish','rs-bish','rcard-bish','sbar-bish',fs_bish);
   setResCard('rv-sat','rs-sat','rcard-sat','sbar-sat',fs_sat);
 
-  updateSummaryTable(fs_det,fs_cons,fs_bish,fs_sat,c,phi,dc,dphi,fs_janbu);
+  const fs_load = loadOn ? calcFSLoad(H,beta,c,phi,gamma,nf,gv('q_load'),gv('bq')).fs : null;
+  updateSummaryTable(fs_det,fs_cons,fs_bish,fs_sat,c,phi,dc,dphi,fs_janbu,fs_load);
   updateStabilization(H,beta,c,phi,gamma,nf,fs_det);
 
   // Recommendation
@@ -2881,6 +2961,40 @@ function toggleCrack() {
   g('crack-row').classList.toggle('visible', crackOn);
   g('crack-water-row').classList.toggle('visible', crackOn);
   g('rcard-crack').style.display = crackOn ? '' : 'none';
+  update();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CARGA EXTERIOR — Sobrecarga en coronación
+//  Ref: EC7 EN1997-1:2004 §6.5.3 · Bowles (1997) Foundation Analysis
+//  Method: sobrecarga q añade W_q = q·bq a dovelas afectadas (Bishop)
+//          En talud infinito: incremento de tensión normal σ_q = q·cos²β
+// ══════════════════════════════════════════════════════════════
+function calcFSLoad(H, beta_deg, c, phi_deg, gamma, nf_pct, q, bq) {
+  const beta  = beta_deg * Math.PI / 180;
+  const phi   = phi_deg  * Math.PI / 180;
+  const ru    = (nf_pct / 100) * 0.45;
+  // Extra normal stress from surcharge (distributed over slope surface)
+  const sigma_q  = q * Math.cos(beta) ** 2;     // normal component
+  const tau_q    = q * Math.sin(beta) * Math.cos(beta); // driving shear component
+  const sigma_n  = gamma * H * Math.cos(beta) ** 2 + sigma_q;
+  const u        = ru * (gamma * H + q);
+  const T_drive  = gamma * H * Math.sin(beta) * Math.cos(beta) + tau_q;
+  if (T_drive < 0.01) return { fs: 9.99 };
+  const fs = Math.max(0.01, Math.min(
+    (c + Math.max(0, sigma_n - u) * Math.tan(phi)) / T_drive,
+    9.99
+  ));
+  return { fs };
+}
+
+function toggleLoad() {
+  loadOn = !loadOn;
+  const track = g('load-track');
+  track.classList.toggle('on', loadOn);
+  g('load-row').classList.toggle('visible', loadOn);
+  g('load-width-row').classList.toggle('visible', loadOn);
+  g('rcard-load').style.display = loadOn ? '' : 'none';
   update();
 }
 
@@ -3553,14 +3667,14 @@ sliderIds.forEach(id => {
   const ni = g(id+'_ni');
   if (slider) slider.addEventListener('input', () => {
     if (ni) ni.value = slider.value;
-    update();
+    debouncedUpdate();
   });
   if (ni) ni.addEventListener('input', () => {
     const val = parseFloat(ni.value);
     const min = parseFloat(ni.min), max = parseFloat(ni.max);
     if (!isNaN(val) && val >= min && val <= max) {
       if (slider) slider.value = val;
-      update();
+      debouncedUpdate();
     }
   });
 });
@@ -4813,11 +4927,10 @@ function calcCrack(H, beta_deg, c, phi_deg, gamma, nf_pct, zc, waterFilled) {
 }
 
 // ── CRACK TOGGLE ──
-</script>
-</body>
-</html>
 
-<script>
+// ═══════════════════════════════════════════════════════
+//  FORECAST ENGINE (merged)
+// ═══════════════════════════════════════════════════════
 // ══════════════════════════════════════════════════════════════════
 //  SLOPEMIND FORECAST v2 — Multi-factor hydrometeorological model
 //
@@ -5631,6 +5744,7 @@ function mcDrawHistogram(fsArr, mean, std, pf, pmarg, N) {
     ctx.fillText('P(fallo)='+(pf*100).toFixed(2)+'%',ML+4,MT+12);
   }
 }
+
 
 
 
